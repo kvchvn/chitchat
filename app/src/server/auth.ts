@@ -5,7 +5,10 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
+import FacebookProvider from "next-auth/providers/facebook";
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import YandexProvider from "next-auth/providers/yandex";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -14,7 +17,7 @@ import {
   sessions,
   users,
   verificationTokens,
-} from "~/server/db/schema";
+} from "~/server/db/schema/auth";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -59,9 +62,21 @@ export const authOptions: NextAuthOptions = {
     verificationTokensTable: verificationTokens,
   }) as Adapter,
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    GoogleProvider({
+      clientId: env.GOOGLE_ID,
+      clientSecret: env.GOOGLE_SECRET,
+    }),
+    GithubProvider({
+      clientId: env.GITHUB_ID,
+      clientSecret: env.GITHUB_SECRET,
+    }),
+    YandexProvider({
+      clientId: env.YANDEX_ID,
+      clientSecret: env.YANDEX_SECRET,
+    }),
+    FacebookProvider({
+      clientId: env.FACEBOOK_ID,
+      clientSecret: env.FACEBOOK_SECRET,
     }),
     /**
      * ...add more providers here.
