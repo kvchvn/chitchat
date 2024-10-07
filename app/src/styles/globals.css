@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+
+  h1 {
+    @apply text-2xl font-semibold;
+  }
+}
+
+html {
+  height: 100dvh;
+  overflow-y: hidden;
+}
