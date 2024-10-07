@@ -8,6 +8,7 @@ export default async function Home() {
 
   return (
     <HydrateClient>
+      <button>Toggle Theme</button>
       <p>Messages:</p>
       {messages.length ? (
         <ul>
