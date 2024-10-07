@@ -1,0 +1,13 @@
+import { type Config } from "drizzle-kit";
+
+import { env } from "~/env";
+
+export default {
+  schema: "./src/server/db/schema/*",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: env.DATABASE_URL,
+  },
+  tablesFilter: ["chitchat-v2_*"],
+  out: "./drizzle/migrations",
+} satisfies Config;
