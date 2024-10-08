@@ -2,6 +2,7 @@
 
 import { cva } from 'class-variance-authority';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { cn } from '~/lib/utils';
@@ -19,11 +20,20 @@ const iconVariants = cva('absolute transition-transform duration-500 scale-30', 
 });
 
 export const ThemeToggler = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
   const handleClick = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Button size="icon" onClick={handleClick} className="absolute bottom-4 right-4 overflow-hidden">
