@@ -1,7 +1,7 @@
 'use client';
 
-import { signIn, type getProviders } from 'next-auth/react';
-import { Button } from '~/components/ui/button';
+import { type getProviders } from 'next-auth/react';
+import { Provider } from './provider';
 
 type Props = {
   providers: NonNullable<Awaited<ReturnType<typeof getProviders>>>;
@@ -9,18 +9,13 @@ type Props = {
 
 export const Providers = ({ providers }: Props) => {
   return (
-    <ul className="flex w-full flex-col items-stretch gap-4">
+    <ul className="xs:max-w-full flex w-full max-w-[300px] flex-col items-stretch gap-4">
       {Object.values(providers).map((provider) => (
         <li key={provider.id}>
-          <Button
-            variant="transparent"
-            size="lg"
-            fullwidth
-            className="hover: bg-[#4285f4] text-text-dark"
-            onClick={() => signIn(provider.id)}
-          >
-            Sign In with {provider.name}
-          </Button>
+          <Provider
+            id={provider.id as React.ComponentProps<typeof Provider>['id']}
+            name={provider.name}
+          />
         </li>
       ))}
     </ul>
