@@ -7,12 +7,17 @@
     --radius: 0.5rem;
   }
 
+  html {
+    @apply h-dvh overflow-y-hidden text-sm text-text-light dark:text-text-dark sm:text-base;
+  }
+
   h1 {
     @apply text-2xl font-semibold;
   }
 }
 
-html {
-  height: 100dvh;
-  overflow-y: hidden;
+@layer utilities {
+  .link {
+    @apply text-highlight-light hover:text-highlight-hover-light active:text-highlight-active-light dark:text-highlight-dark dark:hover:text-highlight-hover-dark dark:active:text-highlight-active-dark;
+  }
 }
