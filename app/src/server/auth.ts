@@ -47,9 +47,9 @@ export const authOptions: NextAuthOptions = {
     }),
   },
   pages: {
-    signIn: '/sign-in',
-    error: '/sign-in/error',
-    newUser: '/sign-in/welcome',
+    signIn: ROUTES.signIn,
+    error: ROUTES.signInError,
+    newUser: ROUTES.signInWelcome,
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
