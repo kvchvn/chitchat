@@ -160,6 +160,9 @@ export default {
       scale: {
         '30': '0.3',
       },
+      zIndex: {
+        '2': '2',
+      },
     },
   },
   plugins: [tailwindcssAnimate],
