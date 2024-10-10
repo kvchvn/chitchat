@@ -3,7 +3,6 @@ import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { ROUTES } from '~/constants/routes';
 
-export default function SignInWelcomePage() {
   return (
     <>
       <h2>Welcome!</h2>
@@ -14,7 +13,7 @@ export default function SignInWelcomePage() {
           chitchat.app.2024@gmail.com
         </Link>
       </div>
-      <div className="xs:mt-4 mt-8 flex gap-3">
+      <div className="mt-8 flex gap-3 xs:mt-4">
         <Button variant="secondary" asChild>
           <Link href={ROUTES.profile}>
             <Icon scope="global" id="person" />
