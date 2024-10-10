@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { type AdapterAccount } from 'next-auth/adapters';
 import { createTable } from '../table-creator';
 
@@ -22,6 +22,7 @@ export const users = createTable('user', {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar('image', { length: 255 }),
+  isNewUser: boolean('is_new_user').default(true),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

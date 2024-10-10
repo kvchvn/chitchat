@@ -4,6 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { signIn } from 'next-auth/react';
 import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
+import { ROUTES } from '~/constants/routes';
 import { cn } from '~/lib/utils';
 
 const providerVariants = cva(
@@ -33,7 +34,7 @@ type Props = Required<Pick<ProviderVariants, 'id'>> & {
 export const Provider = ({ id, name }: Props) => {
   const handleClick = async () => {
     if (id) {
-      await signIn(id);
+      await signIn(id, { callbackUrl: ROUTES.signInWelcome });
     }
   };
 
