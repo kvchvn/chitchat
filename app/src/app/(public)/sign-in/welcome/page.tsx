@@ -2,6 +2,15 @@ import Link from 'next/link';
 import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { ROUTES } from '~/constants/routes';
+import { getServerAuthSession } from '~/server/auth';
+import { api } from '~/trpc/server';
+
+export default async function SignInWelcomePage() {
+  const session = await getServerAuthSession();
+
+  if (session) {
+    await api.user.makeAsNotNew({ id: session.user.id });
+  }
 
   return (
     <>
