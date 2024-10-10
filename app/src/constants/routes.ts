@@ -1,7 +1,9 @@
+export const SIGN_IN_ROUTE_BASE = '/sign-in';
+
 export const ROUTES = {
-  signIn: '/sign-in',
-  signInWelcome: '/sign-in/welcome',
-  signInError: '/sign-in/error',
+  signIn: SIGN_IN_ROUTE_BASE,
+  signInWelcome: `${SIGN_IN_ROUTE_BASE}/welcome`,
+  signInError: `${SIGN_IN_ROUTE_BASE}/error`,
   profile: '/profile',
-  chats: '/chats',
+  chats: '/',
 } as const;
