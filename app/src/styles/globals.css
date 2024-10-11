@@ -8,7 +8,11 @@
   }
 
   html {
-    @apply h-dvh overflow-y-hidden text-sm text-text-light dark:text-text-dark sm:text-base;
+    @apply h-dvh overflow-y-hidden text-sm sm:text-base;
+  }
+
+  html > * {
+    @apply text-text-light dark:text-text-dark;
   }
 
   h1,

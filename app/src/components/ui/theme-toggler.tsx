@@ -19,7 +19,11 @@ const iconVariants = cva('absolute transition-transform duration-500 scale-30', 
   },
 });
 
-export const ThemeToggler = () => {
+type Props = {
+  className?: string;
+};
+
+export const ThemeToggler = ({ className }: Props) => {
   const [isMounted, setIsMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -29,14 +33,14 @@ export const ThemeToggler = () => {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+  }, [isMounted]);
 
   if (!isMounted) {
     return null;
   }
 
   return (
-    <Button size="icon" onClick={handleClick} className="absolute bottom-4 right-4 overflow-hidden">
+    <Button size="icon" onClick={handleClick} className={cn('relative overflow-hidden', className)}>
       <Icon
         scope="global"
         id="sun"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeToggler } from './_components/theme-toggler';
+import { ThemeToggler } from '~/components/ui/theme-toggler';
 import { WelcomeConfetti } from './_components/welcome-confetti';
 
 export default function SignInLayout({ children }: React.PropsWithChildren) {
@@ -9,7 +9,7 @@ export default function SignInLayout({ children }: React.PropsWithChildren) {
         {children}
       </section>
       <WelcomeConfetti />
-      <ThemeToggler />
+      <ThemeToggler className="absolute bottom-4 right-4" />
     </main>
   );
 }
