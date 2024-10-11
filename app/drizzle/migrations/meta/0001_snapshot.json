@@ -1,6 +1,6 @@
 {
-  "id": "1634be36-a05a-41fe-bf15-86065dd509d6",
-  "prevId": "7fabbfc1-1916-4502-a7a3-d51d7b83c1cd",
+  "id": "1786b8c8-7d0c-4739-b9f3-37aef24c691e",
+  "prevId": "52c2877f-e490-43e4-a4aa-c7b521b6db5d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -210,6 +210,13 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "is_new_user": {
+          "name": "is_new_user",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
         }
       },
       "indexes": {},

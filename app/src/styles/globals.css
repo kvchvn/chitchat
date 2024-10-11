@@ -7,12 +7,54 @@
     --radius: 0.5rem;
   }
 
+  html {
+    @apply h-dvh overflow-y-hidden text-sm sm:text-base;
+  }
+
+  html > * {
+    @apply text-text-light dark:text-text-dark;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-title font-semibold;
+  }
+
   h1 {
-    @apply text-2xl font-semibold;
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  h4 {
+    @apply text-base;
+  }
+
+  h5 {
+    @apply text-sm;
+  }
+
+  h6 {
+    @apply text-xs;
   }
 }
 
-html {
-  height: 100dvh;
-  overflow-y: hidden;
+@layer utilities {
+  .link {
+    @apply inline-block text-highlight-light hover:text-highlight-hover-light active:text-highlight-active-light dark:text-highlight-dark dark:hover:text-highlight-hover-dark dark:active:text-highlight-active-dark;
+  }
+
+  .text-subtitle {
+    @apply text-lg font-medium;
+  }
 }

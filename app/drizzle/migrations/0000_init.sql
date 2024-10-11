@@ -13,14 +13,6 @@ CREATE TABLE IF NOT EXISTS "chitchat-v2_account" (
 	CONSTRAINT "chitchat-v2_account_provider_provider_account_id_pk" PRIMARY KEY("provider","provider_account_id")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "chitchat-v2_post" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(256),
-	"created_by" varchar(255) NOT NULL,
-	"created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updated_at" timestamp with time zone
-);
---> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "chitchat-v2_session" (
 	"session_token" varchar(255) PRIMARY KEY NOT NULL,
 	"user_id" varchar(255) NOT NULL,
@@ -42,14 +34,13 @@ CREATE TABLE IF NOT EXISTS "chitchat-v2_verification_token" (
 	CONSTRAINT "chitchat-v2_verification_token_identifier_token_pk" PRIMARY KEY("identifier","token")
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "chitchat-v2_account" ADD CONSTRAINT "chitchat-v2_account_user_id_chitchat-v2_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."chitchat-v2_user"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+CREATE TABLE IF NOT EXISTS "chitchat-v2_message" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"text" varchar(256) NOT NULL
+);
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "chitchat-v2_post" ADD CONSTRAINT "chitchat-v2_post_created_by_chitchat-v2_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."chitchat-v2_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "chitchat-v2_account" ADD CONSTRAINT "chitchat-v2_account_user_id_chitchat-v2_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."chitchat-v2_user"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -61,6 +52,4 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "account_user_id_idx" ON "chitchat-v2_account" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "created_by_idx" ON "chitchat-v2_post" USING btree ("created_by");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "name_idx" ON "chitchat-v2_post" USING btree ("name");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "session_user_id_idx" ON "chitchat-v2_session" USING btree ("user_id");

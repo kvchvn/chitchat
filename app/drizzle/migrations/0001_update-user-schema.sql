@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_user" ADD COLUMN "is_new_user" boolean DEFAULT true;

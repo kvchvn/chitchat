@@ -5,6 +5,7 @@ import FacebookProvider from 'next-auth/providers/facebook';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import YandexProvider from 'next-auth/providers/yandex';
+import { ROUTES } from '~/constants/routes';
 
 import { env } from '~/env';
 import { db } from '~/server/db';
@@ -20,15 +21,13 @@ declare module 'next-auth' {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      isNewUser: boolean;
     } & DefaultSession['user'];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    isNewUser: boolean;
+  }
 }
 
 /**
@@ -43,13 +42,20 @@ export const authOptions: NextAuthOptions = {
       user: {
         ...session.user,
         id: user.id,
+        isNewUser: user.isNewUser,
       },
     }),
   },
   pages: {
-    signIn: '/sign-in',
-    error: '/sign-in/error',
-    newUser: '/sign-in/welcome',
+    signIn: ROUTES.signIn,
+    error: ROUTES.signInError,
+    newUser: ROUTES.signInWelcome,
+  },
+  session: {
+    // 12 hours
+    maxAge: 12 * 60 * 60,
+    // 1 hour
+    updateAge: 60 * 60,
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
