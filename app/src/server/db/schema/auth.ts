@@ -2,6 +2,7 @@ import { relations, sql } from 'drizzle-orm';
 import { boolean, index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { type AdapterAccount } from 'next-auth/adapters';
 import { createTable } from '../table-creator';
+import { friendRequests, friends } from './friends';
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -16,7 +17,7 @@ export const users = createTable('user', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar('name', { length: 255 }),
-  email: varchar('email', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   emailVerified: timestamp('email_verified', {
     mode: 'date',
     withTimezone: true,
@@ -24,10 +25,6 @@ export const users = createTable('user', {
   image: varchar('image', { length: 255 }),
   isNewUser: boolean('is_new_user').default(true),
 });
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
 
 export const accounts = createTable(
   'account',
@@ -56,10 +53,6 @@ export const accounts = createTable(
   })
 );
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
-
 export const sessions = createTable(
   'session',
   {
@@ -77,10 +70,6 @@ export const sessions = createTable(
   })
 );
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}));
-
 export const verificationTokens = createTable(
   'verification_token',
   {
@@ -95,3 +84,21 @@ export const verificationTokens = createTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   })
 );
+
+// RELATIONS
+
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
+  sentRequests: many(friendRequests, { relationName: 'sent_requests' }),
+  receivedRequests: many(friendRequests, { relationName: 'received_requests' }),
+  friends1: many(friends, { relationName: 'friends_1' }),
+  friends2: many(friends, { relationName: 'friends_2' }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, { fields: [accounts.userId], references: [users.id] }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));

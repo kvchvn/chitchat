@@ -1,5 +1,5 @@
 {
-  "id": "52c2877f-e490-43e4-a4aa-c7b521b6db5d",
+  "id": "0273b4ee-3300-4dda-9afd-84e14e90015d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -210,12 +210,27 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "is_new_user": {
+          "name": "is_new_user",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "chitchat-v2_user_email_unique": {
+          "name": "chitchat-v2_user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
     },
     "public.chitchat-v2_verification_token": {
       "name": "chitchat-v2_verification_token",
@@ -253,6 +268,123 @@
       },
       "uniqueConstraints": {}
     },
+    "public.chitchat-v2_friend_requests": {
+      "name": "chitchat-v2_friend_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receiver_id": {
+          "name": "receiver_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chitchat-v2_friend_requests_sender_id_chitchat-v2_user_id_fk": {
+          "name": "chitchat-v2_friend_requests_sender_id_chitchat-v2_user_id_fk",
+          "tableFrom": "chitchat-v2_friend_requests",
+          "tableTo": "chitchat-v2_user",
+          "columnsFrom": [
+            "sender_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "chitchat-v2_friend_requests_receiver_id_chitchat-v2_user_id_fk": {
+          "name": "chitchat-v2_friend_requests_receiver_id_chitchat-v2_user_id_fk",
+          "tableFrom": "chitchat-v2_friend_requests",
+          "tableTo": "chitchat-v2_user",
+          "columnsFrom": [
+            "receiver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chitchat-v2_friends": {
+      "name": "chitchat-v2_friends",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_1": {
+          "name": "user_1",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_2": {
+          "name": "user_2",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chitchat-v2_friends_user_1_chitchat-v2_user_id_fk": {
+          "name": "chitchat-v2_friends_user_1_chitchat-v2_user_id_fk",
+          "tableFrom": "chitchat-v2_friends",
+          "tableTo": "chitchat-v2_user",
+          "columnsFrom": [
+            "user_1"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "chitchat-v2_friends_user_2_chitchat-v2_user_id_fk": {
+          "name": "chitchat-v2_friends_user_2_chitchat-v2_user_id_fk",
+          "tableFrom": "chitchat-v2_friends",
+          "tableTo": "chitchat-v2_user",
+          "columnsFrom": [
+            "user_2"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.chitchat-v2_message": {
       "name": "chitchat-v2_message",
       "schema": "",
@@ -276,7 +408,17 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "accepted",
+        "rejected"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "_meta": {
