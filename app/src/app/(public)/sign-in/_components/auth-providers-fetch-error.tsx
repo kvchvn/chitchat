@@ -3,7 +3,7 @@
 import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 
-export const ProvidersFetchError = () => {
+export const AuthProvidersFetchError = () => {
   const handleClick = () => {
     window.location.reload();
   };

@@ -31,9 +31,14 @@ type Props = Required<Pick<ProviderVariants, 'id'>> & {
   name: string;
 };
 
-export const Provider = ({ id, name }: Props) => {
+export const AuthProvider = ({ id, name }: Props) => {
   const handleClick = async () => {
+    // TODO: add error-toast
     if (id) {
+      /**
+       * if the user signs in not for the first time
+       * he/she will be redirected to main page (from layout.tsx)
+       */
       await signIn(id, { callbackUrl: ROUTES.signInWelcome });
     }
   };
