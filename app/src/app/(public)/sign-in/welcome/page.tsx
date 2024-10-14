@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { ROUTES } from '~/constants/routes';
@@ -10,6 +11,8 @@ export default async function SignInWelcomePage() {
 
   if (session) {
     await api.user.makeAsNotNew({ id: session.user.id });
+  } else {
+    redirect(ROUTES.signIn);
   }
 
   return (
