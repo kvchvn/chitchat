@@ -15,16 +15,16 @@ export const Header = async () => {
   return (
     <header className="flex items-center gap-2 py-2">
       <div className="ml-auto flex items-center gap-2">
-        <ThemeToggler className="h-8 w-8" />
+        <ThemeToggler className="h-8 w-8 rounded-full" />
         <div className="flex items-center gap-1">
-          <Avatar className="rounded-md">
+          <Avatar>
             <AvatarImage
               src={session.user.image ?? undefined}
               alt={session.user.name ?? "user's avatar"}
             />
-            <AvatarFallback>{nameInitials}</AvatarFallback>
+            <AvatarFallback className="text-sm">{nameInitials}</AvatarFallback>
           </Avatar>
-          <span className="text-sm">{session.user.name ?? 'nice person'}</span>
+          {/* <span className="text-sm">{session.user.name ?? 'nice person'}</span> */}
         </div>
       </div>
     </header>
