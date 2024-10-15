@@ -5,7 +5,7 @@ import { cn } from '~/lib/utils';
  * id - symbol's id
  */
 type Props = {
-  scope: 'auth' | 'global';
+  scope: 'auth' | 'global' | 'friends';
   id: string;
   className?: string;
 };
