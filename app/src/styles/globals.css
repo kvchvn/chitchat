@@ -54,6 +54,10 @@
     @apply inline-block text-highlight-light hover:text-highlight-hover-light active:text-highlight-active-light dark:text-highlight-dark dark:hover:text-highlight-hover-dark dark:active:text-highlight-active-dark;
   }
 
+  .link-ghost {
+    @apply inline-block border-b border-b-transparent hover:border-b-current active:text-highlight-light dark:active:text-highlight-dark;
+  }
+
   .text-subtitle {
     @apply text-lg font-medium;
   }

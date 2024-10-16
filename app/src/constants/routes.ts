@@ -6,4 +6,5 @@ export const ROUTES = {
   signInError: `${SIGN_IN_ROUTE_BASE}/error`,
   profile: '/profile',
   chats: '/',
+  friends: '/friends',
 } as const;
