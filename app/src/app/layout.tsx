@@ -3,7 +3,7 @@ import '~/styles/globals.css';
 import { type Metadata } from 'next';
 
 import { ThemeProvider } from 'next-themes';
-import { inter, jetBransMono, poppins } from '~/styles/font';
+import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
