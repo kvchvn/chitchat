@@ -36,7 +36,7 @@ export const ThemeToggler = ({ className }: Props) => {
   }, [isMounted]);
 
   if (!isMounted) {
-    return null;
+    return <Button size="icon" className={cn('', className)}></Button>;
   }
 
   return (
