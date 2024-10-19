@@ -7,4 +7,5 @@ export const ROUTES = {
   profile: '/profile',
   chats: '/',
   friends: '/friends',
+  allFriends: '/friends/all',
 } as const;
