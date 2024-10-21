@@ -8,8 +8,12 @@ import YandexProvider from 'next-auth/providers/yandex';
 import { ROUTES } from '~/constants/routes';
 
 import { env } from '~/env';
+import { logger } from '~/lib/logger';
 import { db } from '~/server/db';
 import { accounts, sessions, users, verificationTokens } from '~/server/db/schema/auth';
+import { api } from '~/trpc/server';
+
+const log = logger.child({ module: 'auth.ts' });
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -45,6 +49,17 @@ export const authOptions: NextAuthOptions = {
         isNewUser: user.isNewUser,
       },
     }),
+    async signIn({ user }) {
+      try {
+        // because next-auth doesn't do it for you
+        const expiredSessions = await api.user.removeExpiredSessions({ id: user.id });
+        log.info({ expiredSessions }, `${expiredSessions.length} sessions were cleared`);
+      } catch (err) {
+        log.error(err);
+      }
+
+      return true;
+    },
   },
   pages: {
     signIn: ROUTES.signIn,
