@@ -55,7 +55,7 @@
   }
 
   .link-ghost {
-    @apply inline-block border-b border-b-transparent hover:border-b-current active:text-highlight-light dark:active:text-highlight-dark;
+    @apply inline-block hover:underline active:text-highlight-light dark:active:text-highlight-dark;
   }
 
   .text-subtitle {
