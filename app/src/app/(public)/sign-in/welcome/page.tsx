@@ -10,7 +10,9 @@ export default async function SignInWelcomePage() {
   const session = await getServerAuthSession();
 
   if (session) {
-    await api.user.makeAsNotNew({ id: session.user.id });
+    if (session.user.isNewUser) {
+      await api.user.makeAsNotNew({ id: session.user.id });
+    }
   } else {
     redirect(ROUTES.signIn);
   }
