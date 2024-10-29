@@ -1,49 +1,89 @@
 import { type User } from 'next-auth';
+import { NoUsersContainer } from '~/app/(protected)/_components/no-users-container';
 import { UserItem } from '~/app/(protected)/_components/user-item';
+import { UsersContainer } from '~/app/(protected)/_components/users-container';
 import { UsersList } from '~/app/(protected)/_components/users-list';
-import { EmptyBox } from '~/components/ui/empty-box';
+import { UsersPagination } from '~/app/(protected)/_components/users-pagination';
+import { getUsersSlice } from '~/lib/utils';
 import { AddFriendsProposal } from './add-friends-proposal';
 import { FriendAction } from './friend-action';
 import { FriendsSearch } from './friends-search';
 
 const friends: Pick<User, 'id' | 'name' | 'image'>[] = [
-  {
-    id: '1',
-    name: 'Name Surname',
-    image: undefined,
-  },
+  // {
+  //   id: '1',
+  //   name: 'Name Surname 1',
+  //   image: undefined,
+  // },
+  // {
+  //   id: '2',
+  //   name: 'Name Surname 2',
+  //   image: undefined,
+  // },
+  // {
+  //   id: '3',
+  //   name: 'Name Surname 3',
+  //   image: undefined,
+  // },
+  // {
+  //   id: '4',
+  //   name: 'Name Surname 4',
+  //   image: undefined,
+  // },
+  // {
+  //   id: '5',
+  //   name: 'Name Surname 5',
+  //   image: undefined,
+  // },
+  // {
+  //   id: '6',
+  //   name: 'Name Surname 6',
+  //   image: undefined,
+  // },
 ];
 
-const MIN_FRIENDS = 5;
+const FRIENDS_LIMIT = 5;
+// temporary
+const PAGE = 1;
 
 export const FriendsList = () => {
   if (!friends.length) {
     return (
-      <div className="my-auto flex flex-col gap-2 self-center text-center text-xs text-slate-500 dark:text-slate-400">
-        <EmptyBox size="lg" className="opacity-50" />
+      <NoUsersContainer>
         <p>You don&apos;t have friends here.</p>
         <AddFriendsProposal />
-      </div>
+      </NoUsersContainer>
     );
   }
+
+  const moreThanLimit = friends.length > FRIENDS_LIMIT;
+  const friendsSlice = getUsersSlice({ users: friends, page: PAGE, perPage: FRIENDS_LIMIT - 1 });
+
+  /**
+   * 1) friends = 0 -> show placeholder
+   * 2) friends <= 5 -> show all of them
+   * 3) friends > 5 -> show 4 + pagination (to avoid layout shift, the height is equal to UserItem's height)
+   */
 
   return (
     <>
       <FriendsSearch />
-      <div className="flex flex-col gap-4 self-stretch">
+      <UsersContainer>
         <UsersList>
-          {friends.map((friend) => (
+          {/* TODO: make slices on the backend */}
+          {friendsSlice.map((friend) => (
             <UserItem key={friend.id} id={friend.id} image={friend.image} name={friend.name}>
               <FriendAction id={friend.id} />
             </UserItem>
           ))}
         </UsersList>
-        {friends.length < MIN_FRIENDS && (
-          <div className="mt-6 self-center">
+        {friends.length < FRIENDS_LIMIT && (
+          <div className="mt-auto self-center pt-6">
             <AddFriendsProposal />
           </div>
         )}
-      </div>
+        {moreThanLimit && <UsersPagination />}
+      </UsersContainer>
     </>
   );
 };
