@@ -11,7 +11,7 @@ enum TabsValue {
 
 export default function FriendRequests() {
   return (
-    <section className="flex flex-col items-start gap-6 rounded-xl border border-slate-200 p-4">
+    <section className="flex h-[434px] flex-col items-start gap-6 rounded-xl border border-slate-200 p-4">
       <Link href={ROUTES.allFriends} className="link-ghost">
         <h2 className="font-title">Friend Requests</h2>
       </Link>
