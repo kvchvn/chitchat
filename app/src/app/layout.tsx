@@ -18,7 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
       className={`${inter.variable} ${jetBransMono.variable} ${poppins.variable}`}
     >
-      <body>
+      <body className="flex min-h-dvh flex-col items-stretch">
         <TRPCReactProvider>
           <ThemeProvider attribute="class">{children}</ThemeProvider>
         </TRPCReactProvider>

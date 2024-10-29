@@ -14,7 +14,7 @@ export default async function ProtectedLayout({ children }: React.PropsWithChild
   return (
     <>
       <Header />
-      <main className="bg-background-light py-6 dark:bg-background-dark">{children}</main>
+      <main className="grow bg-background-light py-6 dark:bg-background-dark">{children}</main>
       <footer></footer>
     </>
   );
