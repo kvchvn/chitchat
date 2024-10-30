@@ -1,5 +1,10 @@
 import React from 'react';
+import { cn } from '~/lib/utils';
 
-export const UsersList = ({ children }: React.PropsWithChildren) => {
-  return <ul className="flex flex-col gap-3">{children}</ul>;
+type Props = React.PropsWithChildren & {
+  className?: string;
+};
+
+export const UsersList = ({ children, className }: Props) => {
+  return <ul className={cn('flex flex-col gap-3', className)}>{children}</ul>;
 };

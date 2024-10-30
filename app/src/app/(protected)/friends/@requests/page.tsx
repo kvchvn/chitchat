@@ -26,7 +26,7 @@ export default function FriendRequests() {
         <TabsContent value={TabsValue.Incoming} className="h-full">
           <IncomingRequestsList />
         </TabsContent>
-        <TabsContent value={TabsValue.Outcoming}>
+        <TabsContent value={TabsValue.Outcoming} className="h-full">
           <OutcomingRequestsList />
         </TabsContent>
       </Tabs>

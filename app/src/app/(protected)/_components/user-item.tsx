@@ -23,10 +23,7 @@ export const UserItem = ({ id, name, image, online, children }: Props) => {
         </Link>
       </Avatar>
       <div className="flex flex-col gap-1">
-        <Link
-          href={`/${id}`}
-          className="text-sm hover:text-highlight-light dark:hover:text-highlight-dark"
-        >
+        <Link href={`/${id}`} className="link-ghost text-sm">
           {name}
         </Link>
         {typeof online === 'boolean' && <Badge>{online ? 'online' : 'offline'}</Badge>}

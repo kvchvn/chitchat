@@ -9,7 +9,7 @@ import {
 
 export const UsersPagination = () => {
   return (
-    <Pagination className="py-1">
+    <Pagination className="mt-auto py-1">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious href="#" />
