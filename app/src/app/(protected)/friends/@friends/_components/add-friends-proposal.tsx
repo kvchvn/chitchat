@@ -5,7 +5,7 @@ export const AddFriendsProposal = () => {
   return (
     <p className="text-xs">
       To add new friends see{' '}
-      <Link href={ROUTES.allFriends} className="link">
+      <Link href={ROUTES.allUsers} className="link">
         all users list
       </Link>{' '}
       or invite your friends
