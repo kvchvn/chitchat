@@ -8,4 +8,5 @@ export const ROUTES = {
   chats: '/',
   friends: '/friends',
   allFriends: '/friends/all',
+  allUsers: '/users',
 } as const;
