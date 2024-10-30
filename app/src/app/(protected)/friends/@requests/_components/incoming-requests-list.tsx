@@ -49,7 +49,6 @@ export const IncomingRequestsList = () => {
     return (
       <NoUsersContainer>
         <p>You don&apos;t have incoming friend requests.</p>
-        <p>Propose someone to be your friend and have your common chat.</p>
       </NoUsersContainer>
     );
   }
