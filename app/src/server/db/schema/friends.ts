@@ -22,10 +22,10 @@ export const friends = createTable('friends', {
   id: varchar('id', { length: 255 })
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  user1: varchar('user_1', { length: 255 })
+  user1Id: varchar('user_1_id', { length: 255 })
     .notNull()
     .references(() => users.id),
-  user2: varchar('user_2', { length: 255 })
+  user2Id: varchar('user_2_id', { length: 255 })
     .notNull()
     .references(() => users.id),
 });
@@ -47,12 +47,12 @@ export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
 
 export const friendsRelations = relations(friends, ({ one }) => ({
   user1: one(users, {
-    fields: [friends.user1],
+    fields: [friends.user1Id],
     references: [users.id],
     relationName: 'friends_1',
   }),
   user2: one(users, {
-    fields: [friends.user2],
+    fields: [friends.user2Id],
     references: [users.id],
     relationName: 'friends_2',
   }),
