@@ -1,23 +1,16 @@
-import { api, HydrateClient } from '~/trpc/server';
-import { Form } from './_components/form';
+import Link from 'next/link';
+import { ROUTES } from '~/constants/routes';
+import { getServerAuthSession } from '~/server/auth';
+import { HydrateClient } from '~/trpc/server';
 
 export default async function Home() {
-  const messages = await api.message.getAll();
+  const session = (await getServerAuthSession())!;
 
   return (
     <HydrateClient>
-      <button>Toggle Theme</button>
-      <p>Messages:</p>
-      {messages.length ? (
-        <ul>
-          {messages.map((message) => (
-            <li key={message.id}>{`${message.id}: ${message.text}`}</li>
-          ))}
-        </ul>
-      ) : (
-        <span>No messages</span>
-      )}
-      <Form />
+      <Link href={ROUTES.friends} className="link">
+        see friends
+      </Link>
     </HydrateClient>
   );
 }
