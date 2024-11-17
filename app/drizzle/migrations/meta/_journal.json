@@ -15,6 +15,13 @@
       "when": 1730551177892,
       "tag": "0001_uneven_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1731268075516,
+      "tag": "0002_simple_stranger",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,8 @@
 import { relations, sql } from 'drizzle-orm';
 import { boolean, index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { type AdapterAccount } from 'next-auth/adapters';
-import { createTable } from '../table-creator';
-import { friendRequests, friends } from './friends';
+import { friendRequests, friends } from '~/server/db/schema/friends';
+import { createTable } from '~/server/db/table-creator';
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -91,8 +91,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sentRequests: many(friendRequests, { relationName: 'sent_requests' }),
   receivedRequests: many(friendRequests, { relationName: 'received_requests' }),
-  friends1: many(friends, { relationName: 'friends_1' }),
-  friends2: many(friends, { relationName: 'friends_2' }),
+  friends: many(friends, { relationName: 'friends' }),
+  friendOf: many(friends, { relationName: 'friend_of' }),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({

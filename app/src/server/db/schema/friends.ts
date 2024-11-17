@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgEnum, varchar } from 'drizzle-orm/pg-core';
-import { createTable } from '../table-creator';
-import { users } from './auth';
+import { createTable } from '~/server/db/table-creator';
+import { users } from '~/server/db/schema/auth';
 
 export const statusEnum = pgEnum('status', ['pending', 'accepted', 'rejected']);
 
@@ -22,10 +22,10 @@ export const friends = createTable('friends', {
   id: varchar('id', { length: 255 })
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  user1Id: varchar('user_1_id', { length: 255 })
+  userId: varchar('user_id', { length: 255 })
     .notNull()
     .references(() => users.id),
-  user2Id: varchar('user_2_id', { length: 255 })
+  friendId: varchar('friend_id', { length: 255 })
     .notNull()
     .references(() => users.id),
 });
@@ -46,14 +46,14 @@ export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
 }));
 
 export const friendsRelations = relations(friends, ({ one }) => ({
-  user1: one(users, {
-    fields: [friends.user1Id],
+  userId: one(users, {
+    fields: [friends.userId],
     references: [users.id],
-    relationName: 'friends_1',
+    relationName: 'friends',
   }),
-  user2: one(users, {
-    fields: [friends.user2Id],
+  friendId: one(users, {
+    fields: [friends.friendId],
     references: [users.id],
-    relationName: 'friends_2',
+    relationName: 'friend_of',
   }),
 }));
