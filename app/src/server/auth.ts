@@ -1,4 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { and, eq, lt } from 'drizzle-orm';
 import { getServerSession, type DefaultSession, type NextAuthOptions } from 'next-auth';
 import { type Adapter } from 'next-auth/adapters';
 import FacebookProvider from 'next-auth/providers/facebook';
@@ -11,7 +12,6 @@ import { env } from '~/env';
 import { logger } from '~/lib/logger';
 import { db } from '~/server/db';
 import { accounts, sessions, users, verificationTokens } from '~/server/db/schema/auth';
-import { api } from '~/trpc/server';
 
 const log = logger.child({ module: 'auth.ts' });
 
@@ -52,7 +52,10 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user }) {
       try {
         // because next-auth doesn't do it for you
-        const expiredSessions = await api.user.removeExpiredSessions({ id: user.id });
+        const expiredSessions = await db
+          .delete(sessions)
+          .where(and(eq(sessions.userId, user.id), lt(sessions.expires, new Date())))
+          .returning();
         log.info({ expiredSessions }, `${expiredSessions.length} sessions were cleared`);
       } catch (err) {
         log.error(err);
