@@ -1,17 +1,41 @@
-import { and, eq, lt, ne } from 'drizzle-orm';
+import { and, eq, lt, ne, sql } from 'drizzle-orm';
+import { except } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
+
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { sessions, users } from '~/server/db/schema/auth';
-import { friendRequests } from '~/server/db/schema/friends';
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { friendRequests, friends } from '~/server/db/schema/friends';
+
+// interface MyEvents {
+//   friendRequest: (args: {
+//     type: 'incoming' | 'outcoming';
+//     senderId: string;
+//     receiverId: string;
+//   }) => void;
+//   isTypingUpdate: () => void;
+// }
+
+// declare interface MyEventEmitter {
+//   on<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
+//   off<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
+//   once<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
+//   emit<TEv extends keyof MyEvents>(event: TEv, ...args: Parameters<MyEvents[TEv]>): boolean;
+// }
+
+// class MyEventEmitter extends EventEmitter {
+//   public toIterable<TEv extends keyof MyEvents>(
+//     event: TEv
+//   ): AsyncIterable<Parameters<MyEvents[TEv]>> {
+//     return on(this, event);
+//   }
+// }
+
+// export const ee = new MyEventEmitter();
 
 export const userRouter = createTRPCRouter({
-  // getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
-  //   const existingUser = await ctx.db.query.users.findFirst({
-  //     where: eq(users.id, input.id),
-  //   });
-
-  //   return existingUser ?? null;
-  // }),
+  greeting: publicProcedure.input(z.object({ text: z.string() })).mutation(async ({ input }) => {
+    return `Hello ${input.text}!`;
+  }),
   makeAsNotNew: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -33,75 +57,139 @@ export const userRouter = createTRPCRouter({
 
       return expiredSessions;
     }),
-  getAllUsersExceptCurrent: protectedProcedure
-    .input(z.object({ id: z.string() }))
+  getSuggestedUsers: protectedProcedure
+    .input(z.object({ id: z.string(), limit: z.number(), offset: z.number() }))
     .query(async ({ ctx, input }) => {
-      const allUsers = await ctx.db.query.users.findMany({ where: ne(users.id, input.id) });
+      const allUsersExceptCurrent = ctx.db
+        .select({
+          id: users.id,
+          name: users.name,
+          image: users.image,
+          hasReceivedRequest: sql<boolean>`EXISTS (SELECT 1 FROM ${friendRequests} WHERE ${friendRequests.senderId} = ${users.id} AND ${friendRequests.receiverId} = ${input.id})`,
+          hasSentRequest: sql<boolean>`EXISTS (SELECT 1 FROM ${friendRequests} WHERE ${friendRequests.senderId} = ${input.id} AND ${friendRequests.receiverId} = ${users.id})`,
+        })
+        .from(users)
+        .where(ne(users.id, input.id));
 
-      return allUsers;
+      const userFriends = ctx.db
+        .select({
+          id: friends.friendId,
+          name: users.name,
+          image: users.image,
+          hasReceivedRequest: sql<boolean>`EXISTS (SELECT 1 FROM ${friendRequests} WHERE ${friendRequests.senderId} = ${users.id} AND ${friendRequests.receiverId} = ${input.id})`,
+          hasSentRequest: sql<boolean>`EXISTS (SELECT 1 FROM ${friendRequests} WHERE ${friendRequests.senderId} = ${input.id} AND ${friendRequests.receiverId} = ${users.id})`,
+        })
+        .from(friends)
+        .where(eq(friends.userId, input.id))
+        .leftJoin(users, eq(users.id, friends.friendId));
+
+      return await except(allUsersExceptCurrent, userFriends);
     }),
   getUserFriends: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string(), limit: z.number(), offset: z.number() }))
     .query(async ({ ctx, input }) => {
-      const user = await ctx.db.query.users.findFirst({
-        where: eq(users.id, input.id),
-        with: {
-          friends1: true,
-        },
-      });
-
-      const userFriendsPromises = user?.friends1.map(async (friendship) => {
-        const friendId = input.id === friendship.user1Id ? friendship.user2Id : friendship.user1Id;
-        return await ctx.db.query.users.findFirst({
-          where: eq(users.id, friendId),
-          columns: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        });
-      });
-
-      if (userFriendsPromises) {
-        return Promise.allSettled(userFriendsPromises);
-      } else {
-        return null;
-      }
+      return await ctx.db
+        .select({
+          id: friends.friendId,
+          name: users.name,
+          image: users.image,
+        })
+        .from(friends)
+        .where(eq(friends.userId, input.id))
+        .leftJoin(users, eq(users.id, friends.friendId))
+        .offset(input.offset)
+        .limit(input.limit);
     }),
   getUserIncomingFriendRequests: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const requests = await ctx.db
+      return await ctx.db
         .select({
           sender: {
             id: users.id,
             name: users.name,
             image: users.image,
           },
-          status: friendRequests.status,
         })
         .from(friendRequests)
         .where(eq(friendRequests.receiverId, input.id))
         .leftJoin(users, eq(users.id, friendRequests.senderId));
-
-      return requests;
     }),
   getUserOutcomingFriendRequests: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const requests = await ctx.db
+      return await ctx.db
         .select({
           receiver: {
             id: users.id,
             name: users.name,
             image: users.image,
           },
-          status: friendRequests.status,
         })
         .from(friendRequests)
         .where(eq(friendRequests.senderId, input.id))
         .leftJoin(users, eq(users.id, friendRequests.receiverId));
-
-      return requests;
     }),
+  sendFriendRequest: protectedProcedure
+    .input(z.object({ senderId: z.string(), receiverId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // create new friend request
+      const newRequest = await ctx.db
+        .insert(friendRequests)
+        .values({
+          senderId: input.senderId,
+          receiverId: input.receiverId,
+        })
+        .returning();
+
+      return newRequest[0] ?? null;
+
+      // ee.emit('friendRequest', {
+      //   type: 'outcoming',
+      //   senderId: input.senderId,
+      //   receiverId: input.receiverId,
+      // });
+    }),
+  cancelFriendRequest: protectedProcedure
+    .input(z.object({ senderId: z.string(), receiverId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .delete(friendRequests)
+        .where(
+          and(
+            eq(friendRequests.senderId, input.senderId),
+            eq(friendRequests.receiverId, input.receiverId)
+          )
+        );
+    }),
+  respondToFriendRequest: protectedProcedure
+    .input(z.object({ requestId: z.string(), response: z.enum(['accept', 'decline']) }))
+    .mutation(async ({ ctx, input }) => {
+      // remove current friend request
+      const requests = await ctx.db
+        .delete(friendRequests)
+        .where(eq(friendRequests.id, input.requestId))
+        .returning();
+
+      const request = requests[0];
+
+      if (input.response === 'accept' && request) {
+        // make users as friends
+        await Promise.all([
+          ctx.db.insert(friends).values({
+            userId: request.senderId,
+            friendId: request.receiverId,
+          }),
+          ctx.db.insert(friends).values({
+            friendId: request.senderId,
+            userId: request.receiverId,
+          }),
+        ]);
+      }
+    }),
+  // onFriendRequest: publicProcedure.subscription(async function* () {
+  //   for await (const [data] of ee.toIterable('friendRequest')) {
+  //     yield data;
+  //   }
+  // }),
 });
