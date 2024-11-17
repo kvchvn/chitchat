@@ -1,6 +1,5 @@
+import { userRouter } from '~/server/api/routers/user';
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
-import { messageRoute } from './routers/message';
-import { userRouter } from './routers/user';
 
 /**
  * This is the primary router for your server.
@@ -8,7 +7,6 @@ import { userRouter } from './routers/user';
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  message: messageRoute,
   user: userRouter,
 });
 
