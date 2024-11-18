@@ -1,4 +1,4 @@
-import { and, eq, lt, ne, sql } from 'drizzle-orm';
+import { and, eq, lt, ne, or, sql } from 'drizzle-orm';
 import { except } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
@@ -69,7 +69,11 @@ export const userRouter = createTRPCRouter({
           hasSentRequest: sql<boolean>`EXISTS (SELECT 1 FROM ${friendRequests} WHERE ${friendRequests.senderId} = ${input.id} AND ${friendRequests.receiverId} = ${users.id})`,
         })
         .from(users)
-        .where(ne(users.id, input.id));
+        .where(ne(users.id, input.id))
+        .leftJoin(
+          friendRequests,
+          or(eq(friendRequests.senderId, input.id), eq(friendRequests.receiverId, input.id))
+        );
 
       const userFriends = ctx.db
         .select({
@@ -162,30 +166,42 @@ export const userRouter = createTRPCRouter({
           )
         );
     }),
-  respondToFriendRequest: protectedProcedure
-    .input(z.object({ requestId: z.string(), response: z.enum(['accept', 'decline']) }))
+  acceptFriendRequest: protectedProcedure
+    .input(z.object({ senderId: z.string(), receiverId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // remove current friend request
-      const requests = await ctx.db
+      await ctx.db
         .delete(friendRequests)
-        .where(eq(friendRequests.id, input.requestId))
-        .returning();
+        .where(
+          and(
+            eq(friendRequests.senderId, input.senderId),
+            eq(friendRequests.receiverId, input.receiverId)
+          )
+        );
 
-      const request = requests[0];
-
-      if (input.response === 'accept' && request) {
-        // make users as friends
-        await Promise.all([
-          ctx.db.insert(friends).values({
-            userId: request.senderId,
-            friendId: request.receiverId,
-          }),
-          ctx.db.insert(friends).values({
-            friendId: request.senderId,
-            userId: request.receiverId,
-          }),
-        ]);
-      }
+      // make users as friends
+      await Promise.all([
+        ctx.db.insert(friends).values({
+          userId: input.senderId,
+          friendId: input.receiverId,
+        }),
+        ctx.db.insert(friends).values({
+          friendId: input.senderId,
+          userId: input.receiverId,
+        }),
+      ]);
+    }),
+  removeFromFriends: protectedProcedure
+    .input(z.object({ userId: z.string(), friendId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await Promise.all([
+        ctx.db
+          .delete(friends)
+          .where(and(eq(friends.userId, input.userId), eq(friends.friendId, input.friendId))),
+        ctx.db
+          .delete(friends)
+          .where(and(eq(friends.userId, input.friendId), eq(friends.friendId, input.userId))),
+      ]);
     }),
   // onFriendRequest: publicProcedure.subscription(async function* () {
   //   for await (const [data] of ee.toIterable('friendRequest')) {
