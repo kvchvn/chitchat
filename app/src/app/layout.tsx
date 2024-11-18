@@ -3,6 +3,7 @@ import '~/styles/globals.css';
 import { type Metadata } from 'next';
 
 import { ThemeProvider } from 'next-themes';
+import { Toaster } from '~/components/ui/toaster';
 import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <TRPCReactProvider>
           <ThemeProvider attribute="class">{children}</ThemeProvider>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );
