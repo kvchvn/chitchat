@@ -10,7 +10,6 @@ type Props = {
   receiverId: string;
   senderId: string;
   receiverName: string | null;
-  invalidateKey?: Extract<keyof ReturnType<(typeof api)['useUtils']>['user'], 'getSuggestedUsers'>;
 };
 
 export const SendFriendRequestAction = ({ receiverId, senderId, receiverName }: Props) => {

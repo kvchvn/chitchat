@@ -4,17 +4,16 @@ import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { useToast } from '~/hooks/use-toast';
 import { api } from '~/trpc/react';
+import { SendFriendRequestAction } from './send-friend-request-action';
 
 type Props = {
   userId: string;
   friendId: string;
   friendName: string | null;
-  invalidateKey?: Extract<keyof ReturnType<(typeof api)['useUtils']>['user'], 'getUserFriends'>;
 };
 
-export const RemoveFriendAction = ({ userId, friendId, friendName, invalidateKey }: Props) => {
+export const RemoveFriendAction = ({ userId, friendId, friendName }: Props) => {
   const removeFriend = api.user.removeFromFriends.useMutation();
-  const utils = api.useUtils();
   const { toast } = useToast();
 
   const formatName = friendName ? ` ${friendName}` : '';
@@ -27,10 +26,6 @@ export const RemoveFriendAction = ({ userId, friendId, friendName, invalidateKey
         title: 'Success!',
         description: `You\'ve just removed${formatName} from friends`,
       });
-
-      if (invalidateKey) {
-        await utils.user[invalidateKey].invalidate();
-      }
     } catch (err) {
       console.trace(err);
 
@@ -41,6 +36,12 @@ export const RemoveFriendAction = ({ userId, friendId, friendName, invalidateKey
       });
     }
   };
+
+  if (removeFriend.isSuccess) {
+    return (
+      <SendFriendRequestAction senderId={userId} receiverId={friendId} receiverName={friendName} />
+    );
+  }
 
   return (
     <Button

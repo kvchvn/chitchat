@@ -4,25 +4,16 @@ import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { useToast } from '~/hooks/use-toast';
 import { api } from '~/trpc/react';
+import { RemoveFriendAction } from './remove-friend-action';
 
 type Props = {
   receiverId: string;
   senderId: string;
   senderName: string | null;
-  invalidateKey?: Extract<
-    keyof ReturnType<(typeof api)['useUtils']>['user'],
-    'getSuggestedUsers' | 'getUserIncomingFriendRequests'
-  >;
 };
 
-export const AcceptFriendRequestAction = ({
-  receiverId,
-  senderId,
-  senderName,
-  invalidateKey,
-}: Props) => {
+export const AcceptFriendRequestAction = ({ receiverId, senderId, senderName }: Props) => {
   const acceptFriendRequest = api.user.acceptFriendRequest.useMutation();
-  const utils = api.useUtils();
   const { toast } = useToast();
 
   const fromFormatName = senderName ? ` from ${senderName}` : '';
@@ -35,10 +26,6 @@ export const AcceptFriendRequestAction = ({
         title: 'Success!',
         description: `You\'ve just accepted friend request${fromFormatName}`,
       });
-
-      if (invalidateKey) {
-        await utils.user[invalidateKey].invalidate();
-      }
     } catch (err) {
       console.trace(err);
 
@@ -49,6 +36,10 @@ export const AcceptFriendRequestAction = ({
       });
     }
   };
+
+  if (acceptFriendRequest.isSuccess) {
+    return <RemoveFriendAction userId={receiverId} friendId={senderId} friendName={senderName} />;
+  }
 
   return (
     <Button

@@ -4,25 +4,16 @@ import { Button } from '~/components/ui/button';
 import { Icon } from '~/components/ui/icon';
 import { useToast } from '~/hooks/use-toast';
 import { api } from '~/trpc/react';
+import { SendFriendRequestAction } from './send-friend-request-action';
 
 type Props = {
   receiverId: string;
   senderId: string;
   senderName: string | null;
-  invalidateKey?: Extract<
-    keyof ReturnType<(typeof api)['useUtils']>['user'],
-    'getSuggestedUsers' | 'getUserIncomingFriendRequests'
-  >;
 };
 
-export const RejectFriendRequestAction = ({
-  receiverId,
-  senderId,
-  senderName,
-  invalidateKey,
-}: Props) => {
+export const RejectFriendRequestAction = ({ receiverId, senderId, senderName }: Props) => {
   const rejectFriendRequest = api.user.cancelFriendRequest.useMutation();
-  const utils = api.useUtils();
   const { toast } = useToast();
 
   const fromFormatName = senderName ? ` from ${senderName}` : '';
@@ -35,20 +26,26 @@ export const RejectFriendRequestAction = ({
         title: 'Success!',
         description: `You\'ve just rejected friend request${fromFormatName}`,
       });
-
-      if (invalidateKey) {
-        await utils.user[invalidateKey].invalidate();
-      }
     } catch (err) {
       console.trace(err);
 
       toast({
         variant: 'destructive',
         title: 'Error!',
-        description: `Rejecting friend request${fromFormatName} failed. Try again`,
+        description: `Rejecting friend request${fromFormatName} failed. Try again later`,
       });
     }
   };
+
+  if (rejectFriendRequest.isSuccess) {
+    return (
+      <SendFriendRequestAction
+        senderId={receiverId}
+        receiverId={senderId}
+        receiverName={senderName}
+      />
+    );
+  }
 
   return (
     <Button
