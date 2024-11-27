@@ -1,0 +1,1 @@
+DROP TABLE "chitchat-v2_message";
