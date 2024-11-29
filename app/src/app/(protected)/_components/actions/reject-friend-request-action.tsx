@@ -50,6 +50,7 @@ export const RejectFriendRequestAction = ({ receiverId, senderId, senderName }: 
   return (
     <Button
       variant="ghost"
+      size="icon"
       onClick={handleClick}
       disabled={rejectFriendRequest.isPending}
       className="ml-auto"
@@ -59,7 +60,6 @@ export const RejectFriendRequestAction = ({ receiverId, senderId, senderName }: 
       ) : (
         <Icon scope="global" id="close" />
       )}
-      Reject request
     </Button>
   );
 };

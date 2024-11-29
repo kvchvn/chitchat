@@ -1,8 +1,7 @@
 'use client';
 
-import { AcceptFriendRequestAction } from '~/app/(protected)/_components/actions/accept-friend-request-action';
 import { CancelFriendRequestAction } from '~/app/(protected)/_components/actions/cancel-friend-request-action';
-import { RejectFriendRequestAction } from '~/app/(protected)/_components/actions/reject-friend-request-action';
+import { RespondToFriendRequest } from '~/app/(protected)/_components/actions/respond-to-friend-request';
 import { SendFriendRequestAction } from '~/app/(protected)/_components/actions/send-friend-request-action';
 
 type Props = {
@@ -27,7 +26,6 @@ export const SuggestionAction = ({
           receiverId={suggestedId}
           senderId={userId}
           receiverName={suggestedName}
-          invalidateKey="getSuggestedUsers"
         />
       );
     case hasSentRequest:
@@ -36,25 +34,15 @@ export const SuggestionAction = ({
           receiverId={suggestedId}
           senderId={userId}
           receiverName={suggestedName}
-          invalidateKey="getSuggestedUsers"
         />
       );
     case hasReceivedRequest:
       return (
-        <>
-          <AcceptFriendRequestAction
-            receiverId={userId}
-            senderId={suggestedId}
-            senderName={suggestedName}
-            invalidateKey="getSuggestedUsers"
-          />
-          <RejectFriendRequestAction
-            receiverId={userId}
-            senderId={suggestedId}
-            senderName={suggestedName}
-            invalidateKey="getSuggestedUsers"
-          />
-        </>
+        <RespondToFriendRequest
+          receiverId={userId}
+          senderId={suggestedId}
+          senderName={suggestedName}
+        />
       );
   }
 };
