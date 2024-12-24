@@ -1,3 +1,4 @@
+import tailwindcssContainerQueries from '@tailwindcss/container-queries';
 import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import colors from 'tailwindcss/colors';
@@ -165,5 +166,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, tailwindcssContainerQueries],
 } satisfies Config;
