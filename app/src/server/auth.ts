@@ -11,7 +11,8 @@ import { ROUTES } from '~/constants/routes';
 import { env } from '~/env';
 import { logger } from '~/lib/logger';
 import { db } from '~/server/db';
-import { accounts, sessions, users, verificationTokens } from '~/server/db/schema/auth';
+import { accounts, sessions, verificationTokens } from '~/server/db/schema/auth';
+import { users } from './db/schema/users';
 
 const log = logger.child({ module: 'auth.ts' });
 

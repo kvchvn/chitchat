@@ -1,8 +1,8 @@
-import { relations, sql } from 'drizzle-orm';
-import { boolean, index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { index, integer, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { type AdapterAccount } from 'next-auth/adapters';
-import { friendRequests, friends } from '~/server/db/schema/friends';
 import { createTable } from '~/server/db/table-creator';
+import { users } from './users';
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -10,21 +10,6 @@ import { createTable } from '~/server/db/table-creator';
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-
-export const users = createTable('user', {
-  id: varchar('id', { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: varchar('name', { length: 255 }),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  emailVerified: timestamp('email_verified', {
-    mode: 'date',
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: varchar('image', { length: 255 }),
-  isNewUser: boolean('is_new_user').default(true),
-});
 
 export const accounts = createTable(
   'account',
@@ -86,14 +71,6 @@ export const verificationTokens = createTable(
 );
 
 // RELATIONS
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-  sentRequests: many(friendRequests, { relationName: 'sent_requests' }),
-  receivedRequests: many(friendRequests, { relationName: 'received_requests' }),
-  friends: many(friends, { relationName: 'friends' }),
-  friendOf: many(friends, { relationName: 'friend_of' }),
-}));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),

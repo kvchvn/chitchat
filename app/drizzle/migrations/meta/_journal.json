@@ -29,6 +29,13 @@
       "when": 1732739419621,
       "tag": "0003_huge_zaran",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1733649061775,
+      "tag": "0004_special_scalphunter",
+      "breakpoints": true
     }
   ]
 }
