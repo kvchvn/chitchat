@@ -1,6 +1,8 @@
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
 import { redirect } from 'next/navigation';
+import { ChatNotFound } from '~/components/chat/chat-not-found';
+import { ChatIsNotCreated } from '~/components/chat/chat-is-not-created';
 
 export default async function ChatPage(props: { params: Promise<{ chatSlug: string[] }> }) {
   const [params, session] = await Promise.all([props.params, getServerAuthSession()]);
@@ -9,14 +11,19 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
     redirect(`/${params.chatSlug[0]}`);
   }
 
-  const companionId = params?.chatSlug?.[0];
+  const companionId = params?.chatSlug?.[0] ?? '';
 
-  const chat = companionId
-    ? await api.chats.getByMembersIds({ userId: session!.user.id, companionId })
-    : null;
+  const existingCompanionPromise = api.users.isExisting({ id: companionId });
+  const chatPromise = api.chats.getByMembersIds({ userId: session!.user.id, companionId });
+
+  const [companion, chat] = await Promise.all([existingCompanionPromise, chatPromise]);
+
+  if (!companion) {
+    return <ChatNotFound />;
+  }
 
   if (!chat) {
-    return <h2>No chat</h2>;
+    return <ChatIsNotCreated />;
   }
 
   return (

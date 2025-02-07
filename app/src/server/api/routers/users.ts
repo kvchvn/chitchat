@@ -23,6 +23,13 @@ import { users } from '~/server/db/schema/users';
 
 export const usersRouter = createTRPCRouter({
   // queries
+  isExisting: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.select().from(users).where(eq(users.id, input.id));
+
+      return user[0] ?? null;
+    }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const allUsers = await ctx.db
       .select({

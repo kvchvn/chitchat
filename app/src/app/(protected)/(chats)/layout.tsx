@@ -1,7 +1,7 @@
-import { cookies } from 'next/headers';
+import {cookies} from 'next/headers';
 import type React from 'react';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '~/components/ui/resizable';
-import { logger } from '~/lib/logger';
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '~/components/ui/resizable';
+import {logger} from '~/lib/logger';
 import UsersList from '~/app/(protected)/(chats)/_components/users-list';
 
 const log = logger.child({ module: '(protected)/(chats)/layout.tsx' });
@@ -30,7 +30,7 @@ export default function ChatsLayout({ children }: React.PropsWithChildren) {
         <ResizablePanel
           defaultSize={defaultResizableLayout?.[0]}
           maxSize={30}
-          className="min-w-[52px]"
+          className="min-w-14"
         >
           <UsersList />
         </ResizablePanel>
