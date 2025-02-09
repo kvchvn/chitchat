@@ -1,6 +1,6 @@
 import { ChatContainer } from '~/components/chat/chat-container';
 
-export function ChatNotFound() {
+export const ChatNotFound = () => {
   return (
     <ChatContainer>
       <div className="flex max-w-60 flex-col gap-2 text-center">
@@ -11,4 +11,4 @@ export function ChatNotFound() {
       </div>
     </ChatContainer>
   );
-}
+};
