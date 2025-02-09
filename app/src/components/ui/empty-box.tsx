@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
+import { PackageOpen } from 'lucide-react';
 import { cn } from '~/lib/utils';
-import { Icon } from './icon';
 
 const emptyBoxVariants = cva('mx-auto', {
   variants: {
@@ -23,7 +23,7 @@ type Props = VariantProps<typeof emptyBoxVariants> & {
 export const EmptyBox = ({ size, className }: Props) => {
   return (
     <div className={cn(emptyBoxVariants({ size }), className)}>
-      <Icon scope="global" id="empty-box" className="h-full w-full" />
+      <PackageOpen className="h-full w-full" />
     </div>
   );
 };
