@@ -1,7 +1,7 @@
 'use client';
 
+import { RotateCw } from 'lucide-react';
 import { Button } from '~/components/ui/button';
-import { Icon } from '~/components/ui/icon';
 
 export const AuthProvidersFetchError = () => {
   const handleClick = () => {
@@ -12,7 +12,7 @@ export const AuthProvidersFetchError = () => {
     <>
       <p>Failed to fetch OAuth providers</p>
       <Button variant="destructive" onClick={handleClick}>
-        <Icon scope="global" id="refresh" />
+        <RotateCw />
         Try again
       </Button>
     </>

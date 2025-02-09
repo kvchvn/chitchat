@@ -1,7 +1,7 @@
+import { UserItemMemo } from '~/components/user/user-item';
 import { api } from '~/trpc/server';
-import { UserItemMemo } from '~/app/(protected)/(chats)/_components/user-item';
 
-export default async function UsersList() {
+export const UsersList = async () => {
   const allUsers = await api.users.getAll();
 
   return (
@@ -11,4 +11,4 @@ export default async function UsersList() {
       ))}
     </ul>
   );
-}
+};

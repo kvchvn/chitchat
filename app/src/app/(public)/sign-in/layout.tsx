@@ -1,6 +1,6 @@
 import React from 'react';
+import { WelcomeConfetti } from '~/components/auth/welcome-confetti';
 import { ThemeToggler } from '~/components/ui/theme-toggler';
-import { WelcomeConfetti } from './_components/welcome-confetti';
 
 export default function SignInLayout({ children }: React.PropsWithChildren) {
   return (

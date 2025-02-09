@@ -49,8 +49,7 @@ export const AuthProvider = ({ id, name }: Props) => {
       size="lg"
       fullWidth
       className={cn(providerVariants({ id }))}
-      onClick={handleClick}
-    >
+      onClick={handleClick}>
       {id && <Icon scope="auth" id={id} />}
       Sign In with {name}
     </Button>

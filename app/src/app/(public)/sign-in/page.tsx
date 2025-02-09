@@ -1,7 +1,7 @@
 import { getProviders } from 'next-auth/react';
 import Link from 'next/link';
-import { AuthProviders } from './_components/auth-providers';
-import { AuthProvidersFetchError } from './_components/auth-providers-fetch-error';
+import { AuthProviders } from '~/components/auth/auth-providers';
+import { AuthProvidersFetchError } from '~/components/auth/auth-providers-fetch-error';
 
 export default async function SignInPage() {
   const providers = await getProviders();

@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
 import clsx from 'clsx';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { getNameInitials } from '~/lib/utils';
-import { usePathname } from 'next/navigation';
 
 type Props = {
   id: string;
@@ -13,7 +13,7 @@ type Props = {
   name: string | null;
 };
 
-export function UserItem({ id, image, name }: Props) {
+export const UserItem = ({ id, image, name }: Props) => {
   const pathname = usePathname();
   const idFromPathname = pathname.slice(1);
 
@@ -26,8 +26,7 @@ export function UserItem({ id, image, name }: Props) {
           {
             'bg-primary-hover-light dark:bg-primary-hover-dark': idFromPathname === id,
           }
-        )}
-      >
+        )}>
         <Avatar className="h-10 w-10">
           <AvatarImage src={image ?? undefined} alt={name ?? "user's avatar"} />
           <AvatarFallback className="text-sm">{getNameInitials(name)}</AvatarFallback>
@@ -36,6 +35,6 @@ export function UserItem({ id, image, name }: Props) {
       </Link>
     </li>
   );
-}
+};
 
 export const UserItemMemo = React.memo(UserItem);

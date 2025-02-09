@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
 import type React from 'react';
+import { Header } from '~/components/global/header';
 import { Wrapper } from '~/components/ui/wrapper';
 import { ROUTES } from '~/constants/routes';
 import { getServerAuthSession } from '~/server/auth';
-import { Header } from './_components/header';
 
 export default async function ProtectedLayout({ children }: React.PropsWithChildren) {
   const session = await getServerAuthSession();
