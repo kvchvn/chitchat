@@ -9,6 +9,8 @@ const config = {
   tabWidth: 2,
   trailingComma: 'es5',
   useTabs: false,
+  bracketSpacing: true,
+  bracketSameLine: true,
   overrides: [
     {
       files: '*.svg',

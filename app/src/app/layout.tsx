@@ -3,7 +3,9 @@ import '~/styles/globals.css';
 import { type Metadata } from 'next';
 
 import { ThemeProvider } from 'next-themes';
-import { inter, jetBransMono, poppins } from '~/styles/font';
+import { Toaster } from '~/components/ui/toaster';
+import { cn } from '~/lib/utils';
+import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
@@ -16,12 +18,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetBransMono.variable} ${poppins.variable}`}
-    >
-      <body>
+      className={cn(
+        'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 [&.dark]:scrollbar-thumb-gray-950 [&.dark]:scrollbar-track-gray-800',
+        inter.variable,
+        jetBransMono.variable,
+        poppins.variable
+      )}>
+      <body className="flex min-h-dvh flex-col items-stretch">
         <TRPCReactProvider>
           <ThemeProvider attribute="class">{children}</ThemeProvider>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

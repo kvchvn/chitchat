@@ -14,7 +14,7 @@ const buttonVariants = cva(
         destructive:
           'bg-error-light text-text-light shadow-sm hover:bg-error-hover-light active:bg-error-active-light dark:bg-error-dark dark:hover:bg-error-hover-dark dark:active:bg-error-active-dark dark:text-text-dark',
         outline:
-          'border border-muted-light bg-background-light shadow-sm hover:bg-muted-light hover:text-text-light dark:border-muted-dark dark:bg-background-dark dark:hover:bg-muted-dark dark:hover:text-text-dark',
+          'border border-gray-light bg-background-light shadow-sm hover:bg-muted-light hover:text-text-light dark:border-gray-dark dark:bg-background-dark dark:hover:bg-muted-dark dark:hover:text-text-dark',
         secondary:
           'bg-secondary-light text-text-light shadow-sm hover:bg-secondary-hover-light dark:bg-secondary-dark dark:text-text-dark dark:hover:bg-secondary-hover-dark',
         ghost:
@@ -28,6 +28,8 @@ const buttonVariants = cva(
         sm: 'h-8 rounded-md px-3 text-xs',
         lg: 'h-10 rounded-md px-8',
         icon: 'h-9 w-9',
+        'icon-sm': 'h-8 w-8',
+        'icon-lg': 'h-10 w-10',
       },
       fullWidth: {
         true: 'w-full',

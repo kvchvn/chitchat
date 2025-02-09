@@ -1,6 +1,7 @@
+import { MessageCircle, UserRound } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Button } from '~/components/ui/button';
-import { Icon } from '~/components/ui/icon';
 import { ROUTES } from '~/constants/routes';
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
@@ -9,7 +10,11 @@ export default async function SignInWelcomePage() {
   const session = await getServerAuthSession();
 
   if (session) {
-    await api.user.makeAsNotNew({ id: session.user.id });
+    if (session.user.isNewUser) {
+      await api.users.makeAsNotNew({ id: session.user.id });
+    }
+  } else {
+    redirect(ROUTES.signIn);
   }
 
   return (
@@ -25,13 +30,13 @@ export default async function SignInWelcomePage() {
       <div className="mt-8 flex gap-3 xs:mt-4">
         <Button variant="secondary" asChild>
           <Link href={ROUTES.profile}>
-            <Icon scope="global" id="person" />
+            <UserRound />
             Go to Profile
           </Link>
         </Button>
         <Button asChild>
           <Link href={ROUTES.chats}>
-            <Icon scope="global" id="chats" />
+            <MessageCircle />
             Go to Chats
           </Link>
         </Button>

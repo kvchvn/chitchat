@@ -8,7 +8,7 @@
   }
 
   html {
-    @apply h-dvh overflow-y-hidden text-sm sm:text-base;
+    @apply h-dvh overflow-y-auto text-sm sm:text-base;
   }
 
   html > * {
@@ -54,7 +54,16 @@
     @apply inline-block text-highlight-light hover:text-highlight-hover-light active:text-highlight-active-light dark:text-highlight-dark dark:hover:text-highlight-hover-dark dark:active:text-highlight-active-dark;
   }
 
+  .link-ghost {
+    @apply inline-block hover:underline active:text-highlight-light dark:active:text-highlight-dark;
+  }
+
   .text-subtitle {
     @apply text-lg font-medium;
   }
+}
+
+svg {
+  width: 20px;
+  height: 20px;
 }
