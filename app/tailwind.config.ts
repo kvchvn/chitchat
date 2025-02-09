@@ -1,4 +1,5 @@
 import tailwindcssContainerQueries from '@tailwindcss/container-queries';
+import tailwindScrollbar from 'tailwind-scrollbar';
 import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import colors from 'tailwindcss/colors';
@@ -166,5 +167,13 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate, tailwindcssContainerQueries],
+  plugins: [
+    tailwindcssAnimate,
+    tailwindcssContainerQueries,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    tailwindScrollbar({
+      nocompatible: true,
+      preferredStrategy: 'pseudoelements',
+    }),
+  ],
 } satisfies Config;
