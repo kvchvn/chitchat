@@ -43,6 +43,20 @@
       "when": 1739010104445,
       "tag": "0005_slimy_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1739216787105,
+      "tag": "0006_opposite_marvel_apes",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1739217677231,
+      "tag": "0007_mean_mimic",
+      "breakpoints": true
     }
   ]
 }
