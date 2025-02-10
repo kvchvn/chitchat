@@ -16,15 +16,16 @@ export const ExistingChat = ({ companionName }: Props) => {
           <EllipsisVertical />
         </Button>
       </header>
-      <div className="my-2 w-full grow border border-red-400">
-        <ul className="flex h-full flex-col justify-end">
-          <li>Message 1</li>
-          <li className="self-end">Message 2</li>
+      <div className="my-2 w-[calc(100%+8px)] grow overflow-y-auto pr-[8px] scrollbar scrollbar-w-[4px]">
+        <ul className="flex min-h-full flex-col justify-end gap-2 overflow-y-auto">
+          {messages.map((message, i) => (
+            <Message key={i} text={message.text} userId={message.userId} />
+          ))}
         </ul>
       </div>
       <div className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
         <Textarea
-          className="scrollbar scrollbar-w-[6px] scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg w-full resize-none rounded-sm bg-slate-200 p-2 dark:bg-slate-700"
+          className="w-full resize-none rounded-sm bg-slate-200 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[6px] dark:bg-slate-700"
           defaultValue="text"
           maxRows={8}
         />
