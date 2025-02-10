@@ -15,7 +15,7 @@ export default async function ProtectedLayout({ children }: React.PropsWithChild
   return (
     <>
       <Header />
-      <main className="flex grow items-stretch bg-background-light py-6 dark:bg-background-dark">
+      <main className="flex max-h-full grow items-stretch bg-background-light pb-6 pt-16 dark:bg-background-dark">
         <Wrapper>{children}</Wrapper>
       </main>
     </>

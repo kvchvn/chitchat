@@ -16,6 +16,7 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
   if (!companion) {
     return <ChatNotFound />;
   }
+
   return (
     <ChatWindow
       userId={session!.user.id}
