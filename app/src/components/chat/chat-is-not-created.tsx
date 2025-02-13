@@ -1,7 +1,6 @@
 'use client';
 
 import { MessageSquarePlus } from 'lucide-react';
-import { ChatContainer } from '~/components/chat/chat-container';
 import { Button } from '~/components/ui/button';
 import { useToast } from '~/hooks/use-toast';
 import { api } from '~/trpc/react';
@@ -38,15 +37,13 @@ export const ChatIsNotCreated = ({ userId, companionId, companionName }: Props) 
   };
 
   return (
-    <ChatContainer>
-      <div className="max-w-100 flex flex-col items-center gap-2 text-center">
-        <h3>Chat is not created yet.</h3>
-        <p>But you can do it easily. Just click the button below.</p>
-        <Button onClick={handleClick} disabled={isPending} className="mt-4">
-          {!isPending ? <MessageSquarePlus /> : <LoadingIcon />}
-          Start chatting
-        </Button>
-      </div>
-    </ChatContainer>
+    <div className="max-w-100 flex w-full grow flex-col items-center justify-center gap-2 text-center">
+      <h3>Chat is not created yet.</h3>
+      <p>But you can do it easily. Just click the button below.</p>
+      <Button onClick={handleClick} disabled={isPending} className="mt-4">
+        {!isPending ? <MessageSquarePlus /> : <LoadingIcon />}
+        Start chatting
+      </Button>
+    </div>
   );
 };

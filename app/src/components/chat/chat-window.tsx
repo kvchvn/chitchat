@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
-  const { isError, isLoading } = api.chats.getByMembersIds.useQuery(
+  const { isError, isLoading, data } = api.chats.getByMembersIds.useQuery(
     {
       userId,
       companionId,
@@ -24,11 +24,13 @@ export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
     return <ChatSkeleton />;
   }
 
-  if (isError) {
+  if (isError || !data) {
     return (
       <ChatIsNotCreated userId={userId} companionId={companionId} companionName={companionName} />
     );
   }
 
-  return <ExistingChat companionName={companionName} />;
+  return (
+    <ExistingChat messages={data.messages} chat={{ chatId: data.chat.id, userId, companionId }} />
+  );
 };
