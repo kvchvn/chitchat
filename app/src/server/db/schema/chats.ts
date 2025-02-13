@@ -32,3 +32,12 @@ export const chatsRelations = relations(chats, ({ one, many }) => ({
   }),
   messages: many(messages),
 }));
+
+// TYPES
+
+export type Chat = typeof chats.$inferSelect;
+export type ChatPretty = {
+  chatId: string;
+  userId: string;
+  companionId: string;
+};
