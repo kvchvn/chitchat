@@ -48,7 +48,7 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
     references: [users.id],
   }),
   receiver: one(users, {
-    fields: [messages.senderId],
+    fields: [messages.receiverId],
     references: [users.id],
   }),
   likes: many(messageLikes),
@@ -64,3 +64,7 @@ export const messageLikesRelations = relations(messageLikes, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// TYPES
+
+export type ChatMessage = typeof messages.$inferSelect;
