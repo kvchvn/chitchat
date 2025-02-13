@@ -2,15 +2,15 @@ import { cn } from '~/lib/utils';
 
 type Props = {
   text: string;
-  userId: string;
+  fromCurrentUser: boolean;
 };
 
-export const Message = ({ text, userId }: Props) => {
+export const Message = ({ text, fromCurrentUser }: Props) => {
   return (
     <li
       className={cn(
-        userId === '2' && 'self-message self-end',
-        'w-fit max-w-[45%] rounded-3xl border px-6 py-1'
+        fromCurrentUser && 'self-message self-end bg-zinc-200',
+        'w-fit max-w-[80%] break-words rounded-3xl border border-zinc-300 px-6 py-1 leading-6'
       )}>
       {text}
     </li>
