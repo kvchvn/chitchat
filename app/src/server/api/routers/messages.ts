@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { messages } from '~/server/db/schema/messages';
+import { ee } from '../event-emitter';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const messagesRouter = createTRPCRouter({
@@ -34,6 +35,15 @@ export const messagesRouter = createTRPCRouter({
         })
         .returning();
 
+      if (newMessage) {
+        ee.emit('sendMessage', newMessage);
+      }
+
       return newMessage;
     }),
+  onCreateMessage: protectedProcedure.subscription(async function* () {
+    for await (const [message] of ee.toIterable('sendMessage')) {
+      yield message;
+    }
+  }),
 });

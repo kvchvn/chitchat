@@ -6,22 +6,6 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/
 import { sessions } from '~/server/db/schema/auth';
 import { users } from '~/server/db/schema/users';
 
-// type MyEvents = Record<
-//   `userInteract:${string}`,
-//   (args: { type: UserInteraction; interactionFrom: string; interactionWith: string }) => void
-// >;
-
-// declare interface AppEventEmitter {
-//   on<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
-//   off<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
-//   once<TEv extends keyof MyEvents>(event: TEv, listener: MyEvents[TEv]): this;
-//   emit<TEv extends keyof MyEvents>(event: TEv, ...args: Parameters<MyEvents[TEv]>): boolean;
-// }
-
-// class AppEventEmitter extends EventEmitter {}
-
-// export const ee = new AppEventEmitter();
-
 export const usersRouter = createTRPCRouter({
   // queries
   isExisting: protectedProcedure
