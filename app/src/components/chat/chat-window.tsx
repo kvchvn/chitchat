@@ -13,10 +13,7 @@ type Props = {
 
 export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
   const { isError, isLoading, data } = api.chats.getByMembersIds.useQuery(
-    {
-      userId,
-      companionId,
-    },
+    { userId, companionId },
     { retry: false }
   );
 
