@@ -77,3 +77,13 @@ svg {
     @apply rounded-br-md;
   }
 }
+
+.companion-message {
+  & + .companion-message {
+    @apply rounded-tl-md;
+  }
+
+  &:has(+ .companion-message) {
+    @apply rounded-bl-md;
+  }
+}
