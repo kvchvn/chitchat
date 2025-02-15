@@ -1,21 +1,73 @@
 import { SendHorizonal } from 'lucide-react';
-import { type ChangeEventHandler, type FormEventHandler, useState } from 'react';
+import { type ChangeEventHandler, type FormEventHandler, useId, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
 import { useToast } from '~/hooks/use-toast';
 import { type ChatPretty } from '~/server/db/schema/chats';
 import { api } from '~/trpc/react';
-import { LoadingIcon } from '../ui/loading-icon';
 
 type Props = {
   chat: ChatPretty;
 };
 
 export const ChatForm = ({ chat }: Props) => {
-  const { mutateAsync: sendMessage, isPending } = api.messages.create.useMutation();
   const utils = api.useUtils();
+  const newMessageId = useId();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
+
+  const { mutate: sendMessage } = api.messages.create.useMutation({
+    onMutate: async (newMessage) => {
+      setMessage('');
+
+      await utils.chats.getByMembersIds.cancel();
+
+      const previousChat = utils.chats.getByMembersIds.getData();
+
+      utils.chats.getByMembersIds.setData(
+        { userId: chat.userId, companionId: chat.companionId },
+        (oldData) =>
+          oldData
+            ? {
+                chat: oldData.chat,
+                messages: [
+                  ...oldData.messages,
+                  {
+                    id: newMessageId,
+                    chatId: newMessage.chatId,
+                    senderId: newMessage.senderId,
+                    receiverId: newMessage.receiverId,
+                    text: newMessage.text,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    hasRed: false,
+                  },
+                ],
+              }
+            : oldData
+      );
+
+      return { previousChat };
+    },
+    onError: (_, __, context) => {
+      utils.chats.getByMembersIds.setData(
+        { userId: chat.userId, companionId: chat.companionId },
+        context?.previousChat
+      );
+
+      toast({
+        variant: 'destructive',
+        title: 'Message sending failed',
+        description: 'Something went wrong. Please try again later',
+      });
+    },
+    onSettled: async () => {
+      await utils.chats.getByMembersIds.invalidate({
+        userId: chat.userId,
+        companionId: chat.companionId,
+      });
+    },
+  });
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -25,21 +77,7 @@ export const ChatForm = ({ chat }: Props) => {
       senderId: chat.userId,
       receiverId: chat.companionId,
       text: message.trim(),
-    })
-      .then(async () => {
-        setMessage('');
-        await utils.chats.getByMembersIds.invalidate({
-          userId: chat.userId,
-          companionId: chat.companionId,
-        });
-      })
-      .catch(() => {
-        toast({
-          variant: 'destructive',
-          title: 'Message sending failed',
-          description: 'Something went wrong. Please try again later',
-        });
-      });
+    });
   };
 
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
@@ -58,7 +96,7 @@ export const ChatForm = ({ chat }: Props) => {
         onChange={handleChange}
       />
       <Button type="submit" size="icon-lg" disabled={!message} className="shrink-0 rounded-full">
-        {!isPending ? <SendHorizonal /> : <LoadingIcon />}
+        <SendHorizonal />
       </Button>
     </form>
   );
