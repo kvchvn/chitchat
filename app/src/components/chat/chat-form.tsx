@@ -1,5 +1,11 @@
 import { SendHorizonal } from 'lucide-react';
-import { type ChangeEventHandler, type FormEventHandler, useId, useState } from 'react';
+import {
+  type ChangeEventHandler,
+  type FormEventHandler,
+  type KeyboardEventHandler,
+  useId,
+  useState,
+} from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
 import { useToast } from '~/hooks/use-toast';
@@ -69,15 +75,32 @@ export const ChatForm = ({ chat }: Props) => {
     },
   });
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
+  const onSubmit = () => {
+    const trimmedMessage = message.trim();
+
+    if (!trimmedMessage) {
+      return;
+    }
 
     sendMessage({
       chatId: chat.chatId,
       senderId: chat.userId,
       receiverId: chat.companionId,
-      text: message.trim(),
+      text: trimmedMessage,
     });
+  };
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    onSubmit();
+  };
+
+  const handleKeyDown: KeyboardEventHandler<HTMLFormElement> = (e) => {
+    if (e.ctrlKey && e.code === 'Enter') {
+      setMessage((prevMessage) => `${prevMessage}\n`);
+    } else if (!e.shiftKey && e.code === 'Enter') {
+      onSubmit();
+    }
   };
 
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
@@ -86,6 +109,7 @@ export const ChatForm = ({ chat }: Props) => {
 
   return (
     <form
+      onKeyDown={handleKeyDown}
       onSubmit={handleSubmit}
       className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
       <Textarea
