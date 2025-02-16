@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_messages" ADD COLUMN "is_sent" boolean DEFAULT true;

@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_messages" RENAME COLUMN "has_red" TO "is_read";

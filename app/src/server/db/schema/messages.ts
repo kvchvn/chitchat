@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import { boolean, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { createTable } from '../table-creator';
 import { chats } from './chats';
@@ -17,14 +17,13 @@ export const messages = createTable('messages', {
     .notNull()
     .references(() => users.id),
   text: varchar('text', { length: 255 }).notNull(),
-  createdAt: timestamp('created_at')
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-  hasRed: boolean('has_red').notNull().default(false),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  isRead: boolean('is_read').notNull().default(false),
+  isSent: boolean('is_sent').notNull().default(true),
 });
 
 export const messageLikes = createTable('message_likes', {
