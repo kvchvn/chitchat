@@ -3,6 +3,7 @@ import { type ChatMessage } from '../db/schema/messages';
 
 type AppEvents = {
   sendMessage: (message: ChatMessage) => void;
+  readMessages: (unreadMessagesIds: Set<string>) => void;
 };
 
 declare interface AppEventEmitter {

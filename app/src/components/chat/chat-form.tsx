@@ -14,9 +14,10 @@ import { api } from '~/trpc/react';
 
 type Props = {
   chat: ChatPretty;
+  onSubmitSideEffect: () => void;
 };
 
-export const ChatForm = ({ chat }: Props) => {
+export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
   const utils = api.useUtils();
   const newMessageId = useId();
   const { toast } = useToast();
@@ -46,12 +47,15 @@ export const ChatForm = ({ chat }: Props) => {
                     text: newMessage.text,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    hasRed: false,
+                    isRead: false,
+                    isSent: false,
                   },
                 ],
               }
             : oldData
       );
+
+      onSubmitSideEffect();
 
       return { previousChat };
     },
@@ -99,6 +103,7 @@ export const ChatForm = ({ chat }: Props) => {
     if (e.ctrlKey && e.code === 'Enter') {
       setMessage((prevMessage) => `${prevMessage}\n`);
     } else if (!e.shiftKey && e.code === 'Enter') {
+      e.preventDefault();
       onSubmit();
     }
   };
