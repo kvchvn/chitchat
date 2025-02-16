@@ -70,20 +70,20 @@ svg {
 
 .self-message {
   & + .self-message {
-    @apply rounded-tr-md;
+    @apply rounded-tr-lg;
   }
 
   &:has(+ .self-message) {
-    @apply rounded-br-md;
+    @apply rounded-br-lg;
   }
 }
 
 .companion-message {
   & + .companion-message {
-    @apply rounded-tl-md;
+    @apply rounded-tl-lg;
   }
 
   &:has(+ .companion-message) {
-    @apply rounded-bl-md;
+    @apply rounded-bl-lg;
   }
 }
