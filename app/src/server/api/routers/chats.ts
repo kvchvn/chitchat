@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { and, eq, or } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { chats } from '~/server/db/schema/chats';
 import { messages } from '~/server/db/schema/messages';
@@ -21,7 +21,8 @@ export const chatsRouter = createTRPCRouter({
             and(eq(chats.userId1, input.companionId), eq(chats.userId2, input.userId))
           )
         )
-        .leftJoin(messages, eq(chats.id, messages.chatId));
+        .leftJoin(messages, eq(chats.id, messages.chatId))
+        .orderBy(asc(messages.createdAt));
 
       if (!result[0]) {
         throw new TRPCError({
