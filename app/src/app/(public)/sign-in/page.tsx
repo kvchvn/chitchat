@@ -1,9 +1,20 @@
 import { getProviders } from 'next-auth/react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { AuthProviders } from '~/components/auth/auth-providers';
 import { AuthProvidersFetchError } from '~/components/auth/auth-providers-fetch-error';
+import { ROUTES } from '~/constants/routes';
 
-export default async function SignInPage() {
+type Props = {
+  searchParams: Record<string, string>;
+};
+
+export default async function SignInPage({ searchParams }: Props) {
+  if ('error' in searchParams) {
+    const sp = new URLSearchParams({ error: searchParams.error });
+    redirect(`${ROUTES.signInError}?${sp.toString()}`);
+  }
+
   const providers = await getProviders();
 
   if (!providers) {
