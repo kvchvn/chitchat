@@ -1,11 +1,12 @@
 import EventEmitter, { on } from 'node:events';
-import { type ChatMessage } from '../db/schema/messages';
+import { type ChatMessage } from '~/server/db/schema/messages';
 
 type AppEvents = {
   sendMessage: (message: ChatMessage) => void;
   readMessages: (unreadMessagesIds: Set<string>) => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 declare interface AppEventEmitter {
   on<E extends keyof AppEvents>(event: E, listener: AppEvents[E]): this;
   off<E extends keyof AppEvents>(event: E, listener: AppEvents[E]): this;
@@ -13,9 +14,10 @@ declare interface AppEventEmitter {
   emit<E extends keyof AppEvents>(event: E, ...args: Parameters<AppEvents[E]>): boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class AppEventEmitter extends EventEmitter {
   public toIterable<E extends keyof AppEvents>(event: E): AsyncIterable<Parameters<AppEvents[E]>> {
-    return on(this, event);
+    return on(this, event) as AsyncIterable<Parameters<AppEvents[E]>>;
   }
 }
 
