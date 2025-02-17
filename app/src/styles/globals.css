@@ -67,3 +67,23 @@ svg {
   width: 20px;
   height: 20px;
 }
+
+.self-message {
+  & + .self-message {
+    @apply rounded-tr-lg;
+  }
+
+  &:has(+ .self-message) {
+    @apply rounded-br-lg;
+  }
+}
+
+.companion-message {
+  & + .companion-message {
+    @apply rounded-tl-lg;
+  }
+
+  &:has(+ .companion-message) {
+    @apply rounded-bl-lg;
+  }
+}

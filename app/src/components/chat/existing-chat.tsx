@@ -1,37 +1,127 @@
-import { EllipsisVertical, SendHorizonal } from 'lucide-react';
-import { ChatContainer } from '~/components/chat/chat-container';
-import { Button } from '~/components/ui/button';
-import { Textarea } from '~/components/ui/textarea';
+import { useEffect, useRef } from 'react';
+import { ChatForm } from '~/components/chat/chat-form';
+import { MessageContainer } from '~/components/message/message-container';
+import { MessageStatusBar } from '~/components/message/message-status-bar';
+import { MessageStatusIcon } from '~/components/message/message-status-icon';
+import { MessageTime } from '~/components/message/message-time';
+import { useNewMessagesSubscription } from '~/hooks/use-new-messages-subscription';
+import { useNewReadMessagesSubscription } from '~/hooks/use-new-read-messages-subscription';
+import { type ChatPretty } from '~/server/db/schema/chats';
+import { type ChatMessage } from '~/server/db/schema/messages';
+import { api } from '~/trpc/react';
 
 type Props = {
-  companionName: string | null;
+  chat: ChatPretty;
+  messages: (ChatMessage | null)[];
 };
 
-export const ExistingChat = ({ companionName }: Props) => {
+export const ExistingChat = ({ chat, messages }: Props) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const firstUnreadMessageRef = useRef<HTMLLIElement | null>(null);
+  const unreadMessages = useRef<Set<string>>(new Set([]));
+  const timeout = useRef<NodeJS.Timeout | null>(null);
+
+  const { mutate: readUnreadMessages } = api.messages.readUnreadMessages.useMutation();
+
+  useNewMessagesSubscription();
+  useNewReadMessagesSubscription({ userId: chat.userId, companionId: chat.companionId });
+
+  const onReadMessages = () => {
+    if (unreadMessages.current.size) {
+      readUnreadMessages({
+        senderId: chat.companionId,
+        receiverId: chat.userId,
+        messagesIds: Array.from(unreadMessages.current),
+      });
+    }
+  };
+
+  const handleScroll = () => {
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
+
+    timeout.current = setTimeout(() => {
+      onReadMessages();
+      unreadMessages.current.clear();
+    }, 3000);
+  };
+
+  const onSendMessageSideEffect = () => {
+    onReadMessages();
+    firstUnreadMessageRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      // mark viewed messages as "read"
+      onReadMessages();
+
+      if (timeout.current) {
+        clearTimeout(timeout.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // scroll to the bottom when send a message
+    if (messages.at(-1)?.senderId === chat.userId) {
+      containerRef.current?.scrollTo({
+        top: containerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages.length]);
+
+  useEffect(() => {
+    // Initial scroll or to the freshest unread message
+    const container = containerRef.current;
+    const message = firstUnreadMessageRef.current;
+
+    if (container) {
+      if (message) {
+        container.scrollTo({ top: message.offsetTop - message.offsetHeight });
+      } else {
+        container.scrollTo({ top: container.scrollHeight });
+      }
+    }
+  }, []);
+
   return (
-    <ChatContainer className="flex-col items-start justify-stretch py-0">
-      <header className="flex w-full items-center border-b border-slate-300 py-2">
-        <h3>{companionName}</h3>
-        <Button size="icon-sm" variant="outline" className="ml-auto">
-          <EllipsisVertical />
-        </Button>
-      </header>
-      <div className="my-2 w-full grow border border-red-400">
-        <ul className="flex h-full flex-col justify-end">
-          <li>Message 1</li>
-          <li className="self-end">Message 2</li>
-        </ul>
-      </div>
-      <div className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
-        <Textarea
-          className="scrollbar scrollbar-w-[6px] scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg w-full resize-none rounded-sm bg-slate-200 p-2 dark:bg-slate-700"
-          defaultValue="text"
-          maxRows={8}
-        />
-        <Button size="icon-lg" className="rounded-full">
-          <SendHorizonal />
-        </Button>
-      </div>
-    </ChatContainer>
+    <>
+      {messages.length ? (
+        <div
+          ref={containerRef}
+          onScroll={handleScroll}
+          className="relative mb-4 mt-2 w-[calc(100%+8px)] grow overflow-y-auto pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
+          <ul className="flex min-h-full flex-col justify-end gap-2 overflow-y-auto px-1 pb-1 pt-4">
+            {messages.map((message) =>
+              message ? (
+                <MessageContainer
+                  key={message.id}
+                  messageId={message.id}
+                  fromCurrentUser={chat.userId === message.senderId}
+                  isRead={message.isRead}
+                  unreadMessages={unreadMessages.current}
+                  ref={firstUnreadMessageRef}>
+                  <span className="px-5">{message.text}</span>
+                  <MessageStatusBar fromCurrentUser={chat.userId === message.senderId}>
+                    <MessageTime createdAt={message.createdAt} />
+                    {chat.userId === message.senderId ? (
+                      <MessageStatusIcon isRead={message.isRead} isSent={message.isSent} />
+                    ) : null}
+                  </MessageStatusBar>
+                </MessageContainer>
+              ) : null
+            )}
+          </ul>
+        </div>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center">
+          <span className="text-gray-dark dark:text-gray-light">There are no messages yet...</span>
+        </div>
+      )}
+      <ChatForm chat={chat} onSubmitSideEffect={onSendMessageSideEffect} />
+    </>
   );
 };

@@ -14,7 +14,7 @@ export const Header = async () => {
   const nameInitials = getNameInitials(session.user.name);
 
   return (
-    <header className="bg-slate-100 py-2 dark:bg-slate-700">
+    <header className="fixed w-full bg-slate-100 py-2 dark:bg-slate-700">
       <Wrapper className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggler className="h-8 w-8 rounded-full" />

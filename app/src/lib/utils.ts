@@ -33,3 +33,13 @@ export const getUsersSlice = ({
 }) => {
   return users.length > perPage + 1 ? users.slice(perPage * (page - 1), perPage * page) : users;
 };
+
+export const getHoursMinutes = (date: Date) => {
+  const rawHours = date.getHours();
+  const rawMinutes = date.getMinutes();
+
+  const hours = rawHours < 10 ? `0${rawHours}` : rawHours;
+  const minutes = rawMinutes < 10 ? `0${rawMinutes}` : rawMinutes;
+
+  return `${hours}:${minutes}`;
+};

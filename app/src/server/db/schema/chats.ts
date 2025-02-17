@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { varchar } from 'drizzle-orm/pg-core';
 import { createTable } from '../table-creator';
+import { messages } from './messages';
 import { users } from './users';
 
 export const chats = createTable('chats', {
@@ -18,7 +19,7 @@ export const chats = createTable('chats', {
 
 // RELATIONS
 
-export const chatsRelations = relations(chats, ({ one }) => ({
+export const chatsRelations = relations(chats, ({ one, many }) => ({
   user1: one(users, {
     fields: [chats.userId1],
     references: [users.id],
@@ -29,4 +30,14 @@ export const chatsRelations = relations(chats, ({ one }) => ({
     references: [users.id],
     relationName: 'user2_in_chats',
   }),
+  messages: many(messages),
 }));
+
+// TYPES
+
+export type Chat = typeof chats.$inferSelect;
+export type ChatPretty = {
+  chatId: string;
+  userId: string;
+  companionId: string;
+};

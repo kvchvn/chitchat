@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_messages" ALTER COLUMN "is_sent" SET NOT NULL;
