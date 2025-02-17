@@ -9,7 +9,7 @@ import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
-  title: 'Chit-Chat v2',
+  title: 'chit-chat',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
