@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ChatForm } from '~/components/chat/chat-form';
 import { MessageContainer } from '~/components/message/message-container';
 import { MessageStatusBar } from '~/components/message/message-status-bar';
@@ -26,7 +26,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   useNewMessagesSubscription();
   useNewReadMessagesSubscription({ userId: chat.userId, companionId: chat.companionId });
 
-  const onReadMessages = () => {
+  const onReadMessages = useCallback(() => {
     if (unreadMessages.current.size) {
       readUnreadMessages({
         senderId: chat.companionId,
@@ -34,7 +34,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
         messagesIds: Array.from(unreadMessages.current),
       });
     }
-  };
+  }, [chat.userId, chat.companionId, readUnreadMessages]);
 
   const handleScroll = () => {
     if (timeout.current) {
@@ -61,7 +61,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
         clearTimeout(timeout.current);
       }
     };
-  }, []);
+  }, [onReadMessages]);
 
   useEffect(() => {
     // scroll to the bottom when send a message
@@ -71,7 +71,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
         behavior: 'smooth',
       });
     }
-  }, [messages.length]);
+  }, [messages.length, chat.userId]);
 
   useEffect(() => {
     // Initial scroll or to the freshest unread message

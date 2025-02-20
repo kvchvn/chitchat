@@ -7,5 +7,5 @@ type Props = {
 export const MessageTime = ({ createdAt }: Props) => {
   const time = getHoursMinutes(createdAt);
 
-  return <span>{time}</span>;
+  return <span className="font-mono text-xs">{time}</span>;
 };
