@@ -47,7 +47,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
                     text: newMessage.text,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    isRead: false,
+                    isRead: newMessage.senderId === newMessage.receiverId,
                     isSent: false,
                   },
                 ],

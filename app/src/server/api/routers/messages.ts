@@ -34,10 +34,11 @@ export const messagesRouter = createTRPCRouter({
           text: input.text,
           senderId: input.senderId,
           receiverId: input.receiverId,
+          isRead: input.senderId === input.receiverId,
         })
         .returning();
 
-      if (newMessage) {
+      if (newMessage && input.senderId !== input.receiverId) {
         ee.emit('sendMessage', newMessage);
       }
 
