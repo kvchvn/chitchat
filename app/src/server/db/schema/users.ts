@@ -1,8 +1,9 @@
 import { relations, sql } from 'drizzle-orm';
 import { boolean, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { createTable } from '../table-creator';
-import { accounts } from './auth';
-import { chats } from './chats';
+import { accounts } from '~/server/db/schema/auth';
+import { chats } from '~/server/db/schema/chats';
+import { messages } from '~/server/db/schema/messages';
+import { createTable } from '~/server/db/table-creator';
 
 export const users = createTable('user', {
   id: varchar('id', { length: 255 })
@@ -24,4 +25,6 @@ export const users = createTable('user', {
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   chats: many(chats),
+  sentMessages: many(messages, { relationName: 'message_sender' }),
+  receivedMessages: many(messages, { relationName: 'message_receiver' }),
 }));

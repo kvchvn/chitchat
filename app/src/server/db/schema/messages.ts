@@ -45,10 +45,12 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
   sender: one(users, {
     fields: [messages.senderId],
     references: [users.id],
+    relationName: 'message_sender',
   }),
   receiver: one(users, {
     fields: [messages.receiverId],
     references: [users.id],
+    relationName: 'message_receiver',
   }),
   likes: many(messageLikes),
 }));

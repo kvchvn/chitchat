@@ -3,12 +3,15 @@ import type React from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '~/components/ui/resizable';
 import { UsersList } from '~/components/user/users-list';
 import { logger } from '~/lib/logger';
+import { getServerAuthSession } from '~/server/auth';
 
 const log = logger.child({ module: '(protected)/(chats)/layout.tsx' });
 
 const RESIZABLE_GROUP_ID = 'chats';
 
-export default function ChatsLayout({ children }: React.PropsWithChildren) {
+export default async function ChatsLayout({ children }: React.PropsWithChildren) {
+  const session = (await getServerAuthSession())!;
+
   const resizableLayout = cookies().get(`react-resizable-panels:${RESIZABLE_GROUP_ID}`);
   let defaultResizableLayout: number[] | undefined = undefined;
 
@@ -28,7 +31,7 @@ export default function ChatsLayout({ children }: React.PropsWithChildren) {
     <>
       <ResizablePanelGroup direction="horizontal" autoSaveId={RESIZABLE_GROUP_ID}>
         <ResizablePanel defaultSize={defaultResizableLayout?.[0]} maxSize={30} className="min-w-14">
-          <UsersList />
+          <UsersList currentUserId={session.user.id} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultResizableLayout?.[1]}>{children}</ResizablePanel>
