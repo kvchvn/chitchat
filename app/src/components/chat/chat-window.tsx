@@ -4,6 +4,7 @@ import { api } from '~/trpc/react';
 import { ChatIsNotCreated } from './chat-is-not-created';
 import { ChatSkeleton } from './chat-skeleton';
 import { ExistingChat } from './existing-chat';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   userId: string;
@@ -14,7 +15,7 @@ type Props = {
 export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
   const { isError, isLoading, data } = api.chats.getByMembersIds.useQuery(
     { userId, companionId },
-    { retry: false }
+    { retry: false, refetchOnMount: 'always' }
   );
 
   if (isLoading) {
