@@ -64,8 +64,17 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   }, [onReadMessages]);
 
   useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const containerOffset =
+      containerRef.current.scrollHeight -
+      (containerRef.current.scrollTop +
+      containerRef.current.clientHeight);
+
     // scroll to the bottom when send a message
-    if (messages.at(-1)?.senderId === chat.userId) {
+    if (messages.at(-1)?.senderId === chat.userId || containerOffset < 200) {
       containerRef.current?.scrollTo({
         top: containerRef.current.scrollHeight,
         behavior: 'smooth',
