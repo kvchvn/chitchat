@@ -1,10 +1,10 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-import { LoadingIcon } from '~/components/ui/loading-icon';
+import { Button } from '~/components/ui/button';
 import { UserItemMemo } from '~/components/user/user-item';
 import { api } from '~/trpc/react';
-import { Button } from '../ui/button';
+import { UserItemSkeleton } from './user-item-skeleton';
 
 type Props = {
   currentUserId: string;
@@ -33,9 +33,9 @@ export const UsersList = ({ currentUserId }: Props) => {
 
   if (isLoadingUsersWithLastMessage || isLoadingUsersWithUnreadMessages) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <LoadingIcon className="h-6 w-6" strokeWidth={2} />
-      </div>
+      <ul className="flex flex-col">
+        <UserItemSkeleton count={5} />
+      </ul>
     );
   }
 
