@@ -24,6 +24,19 @@ export const useNewReadMessagesSubscription = ({ userId, companionId }: Args) =>
             }
           : oldData
       );
+
+      utils.users.getAllWithSentUnreadMessages.setData(undefined, (staleCountsRecord) => {
+        if (staleCountsRecord && staleCountsRecord[companionId]) {
+          const count = staleCountsRecord[companionId];
+
+          return {
+            ...staleCountsRecord,
+            [companionId]: count > messagesIds.size ? count - messagesIds.size : 0,
+          };
+        }
+
+        return staleCountsRecord;
+      });
     },
   });
 };

@@ -3,6 +3,7 @@
 import { RefreshCw } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { UserItemMemo } from '~/components/user/user-item';
+import { useChatPreviewSubscription } from '~/hooks/use-chat-preview-subscription';
 import { api } from '~/trpc/react';
 import { UserItemSkeleton } from './user-item-skeleton';
 
@@ -25,6 +26,8 @@ export const UsersList = ({ currentUserId }: Props) => {
     data: usersWithUnreadMessages,
     refetch: refetchUsersWithUnreadMessages,
   } = api.users.getAllWithSentUnreadMessages.useQuery(undefined, { retry: false });
+
+  useChatPreviewSubscription({ userId: currentUserId });
 
   const handleClick = () => {
     void refetchUsersWithLastMessage();

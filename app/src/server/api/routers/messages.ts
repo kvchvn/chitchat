@@ -40,6 +40,7 @@ export const messagesRouter = createTRPCRouter({
 
       if (newMessage && input.senderId !== input.receiverId) {
         ee.emit('sendMessage', newMessage);
+        ee.emit('updateChatPreview', newMessage);
       }
 
       return newMessage;
@@ -84,4 +85,16 @@ export const messagesRouter = createTRPCRouter({
       yield messagesIds;
     }
   }),
+  onUpdateChatPreview: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .subscription(async function* ({ input }) {
+      for await (const [newLastMessage] of ee.toIterable('updateChatPreview')) {
+        if (
+          input.userId === newLastMessage.receiverId ||
+          input.userId === newLastMessage.senderId
+        ) {
+          yield newLastMessage;
+        }
+      }
+    }),
 });

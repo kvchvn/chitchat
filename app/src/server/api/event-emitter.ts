@@ -4,6 +4,7 @@ import { type ChatMessage } from '~/server/db/schema/messages';
 type AppEvents = {
   sendMessage: (message: ChatMessage) => void;
   readMessages: (unreadMessagesIds: Set<string>) => void;
+  updateChatPreview: (newLastMessage: ChatMessage) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
