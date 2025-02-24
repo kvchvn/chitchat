@@ -55,7 +55,7 @@ export const UsersList = ({ currentUserId }: Props) => {
         <UserItemMemo
           key={user.id}
           id={user.id}
-          isCurrentUser={currentUserId === user.id}
+          currentUserId={currentUserId}
           name={user.name}
           image={user.image}
           lastMessage={user.lastMessage}

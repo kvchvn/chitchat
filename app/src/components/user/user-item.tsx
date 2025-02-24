@@ -12,8 +12,8 @@ type Props = {
   id: string;
   image: string | null;
   name: string | null;
-  isCurrentUser: boolean;
-  lastMessage: Pick<ChatMessage, 'id' | 'createdAt' | 'text'> | undefined;
+  currentUserId: string;
+  lastMessage: Pick<ChatMessage, 'id' | 'createdAt' | 'text' | 'senderId'> | undefined;
   unreadMessagesCount: number | undefined;
 };
 
@@ -21,7 +21,7 @@ export const UserItem = ({
   id,
   image,
   name,
-  isCurrentUser,
+  currentUserId,
   lastMessage,
   unreadMessagesCount,
 }: Props) => {
@@ -41,20 +41,25 @@ export const UserItem = ({
         )}>
         <Avatar className="h-10 w-10">
           <AvatarImage
-            className={cn(isCurrentUser && 'scale-75')}
-            src={isCurrentUser ? '/svg/bookmark.svg' : (image ?? undefined)}
+            className={cn(currentUserId && 'scale-75')}
+            src={currentUserId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
             alt={name ?? "user's avatar"}
           />
           <AvatarFallback className="text-sm">{getNameInitials(name)}</AvatarFallback>
         </Avatar>
         <div className="flex w-full min-w-32 flex-col">
           <div className="flex items-center justify-between gap-2">
-            <span className="shrink-0 text-sm font-semibold">{isCurrentUser ? 'Notes' : name}</span>
+            <span className="shrink-0 text-sm font-semibold">
+              {currentUserId === id ? 'Notes' : name}
+            </span>
             <span className="font-mono text-xs text-gray-400">{lastMessageTime}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
             {lastMessage ? (
               <span className="line-clamp-1 min-w-[50%] max-w-[70%] text-ellipsis break-words text-sm">
+                {lastMessage.senderId === currentUserId ? (
+                  <i className="text-gray-500">You: </i>
+                ) : null}
                 {lastMessage.text}
               </span>
             ) : (
