@@ -44,7 +44,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
     timeout.current = setTimeout(() => {
       onReadMessages();
       unreadMessages.current.clear();
-    }, 3000);
+    }, 1000);
   };
 
   const onSendMessageSideEffect = () => {
@@ -70,8 +70,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
 
     const containerOffset =
       containerRef.current.scrollHeight -
-      (containerRef.current.scrollTop +
-      containerRef.current.clientHeight);
+      (containerRef.current.scrollTop + containerRef.current.clientHeight);
 
     // scroll to the bottom when send a message
     if (messages.at(-1)?.senderId === chat.userId || containerOffset < 200) {
