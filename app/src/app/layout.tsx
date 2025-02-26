@@ -26,7 +26,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       )}>
       <body className="flex h-dvh flex-col items-stretch">
         <TRPCReactProvider>
-          <ThemeProvider attribute="class">{children}</ThemeProvider>
+          <ThemeProvider attribute="class" enableSystem={false}>
+            {children}
+          </ThemeProvider>
         </TRPCReactProvider>
         <Toaster />
       </body>
