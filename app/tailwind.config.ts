@@ -166,6 +166,9 @@ export default {
         '2': '2',
         '3': '3',
       },
+      containers: {
+        '2xs': '130px',
+      },
     },
   },
   plugins: [
