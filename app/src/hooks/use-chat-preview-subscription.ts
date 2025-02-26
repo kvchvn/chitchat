@@ -27,13 +27,7 @@ export const useChatPreviewSubscription = ({ userId }: Args) => {
             const updatingUser = staleAllUsers[index];
 
             if (updatingUser) {
-              updatingUser.lastMessage = {
-                id: newLastMessage.id,
-                createdAt: newLastMessage.createdAt,
-                text: newLastMessage.text,
-                senderId: newLastMessage.senderId,
-                receiverId: newLastMessage.receiverId,
-              };
+              updatingUser.lastMessage = newLastMessage;
 
               return staleAllUsers
                 .slice(0, index)

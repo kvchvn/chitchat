@@ -13,7 +13,7 @@ type Props = {
   image: string | null;
   name: string | null;
   currentUserId: string;
-  lastMessage: Pick<ChatMessage, 'id' | 'createdAt' | 'text' | 'senderId'> | undefined;
+  lastMessage: ChatMessage | undefined;
   unreadMessagesCount: number | undefined;
 };
 

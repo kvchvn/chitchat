@@ -41,25 +41,11 @@ export const usersRouter = createTRPCRouter({
       where: eq(users.id, ctx.session.user.id),
       with: {
         sentMessages: {
-          columns: {
-            id: true,
-            createdAt: true,
-            text: true,
-            senderId: true,
-            receiverId: true,
-          },
           where: eq(messages.receiverId, ctx.session.user.id),
           orderBy: [desc(messages.createdAt)],
           limit: 1,
         },
         receivedMessages: {
-          columns: {
-            id: true,
-            createdAt: true,
-            text: true,
-            senderId: true,
-            receiverId: true,
-          },
           where: and(eq(messages.senderId, ctx.session.user.id)),
           orderBy: [desc(messages.createdAt)],
           limit: 1,
@@ -76,25 +62,11 @@ export const usersRouter = createTRPCRouter({
       where: ne(users.id, ctx.session.user.id),
       with: {
         sentMessages: {
-          columns: {
-            id: true,
-            createdAt: true,
-            text: true,
-            senderId: true,
-            receiverId: true,
-          },
           where: eq(messages.receiverId, ctx.session.user.id),
           orderBy: [desc(messages.createdAt)],
           limit: 1,
         },
         receivedMessages: {
-          columns: {
-            id: true,
-            createdAt: true,
-            text: true,
-            senderId: true,
-            receiverId: true,
-          },
           where: and(eq(messages.senderId, ctx.session.user.id)),
           orderBy: [desc(messages.createdAt)],
           limit: 1,
