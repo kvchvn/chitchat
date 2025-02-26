@@ -26,7 +26,7 @@ export const useNewReadMessagesSubscription = ({ userId, companionId }: Args) =>
       );
 
       utils.users.getAllWithSentUnreadMessages.setData(undefined, (staleCountsRecord) => {
-        if (staleCountsRecord && staleCountsRecord[companionId]) {
+        if (staleCountsRecord?.[companionId]) {
           const count = staleCountsRecord[companionId];
 
           return {

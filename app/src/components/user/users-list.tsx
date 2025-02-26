@@ -17,9 +17,7 @@ export const UsersList = ({ currentUserId }: Props) => {
     isError: isErrorUsersWithLastMessage,
     data: usersWithLastMessage,
     refetch: refetchUsersWithLastMessage,
-  } = api.users.getAllWithTheLastMessage.useQuery(undefined, {
-    retry: false,
-  });
+  } = api.users.getAllWithTheLastMessage.useQuery(undefined, { retry: false });
 
   const {
     isLoading: isLoadingUsersWithUnreadMessages,

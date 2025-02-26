@@ -41,7 +41,7 @@ export const useChatPreviewSubscription = ({ userId }: Args) => {
         // Update unread messages indicator
         utils.users.getAllWithSentUnreadMessages.setData(undefined, (staleCountsRecord) => {
           if (staleCountsRecord && newLastMessage.senderId in staleCountsRecord) {
-            let count = staleCountsRecord[newLastMessage.senderId] ?? 0;
+            const count = staleCountsRecord[newLastMessage.senderId] ?? 0;
 
             return { ...staleCountsRecord, [newLastMessage.senderId]: count + 1 };
           }
