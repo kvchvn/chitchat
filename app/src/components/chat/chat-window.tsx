@@ -4,7 +4,6 @@ import { api } from '~/trpc/react';
 import { ChatIsNotCreated } from './chat-is-not-created';
 import { ChatSkeleton } from './chat-skeleton';
 import { ExistingChat } from './existing-chat';
-import { useRouter } from 'next/navigation';
 
 type Props = {
   userId: string;
@@ -13,8 +12,8 @@ type Props = {
 };
 
 export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
-  const { isError, isLoading, data } = api.chats.getByMembersIds.useQuery(
-    { userId, companionId },
+  const { isError, isLoading, data } = api.chats.getByCompanionId.useQuery(
+    { companionId },
     { retry: false, refetchOnMount: 'always' }
   );
 
@@ -23,9 +22,7 @@ export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
   }
 
   if (isError || !data) {
-    return (
-      <ChatIsNotCreated userId={userId} companionId={companionId} companionName={companionName} />
-    );
+    return <ChatIsNotCreated companionId={companionId} companionName={companionName} />;
   }
 
   return (

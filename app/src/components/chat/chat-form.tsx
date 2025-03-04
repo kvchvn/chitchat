@@ -3,7 +3,6 @@ import {
   type ChangeEventHandler,
   type FormEventHandler,
   type KeyboardEventHandler,
-  useId,
   useState,
 } from 'react';
 import { Button } from '~/components/ui/button';
@@ -19,7 +18,6 @@ type Props = {
 
 export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
   const utils = api.useUtils();
-  const newMessageId = useId();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
 
@@ -27,32 +25,30 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
     onMutate: async (newMessage) => {
       setMessage('');
 
-      await utils.chats.getByMembersIds.cancel();
+      await utils.chats.getByCompanionId.cancel();
 
-      const previousChat = utils.chats.getByMembersIds.getData();
+      const previousChat = utils.chats.getByCompanionId.getData();
 
-      utils.chats.getByMembersIds.setData(
-        { userId: chat.userId, companionId: chat.companionId },
-        (oldData) =>
-          oldData
-            ? {
-                chat: oldData.chat,
-                messages: [
-                  ...oldData.messages,
-                  {
-                    id: newMessageId,
-                    chatId: newMessage.chatId,
-                    senderId: newMessage.senderId,
-                    receiverId: newMessage.receiverId,
-                    text: newMessage.text,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    isRead: newMessage.senderId === newMessage.receiverId,
-                    isSent: false,
-                  },
-                ],
-              }
-            : oldData
+      utils.chats.getByCompanionId.setData({ companionId: chat.companionId }, (oldData) =>
+        oldData
+          ? {
+              chat: oldData.chat,
+              messages: [
+                ...oldData.messages,
+                {
+                  id: `${Math.random()}`,
+                  chatId: newMessage.chatId,
+                  senderId: newMessage.senderId,
+                  receiverId: newMessage.receiverId,
+                  text: newMessage.text,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  isRead: newMessage.senderId === newMessage.receiverId,
+                  isSent: false,
+                },
+              ],
+            }
+          : oldData
       );
 
       onSubmitSideEffect();
@@ -60,8 +56,8 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       return { previousChat };
     },
     onError: (_, __, context) => {
-      utils.chats.getByMembersIds.setData(
-        { userId: chat.userId, companionId: chat.companionId },
+      utils.chats.getByCompanionId.setData(
+        { companionId: chat.companionId },
         context?.previousChat
       );
 
@@ -72,8 +68,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       });
     },
     onSettled: async () => {
-      await utils.chats.getByMembersIds.invalidate({
-        userId: chat.userId,
+      await utils.chats.getByCompanionId.invalidate({
         companionId: chat.companionId,
       });
     },

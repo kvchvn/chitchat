@@ -51,7 +51,9 @@ export const UserItem = ({
             <span className="shrink-0 text-sm font-semibold">
               {currentUserId === id ? 'Notes' : name}
             </span>
-            <span className="font-mono text-xs text-gray-400">{lastMessageTime}</span>
+            <span className="cursor-default font-mono text-xs text-gray-400">
+              {lastMessageTime}
+            </span>
           </div>
           <div className="flex items-center justify-between gap-2">
             {lastMessage ? (
@@ -66,8 +68,8 @@ export const UserItem = ({
             ) : (
               <span className="text-sm italic text-gray-400">No messages</span>
             )}
-            {unreadMessagesCount && currentUserId !== lastMessage?.senderId ? (
-              <span className="@2xs:static border- @2xs:border-none absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full border border-current bg-highlight-light font-mono text-xs leading-none dark:bg-highlight-dark">
+            {unreadMessagesCount ? (
+              <span className="border- absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full border border-current bg-highlight-light font-mono text-xs leading-none @2xs:static @2xs:border-none dark:bg-highlight-dark">
                 {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
               </span>
             ) : null}

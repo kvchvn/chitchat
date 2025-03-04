@@ -10,43 +10,39 @@ export const useChatPreviewSubscription = ({ userId }: Args) => {
   api.messages.onUpdateChatPreview.useSubscription(
     { userId },
     {
-      onData: (newLastMessage) => {
+      onData: ({ newPreviewMessage, resetUnreadMessages, senderId, receiverId }) => {
         // Update (the last) message in the chat preview
-        utils.users.getAllWithTheLastMessage.setData(undefined, (staleAllUsers) => {
+        utils.users.getAllWithChatPreview.setData(undefined, (staleAllUsers) => {
           if (staleAllUsers) {
             let index = -1;
 
-            if (newLastMessage.senderId === userId) {
+            if (senderId === userId) {
               // update chat with the message receiver
-              index = staleAllUsers.findIndex((user) => user.id === newLastMessage.receiverId);
+              index = staleAllUsers.findIndex((user) => user.id === receiverId);
             } else {
               // update chat with the sender
-              index = staleAllUsers.findIndex((user) => user.id === newLastMessage.senderId);
+              index = staleAllUsers.findIndex((user) => user.id === senderId);
             }
 
             const updatingUser = staleAllUsers[index];
 
             if (updatingUser) {
-              updatingUser.lastMessage = newLastMessage;
+              const count = updatingUser.unreadMessagesCount;
+              const newCount = resetUnreadMessages ? 0 : count + 1;
+
+              const updatedUser: typeof updatingUser = {
+                ...updatingUser,
+                unreadMessagesCount: userId !== senderId ? newCount : count,
+                lastMessage: newPreviewMessage,
+              };
 
               return staleAllUsers
                 .slice(0, index)
-                .concat(updatingUser, staleAllUsers.slice(index + 1));
+                .concat(updatedUser, staleAllUsers.slice(index + 1));
             }
           }
 
           return staleAllUsers;
-        });
-
-        // Update unread messages indicator
-        utils.users.getAllWithSentUnreadMessages.setData(undefined, (staleCountsRecord) => {
-          if (staleCountsRecord && newLastMessage.senderId in staleCountsRecord) {
-            const count = staleCountsRecord[newLastMessage.senderId] ?? 0;
-
-            return { ...staleCountsRecord, [newLastMessage.senderId]: count + 1 };
-          }
-
-          return staleCountsRecord;
         });
       },
     }

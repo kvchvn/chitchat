@@ -13,26 +13,19 @@ type Props = {
 
 export const UsersList = ({ currentUserId }: Props) => {
   const {
-    isLoading: isLoadingUsersWithLastMessage,
-    isError: isErrorUsersWithLastMessage,
-    data: usersWithLastMessage,
-    refetch: refetchUsersWithLastMessage,
-  } = api.users.getAllWithTheLastMessage.useQuery(undefined, { retry: false });
-
-  const {
-    isLoading: isLoadingUsersWithUnreadMessages,
-    data: usersWithUnreadMessages,
-    refetch: refetchUsersWithUnreadMessages,
-  } = api.users.getAllWithSentUnreadMessages.useQuery(undefined, { retry: false });
+    isLoading,
+    isError,
+    data: users,
+    refetch,
+  } = api.users.getAllWithChatPreview.useQuery(undefined, { retry: false });
 
   useChatPreviewSubscription({ userId: currentUserId });
 
   const handleClick = () => {
-    void refetchUsersWithLastMessage();
-    void refetchUsersWithUnreadMessages();
+    void refetch();
   };
 
-  if (isLoadingUsersWithLastMessage || isLoadingUsersWithUnreadMessages) {
+  if (isLoading) {
     return (
       <ul className="flex flex-col">
         <UserItemSkeleton count={5} />
@@ -40,7 +33,7 @@ export const UsersList = ({ currentUserId }: Props) => {
     );
   }
 
-  if (isErrorUsersWithLastMessage || !usersWithLastMessage) {
+  if (isError || !users) {
     return (
       <div className="flex h-full items-center justify-center">
         <Button onClick={handleClick} size="icon" className="rounded-full">
@@ -52,7 +45,7 @@ export const UsersList = ({ currentUserId }: Props) => {
 
   return (
     <ul className="flex flex-col">
-      {usersWithLastMessage.map((user) => (
+      {users.map((user) => (
         <UserItemMemo
           key={user.id}
           id={user.id}
@@ -60,7 +53,7 @@ export const UsersList = ({ currentUserId }: Props) => {
           name={user.name}
           image={user.image}
           lastMessage={user.lastMessage}
-          unreadMessagesCount={usersWithUnreadMessages?.[user.id]}
+          unreadMessagesCount={user.unreadMessagesCount}
         />
       ))}
     </ul>

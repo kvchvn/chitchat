@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, lt, ne } from 'drizzle-orm';
+import { and, desc, eq, lt } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
@@ -31,35 +31,14 @@ export const usersRouter = createTRPCRouter({
 
     return allUsers;
   }),
-  getAllWithTheLastMessage: protectedProcedure.query(async ({ ctx }) => {
-    const youPromise = ctx.db.query.users.findMany({
-      columns: {
-        id: true,
-        name: true,
-        image: true,
-      },
-      where: eq(users.id, ctx.session.user.id),
-      with: {
-        sentMessages: {
-          where: eq(messages.receiverId, ctx.session.user.id),
-          orderBy: [desc(messages.createdAt)],
-          limit: 1,
-        },
-        receivedMessages: {
-          where: and(eq(messages.senderId, ctx.session.user.id)),
-          orderBy: [desc(messages.createdAt)],
-          limit: 1,
-        },
-      },
-    });
-
+  getAllWithChatPreview: protectedProcedure.query(async ({ ctx }) => {
+    // get all users with the last message in the chat between a user and current user
     const allUsersPromise = ctx.db.query.users.findMany({
       columns: {
         id: true,
         name: true,
         image: true,
       },
-      where: ne(users.id, ctx.session.user.id),
       with: {
         sentMessages: {
           where: eq(messages.receiverId, ctx.session.user.id),
@@ -74,23 +53,8 @@ export const usersRouter = createTRPCRouter({
       },
     });
 
-    const [you, allUsers] = await Promise.all([youPromise, allUsersPromise]);
-
-    const transformedAllUsers = you.concat(allUsers).map((user) => {
-      const sentMessageCreatedAt = Number(user.sentMessages?.[0]?.createdAt);
-      const receivedMessageCreatedAt = Number(user.receivedMessages[0]?.createdAt);
-
-      const lastMessage =
-        sentMessageCreatedAt < receivedMessageCreatedAt
-          ? user.receivedMessages[0]
-          : user.sentMessages[0];
-      return { id: user.id, name: user.name, image: user.image, lastMessage };
-    });
-
-    return transformedAllUsers;
-  }),
-  getAllWithSentUnreadMessages: protectedProcedure.query(async ({ ctx }) => {
-    const usersWithMessages = await ctx.db.query.users.findMany({
+    // get all users with a count of unread messages that has been sent by a user to current user
+    const allUsersWithUnreadSentMessagesPromise = ctx.db.query.users.findMany({
       columns: {
         id: true,
       },
@@ -104,25 +68,47 @@ export const usersRouter = createTRPCRouter({
       },
     });
 
-    const usersWithMessagesRecord: Record<string, number> = {};
+    const [allUsers, allUsersWithUnreadSentMessages] = await Promise.all([
+      allUsersPromise,
+      allUsersWithUnreadSentMessagesPromise,
+    ]);
 
-    for (const user of usersWithMessages) {
-      usersWithMessagesRecord[user.id] = user.sentMessages.length;
+    const allUsersWithUnreadSentMessagesCount: Record<string, number> = {};
+
+    // loop through the array to save count values as properties. Id is a key
+    allUsersWithUnreadSentMessages.forEach((u) => {
+      allUsersWithUnreadSentMessagesCount[u.id] = u.sentMessages.length;
+    });
+
+    // replace current user's chat at the beginning (it will be a kind of "notes")
+    const currentUserIndex = allUsers.findIndex((u) => u.id === ctx.session.user.id);
+    let sortedAllUsers = allUsers;
+
+    if (allUsers[currentUserIndex]) {
+      sortedAllUsers = [allUsers[currentUserIndex]].concat(
+        allUsers.slice(0, currentUserIndex),
+        allUsers.slice(currentUserIndex + 1)
+      );
     }
 
-    return usersWithMessagesRecord;
+    // search for the last message in a chat
+    const transformedAllUsers = sortedAllUsers.map((u) => {
+      const sentMessageCreatedAt = Number(u.sentMessages?.[0]?.createdAt);
+      const receivedMessageCreatedAt = Number(u.receivedMessages[0]?.createdAt);
+
+      const lastMessage =
+        sentMessageCreatedAt < receivedMessageCreatedAt ? u.receivedMessages[0] : u.sentMessages[0];
+
+      const unreadMessagesCount = allUsersWithUnreadSentMessagesCount[u.id] ?? 0;
+      return { id: u.id, name: u.name, image: u.image, lastMessage, unreadMessagesCount };
+    });
+
+    return transformedAllUsers;
   }),
   // mutations
   makeAsNotNew: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (!input.id) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Empty id was passed',
-        });
-      }
-
       const [result] = await ctx.db
         .update(users)
         .set({ isNewUser: false })
@@ -141,13 +127,6 @@ export const usersRouter = createTRPCRouter({
   removeExpiredSessions: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (!input.id) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Empty id was passed',
-        });
-      }
-
       const expiredSessions = await ctx.db
         .delete(sessions)
         .where(and(eq(sessions.userId, input.id), lt(sessions.expires, new Date())))

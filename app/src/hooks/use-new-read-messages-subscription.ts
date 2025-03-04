@@ -1,16 +1,15 @@
 import { api } from '~/trpc/react';
 
 type Args = {
-  userId: string;
   companionId: string;
 };
 
-export const useNewReadMessagesSubscription = ({ userId, companionId }: Args) => {
+export const useNewReadMessagesSubscription = ({ companionId }: Args) => {
   const utils = api.useUtils();
 
   api.messages.onReadMessages.useSubscription(undefined, {
     onData: (messagesIds) => {
-      utils.chats.getByMembersIds.setData({ userId, companionId }, (oldData) =>
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
         oldData
           ? {
               chat: oldData.chat,
@@ -25,17 +24,29 @@ export const useNewReadMessagesSubscription = ({ userId, companionId }: Args) =>
           : oldData
       );
 
-      utils.users.getAllWithSentUnreadMessages.setData(undefined, (staleCountsRecord) => {
-        if (staleCountsRecord?.[companionId]) {
-          const count = staleCountsRecord[companionId];
-
-          return {
-            ...staleCountsRecord,
-            [companionId]: count > messagesIds.size ? count - messagesIds.size : 0,
-          };
+      // reset indicator at the chat preview
+      utils.users.getAllWithChatPreview.setData(undefined, (staleUsers) => {
+        if (!staleUsers) {
+          return staleUsers;
         }
 
-        return staleCountsRecord;
+        const companionIndex = staleUsers.findIndex((u) => u.id === companionId);
+
+        if (companionIndex !== -1 && staleUsers[companionIndex]) {
+          const companion = staleUsers[companionIndex];
+          const count = companion.unreadMessagesCount;
+
+          const updatedCompanion: typeof companion = {
+            ...companion,
+            unreadMessagesCount: count > messagesIds.size ? count - messagesIds.size : 0,
+          };
+
+          return staleUsers
+            .slice(0, companionIndex)
+            .concat(updatedCompanion, staleUsers.slice(companionIndex + 1));
+        }
+
+        return staleUsers;
       });
     },
   });

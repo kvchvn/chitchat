@@ -24,7 +24,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   const { mutate: readUnreadMessages } = api.messages.readUnreadMessages.useMutation();
 
   useNewMessagesSubscription();
-  useNewReadMessagesSubscription({ userId: chat.userId, companionId: chat.companionId });
+  useNewReadMessagesSubscription({ companionId: chat.companionId });
 
   const onReadMessages = useCallback(() => {
     if (unreadMessages.current.size) {
@@ -48,20 +48,20 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   };
 
   const onSendMessageSideEffect = () => {
-    onReadMessages();
     firstUnreadMessageRef.current = null;
   };
 
   useEffect(() => {
-    return () => {
-      // mark viewed messages as "read"
-      onReadMessages();
+    onReadMessages();
+  }, [onReadMessages, messages.length]);
 
+  useEffect(() => {
+    return () => {
       if (timeout.current) {
         clearTimeout(timeout.current);
       }
     };
-  }, [onReadMessages]);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -82,13 +82,13 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   }, [messages.length, chat.userId]);
 
   useEffect(() => {
-    // Initial scroll or to the freshest unread message
+    // initial scroll to the freshest unread message or to the bottom of the chat
     const container = containerRef.current;
     const message = firstUnreadMessageRef.current;
 
     if (container) {
       if (message) {
-        container.scrollTo({ top: message.offsetTop - message.offsetHeight });
+        container.scrollTo({ top: message.offsetTop - message.offsetHeight - 100 });
       } else {
         container.scrollTo({ top: container.scrollHeight });
       }

@@ -6,8 +6,8 @@ import { messages } from '~/server/db/schema/messages';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const chatsRouter = createTRPCRouter({
-  getByMembersIds: protectedProcedure
-    .input(z.object({ userId: z.string(), companionId: z.string() }))
+  getByCompanionId: protectedProcedure
+    .input(z.object({ companionId: z.string() }))
     .query(async ({ ctx, input }) => {
       const result = await ctx.db
         .select({
@@ -17,8 +17,8 @@ export const chatsRouter = createTRPCRouter({
         .from(chats)
         .where(
           or(
-            and(eq(chats.userId1, input.userId), eq(chats.userId2, input.companionId)),
-            and(eq(chats.userId1, input.companionId), eq(chats.userId2, input.userId))
+            and(eq(chats.userId1, ctx.session.user.id), eq(chats.userId2, input.companionId)),
+            and(eq(chats.userId1, input.companionId), eq(chats.userId2, ctx.session.user.id))
           )
         )
         .leftJoin(messages, eq(chats.id, messages.chatId))
@@ -39,20 +39,20 @@ export const chatsRouter = createTRPCRouter({
         messages: chatMessages,
       };
     }),
-  create: protectedProcedure
-    .input(z.object({ userId: z.string(), companionId: z.string() }))
+  createWithCompanion: protectedProcedure
+    .input(z.object({ companionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (!input.userId || !input.companionId) {
+      if (!input.companionId) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Empty id/ids were passed',
+          message: 'Empty id were passed',
         });
       }
 
       const [newChat] = await ctx.db
         .insert(chats)
         .values({
-          userId1: input.userId,
+          userId1: ctx.session.user.id,
           userId2: input.companionId,
         })
         .returning();

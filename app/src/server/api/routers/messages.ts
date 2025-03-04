@@ -1,4 +1,3 @@
-import { TRPCError } from '@trpc/server';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { messages } from '~/server/db/schema/messages';
@@ -17,16 +16,12 @@ export const messagesRouter = createTRPCRouter({
     .input(
       z.object({
         chatId: z.string(),
-        text: z.string(),
+        text: z.string().min(1),
         senderId: z.string(),
         receiverId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (!input.chatId || !input.senderId || !input.receiverId) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid data were passed' });
-      }
-
       const [newMessage] = await ctx.db
         .insert(messages)
         .values({
@@ -40,7 +35,12 @@ export const messagesRouter = createTRPCRouter({
 
       if (newMessage) {
         ee.emit('sendMessage', newMessage);
-        ee.emit('updateChatPreview', newMessage);
+        ee.emit('updateChatPreview', {
+          newPreviewMessage: newMessage,
+          resetUnreadMessages: false,
+          senderId: newMessage.senderId,
+          receiverId: newMessage.receiverId,
+        });
       }
 
       return newMessage;
@@ -55,6 +55,7 @@ export const messagesRouter = createTRPCRouter({
         .set({ isRead: true })
         .where(
           and(
+            eq(messages.isRead, false),
             eq(messages.senderId, input.senderId),
             eq(messages.receiverId, input.receiverId),
             inArray(messages.id, input.messagesIds)
@@ -74,6 +75,30 @@ export const messagesRouter = createTRPCRouter({
 
       return readMessages;
     }),
+  removeAllFromChat: protectedProcedure
+    .input(z.object({ chatId: z.string(), userId: z.string(), companionId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const removedMessages = await ctx.db
+        .delete(messages)
+        .where(eq(messages.chatId, input.chatId))
+        .returning();
+
+      if (removedMessages.length) {
+        ee.emit('removeMessages', {
+          chatId: input.chatId,
+          userId: input.userId,
+          companionId: input.companionId,
+        });
+        ee.emit('updateChatPreview', {
+          newPreviewMessage: undefined,
+          receiverId: input.companionId,
+          senderId: input.userId,
+          resetUnreadMessages: true,
+        });
+      }
+
+      return removedMessages.length;
+    }),
   // subscriptions
   onCreateMessage: protectedProcedure.subscription(async function* () {
     for await (const [message] of ee.toIterable('sendMessage')) {
@@ -90,12 +115,18 @@ export const messagesRouter = createTRPCRouter({
   onUpdateChatPreview: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .subscription(async function* ({ input }) {
-      for await (const [newLastMessage] of ee.toIterable('updateChatPreview')) {
-        if (
-          input.userId === newLastMessage.receiverId ||
-          input.userId === newLastMessage.senderId
-        ) {
-          yield newLastMessage;
+      for await (const [data] of ee.toIterable('updateChatPreview')) {
+        if (input.userId === data.receiverId || input.userId === data.senderId) {
+          yield data;
+        }
+      }
+    }),
+  onRemoveMessages: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .subscription(async function* ({ input }) {
+      for await (const [data] of ee.toIterable('removeMessages')) {
+        if (input.userId === data.companionId) {
+          yield data;
         }
       }
     }),
