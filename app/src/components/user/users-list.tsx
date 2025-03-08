@@ -1,18 +1,19 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
+import { useUserId } from '~/components/contexts/user-id-provider';
 import { Button } from '~/components/ui/button';
 import { UserItemMemo } from '~/components/user/user-item';
 import { useChatPreviewSubscription } from '~/hooks/use-chat-preview-subscription';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useRemoveMessagesSubscription } from '~/hooks/use-remove-messages-subscription';
 import { api } from '~/trpc/react';
 import { UserItemSkeleton } from './user-item-skeleton';
 
-type Props = {
-  currentUserId: string;
-};
+export const UsersList = () => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
 
-export const UsersList = ({ currentUserId }: Props) => {
   const {
     isLoading,
     isError,
@@ -20,8 +21,8 @@ export const UsersList = ({ currentUserId }: Props) => {
     refetch,
   } = api.users.getAllWithChatPreview.useQuery(undefined, { retry: false });
 
-  useChatPreviewSubscription({ userId: currentUserId });
-  useRemoveMessagesSubscription({ userId: currentUserId });
+  useChatPreviewSubscription({ userId });
+  useRemoveMessagesSubscription({ userId, companionId });
 
   const handleClick = () => {
     void refetch();
@@ -51,7 +52,6 @@ export const UsersList = ({ currentUserId }: Props) => {
         <UserItemMemo
           key={user.id}
           id={user.id}
-          currentUserId={currentUserId}
           name={user.name}
           image={user.image}
           lastMessage={user.lastMessage}

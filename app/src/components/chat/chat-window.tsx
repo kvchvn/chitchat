@@ -1,17 +1,19 @@
 'use client';
 
+import { ChatIsNotCreated } from '~/components/chat/chat-is-not-created';
+import { ChatSkeleton } from '~/components/chat/chat-skeleton';
+import { ExistingChat } from '~/components/chat/existing-chat';
+import { ChatIdProvider } from '~/components/contexts/chat-id-provider';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { api } from '~/trpc/react';
-import { ChatIsNotCreated } from './chat-is-not-created';
-import { ChatSkeleton } from './chat-skeleton';
-import { ExistingChat } from './existing-chat';
 
 type Props = {
-  userId: string;
-  companionId: string;
   companionName: string;
 };
 
-export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
+export const ChatWindow = ({ companionName }: Props) => {
+  const companionId = useCompanionId();
+
   const { isError, isLoading, data } = api.chats.getByCompanionId.useQuery(
     { companionId },
     { retry: false, refetchOnMount: 'always' }
@@ -22,10 +24,12 @@ export const ChatWindow = ({ userId, companionId, companionName }: Props) => {
   }
 
   if (isError || !data) {
-    return <ChatIsNotCreated companionId={companionId} companionName={companionName} />;
+    return <ChatIsNotCreated companionName={companionName} />;
   }
 
   return (
-    <ExistingChat messages={data.messages} chat={{ chatId: data.chat.id, userId, companionId }} />
+    <ChatIdProvider chatId={data.chat.id}>
+      <ExistingChat messages={data.messages} />
+    </ChatIdProvider>
   );
 };

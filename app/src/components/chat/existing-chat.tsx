@@ -4,18 +4,21 @@ import { MessageContainer } from '~/components/message/message-container';
 import { MessageStatusBar } from '~/components/message/message-status-bar';
 import { MessageStatusIcon } from '~/components/message/message-status-icon';
 import { MessageTime } from '~/components/message/message-time';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useNewMessagesSubscription } from '~/hooks/use-new-messages-subscription';
 import { useNewReadMessagesSubscription } from '~/hooks/use-new-read-messages-subscription';
-import { type ChatPretty } from '~/server/db/schema/chats';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { api } from '~/trpc/react';
+import { useUserId } from '../contexts/user-id-provider';
 
 type Props = {
-  chat: ChatPretty;
   messages: (ChatMessage | null)[];
 };
 
-export const ExistingChat = ({ chat, messages }: Props) => {
+export const ExistingChat = ({ messages }: Props) => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const firstUnreadMessageRef = useRef<HTMLLIElement | null>(null);
   const unreadMessages = useRef<Set<string>>(new Set([]));
@@ -24,17 +27,17 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   const { mutate: readUnreadMessages } = api.messages.readUnreadMessages.useMutation();
 
   useNewMessagesSubscription();
-  useNewReadMessagesSubscription({ companionId: chat.companionId });
+  useNewReadMessagesSubscription({ companionId });
 
   const onReadMessages = useCallback(() => {
     if (unreadMessages.current.size) {
       readUnreadMessages({
-        senderId: chat.companionId,
-        receiverId: chat.userId,
+        senderId: companionId,
+        receiverId: userId,
         messagesIds: Array.from(unreadMessages.current),
       });
     }
-  }, [chat.userId, chat.companionId, readUnreadMessages]);
+  }, [userId, companionId, readUnreadMessages]);
 
   const handleScroll = () => {
     if (timerIdRef.current) {
@@ -51,7 +54,6 @@ export const ExistingChat = ({ chat, messages }: Props) => {
     firstUnreadMessageRef.current = null;
   };
 
-
   useEffect(() => {
     if (!containerRef.current) {
       return;
@@ -62,13 +64,13 @@ export const ExistingChat = ({ chat, messages }: Props) => {
       (containerRef.current.scrollTop + containerRef.current.clientHeight);
 
     // scroll to the bottom when send a message
-    if (messages.at(-1)?.senderId === chat.userId || containerOffset < 200) {
+    if (messages.at(-1)?.senderId === userId || containerOffset < 200) {
       containerRef.current?.scrollTo({
         top: containerRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  }, [messages.length, chat.userId]);
+  }, [messages.length, userId]);
 
   useEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat
@@ -116,14 +118,14 @@ export const ExistingChat = ({ chat, messages }: Props) => {
                 <MessageContainer
                   key={message.id}
                   messageId={message.id}
-                  fromCurrentUser={chat.userId === message.senderId}
+                  fromCurrentUser={userId === message.senderId}
                   isRead={message.isRead}
                   unreadMessages={unreadMessages.current}
                   ref={firstUnreadMessageRef}>
                   <span className="px-5">{message.text}</span>
-                  <MessageStatusBar fromCurrentUser={chat.userId === message.senderId}>
+                  <MessageStatusBar fromCurrentUser={userId === message.senderId}>
                     <MessageTime createdAt={message.createdAt} />
-                    {chat.userId === message.senderId ? (
+                    {userId === message.senderId ? (
                       <MessageStatusIcon isRead={message.isRead} isSent={message.isSent} />
                     ) : null}
                   </MessageStatusBar>
@@ -137,7 +139,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
           <span className="text-gray-dark dark:text-gray-light">There are no messages yet...</span>
         </div>
       )}
-      <ChatForm chat={chat} onSubmitSideEffect={onSendMessageSideEffect} />
+      <ChatForm onSubmitSideEffect={onSendMessageSideEffect} />
     </>
   );
 };

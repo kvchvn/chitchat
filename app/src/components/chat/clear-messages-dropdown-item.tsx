@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { useRef } from 'react';
+import { useUserId } from '~/components/contexts/user-id-provider';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,18 +14,17 @@ import {
 } from '~/components/ui/alert-dialog';
 import { Button } from '~/components/ui/button';
 import { DropdownMenuItem } from '~/components/ui/dropdown-menu';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
 import { logger } from '~/lib/logger';
 import { api } from '~/trpc/react';
 
-type Props = {
-  userId: string;
-  companionId: string;
-};
-
 const log = logger.child({ module: 'components/chat/clear-messages-dropdown-item.tsx' });
 
-export const ClearMessagesDropdownItem = ({ userId, companionId }: Props) => {
+export const ClearMessagesDropdownItem = () => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
+
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const { toast } = useToast();
   const utils = api.useUtils();

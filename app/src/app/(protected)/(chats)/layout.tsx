@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import type React from 'react';
+import { UserIdProvider } from '~/components/contexts/user-id-provider';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '~/components/ui/resizable';
 import { UsersList } from '~/components/user/users-list';
 import { logger } from '~/lib/logger';
@@ -31,7 +32,9 @@ export default async function ChatsLayout({ children }: React.PropsWithChildren)
     <>
       <ResizablePanelGroup direction="horizontal" autoSaveId={RESIZABLE_GROUP_ID}>
         <ResizablePanel defaultSize={defaultResizableLayout?.[0]} maxSize={30} className="min-w-14">
-          <UsersList currentUserId={session.user.id} />
+          <UserIdProvider userId={session.user.id}>
+            <UsersList />
+          </UserIdProvider>
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultResizableLayout?.[1]}>{children}</ResizablePanel>

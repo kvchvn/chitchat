@@ -11,12 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 
-type Props = {
-  userId: string;
-  companionId: string;
-};
-
-export const ChatSettings = ({ userId, companionId }: Props) => {
+export const ChatSettings = () => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -26,7 +21,7 @@ export const ChatSettings = ({ userId, companionId }: Props) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {/* Clear messages */}
-        <ClearMessagesDropdownItem userId={userId} companionId={companionId} />
+        <ClearMessagesDropdownItem />
         {/* Block user */}
         <DropdownMenuItem className="text-error-light hover:text-error-light focus:text-error-light dark:text-error-dark dark:hover:text-error-dark dark:focus:text-error-dark">
           <Ban />

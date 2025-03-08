@@ -7,16 +7,21 @@ import {
 } from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
-import { type ChatPretty } from '~/server/db/schema/chats';
 import { api } from '~/trpc/react';
+import { useChatId } from '../contexts/chat-id-provider';
+import { useUserId } from '../contexts/user-id-provider';
 
 type Props = {
-  chat: ChatPretty;
   onSubmitSideEffect: () => void;
 };
 
-export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
+export const ChatForm = ({ onSubmitSideEffect }: Props) => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
+  const chatId = useChatId();
+
   const utils = api.useUtils();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
@@ -29,7 +34,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
 
       const previousChat = utils.chats.getByCompanionId.getData();
 
-      utils.chats.getByCompanionId.setData({ companionId: chat.companionId }, (oldData) =>
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
         oldData
           ? {
               chat: oldData.chat,
@@ -56,10 +61,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       return { previousChat };
     },
     onError: (_, __, context) => {
-      utils.chats.getByCompanionId.setData(
-        { companionId: chat.companionId },
-        context?.previousChat
-      );
+      utils.chats.getByCompanionId.setData({ companionId }, context?.previousChat);
 
       toast({
         variant: 'destructive',
@@ -68,9 +70,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       });
     },
     onSettled: async () => {
-      await utils.chats.getByCompanionId.invalidate({
-        companionId: chat.companionId,
-      });
+      await utils.chats.getByCompanionId.invalidate({ companionId });
     },
   });
 
@@ -82,9 +82,9 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
     }
 
     sendMessage({
-      chatId: chat.chatId,
-      senderId: chat.userId,
-      receiverId: chat.companionId,
+      chatId,
+      senderId: userId,
+      receiverId: companionId,
       text: trimmedMessage,
     });
   };

@@ -2,9 +2,10 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React from 'react';
+import { useUserId } from '~/components/contexts/user-id-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { cn, getHoursMinutes, getNameInitials } from '~/lib/utils';
 import { type ChatMessage } from '~/server/db/schema/messages';
 
@@ -12,21 +13,13 @@ type Props = {
   id: string;
   image: string | null;
   name: string | null;
-  currentUserId: string;
   lastMessage: ChatMessage | undefined;
   unreadMessagesCount: number | undefined;
 };
 
-export const UserItem = ({
-  id,
-  image,
-  name,
-  currentUserId,
-  lastMessage,
-  unreadMessagesCount,
-}: Props) => {
-  const pathname = usePathname();
-  const idFromPathname = pathname.slice(1);
+export const UserItem = ({ id, image, name, lastMessage, unreadMessagesCount }: Props) => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
   const lastMessageTime = lastMessage ? getHoursMinutes(lastMessage.createdAt) : null;
 
   return (
@@ -36,21 +29,19 @@ export const UserItem = ({
         className={clsx(
           'relative flex items-center gap-2 px-2 py-4 hover:bg-primary-hover-light active:bg-primary-active-light dark:border-b-slate-800 dark:hover:bg-primary-hover-dark dark:active:bg-primary-active-dark',
           {
-            'bg-primary-hover-light dark:bg-primary-hover-dark': idFromPathname === id,
+            'bg-primary-hover-light dark:bg-primary-hover-dark': companionId === id,
           }
         )}>
-        <Avatar className={cn('h-10 w-10', currentUserId === id && 'rounded-none')}>
+        <Avatar className={cn('h-10 w-10', userId === id && 'rounded-none')}>
           <AvatarImage
-            src={currentUserId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
+            src={userId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
             alt={name ?? "user's avatar"}
           />
           <AvatarFallback className="text-sm">{getNameInitials(name)}</AvatarFallback>
         </Avatar>
         <div className="flex w-full min-w-32 flex-col @container">
           <div className="flex items-center justify-between gap-2">
-            <span className="shrink-0 text-sm font-semibold">
-              {currentUserId === id ? 'Notes' : name}
-            </span>
+            <span className="shrink-0 text-sm font-semibold">{userId === id ? 'Notes' : name}</span>
             <span className="cursor-default font-mono text-xs text-gray-400">
               {lastMessageTime}
             </span>
@@ -58,9 +49,7 @@ export const UserItem = ({
           <div className="flex items-center justify-between gap-2">
             {lastMessage ? (
               <div className="flex max-w-[70%] items-center gap-1">
-                {lastMessage.senderId === currentUserId ? (
-                  <i className="text-gray-500">You: </i>
-                ) : null}
+                {lastMessage.senderId === userId ? <i className="text-gray-500">You: </i> : null}
                 <span className="line-clamp-1 text-ellipsis break-words text-sm">
                   {lastMessage.text}
                 </span>
