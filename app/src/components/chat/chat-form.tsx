@@ -3,6 +3,8 @@ import {
   type ChangeEventHandler,
   type FormEventHandler,
   type KeyboardEventHandler,
+  useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Button } from '~/components/ui/button';
@@ -25,12 +27,13 @@ export const ChatForm = ({ onSubmitSideEffect }: Props) => {
   const utils = api.useUtils();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
+  const timerIdRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const { mutate: sendMessage } = api.messages.create.useMutation({
     onMutate: async (newMessage) => {
       setMessage('');
 
-      await utils.chats.getByCompanionId.cancel();
+      await utils.chats.getByCompanionId.cancel({ companionId });
 
       const previousChat = utils.chats.getByCompanionId.getData();
 
@@ -70,7 +73,11 @@ export const ChatForm = ({ onSubmitSideEffect }: Props) => {
       });
     },
     onSettled: async () => {
-      await utils.chats.getByCompanionId.invalidate({ companionId });
+      clearTimeout(timerIdRef.current);
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      timerIdRef.current = setTimeout(async () => {
+        await utils.chats.getByCompanionId.invalidate({ companionId });
+      }, 1000);
     },
   });
 
@@ -106,6 +113,12 @@ export const ChatForm = ({ onSubmitSideEffect }: Props) => {
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setMessage(e.target.value);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timerIdRef.current);
+    };
+  }, []);
 
   return (
     <form
