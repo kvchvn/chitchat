@@ -19,7 +19,7 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const firstUnreadMessageRef = useRef<HTMLLIElement | null>(null);
   const unreadMessages = useRef<Set<string>>(new Set([]));
-  const timeout = useRef<NodeJS.Timeout | null>(null);
+  const timerIdRef = useRef<NodeJS.Timeout | null>(null);
 
   const { mutate: readUnreadMessages } = api.messages.readUnreadMessages.useMutation();
 
@@ -37,11 +37,11 @@ export const ExistingChat = ({ chat, messages }: Props) => {
   }, [chat.userId, chat.companionId, readUnreadMessages]);
 
   const handleScroll = () => {
-    if (timeout.current) {
-      clearTimeout(timeout.current);
+    if (timerIdRef.current) {
+      clearTimeout(timerIdRef.current);
     }
 
-    timeout.current = setTimeout(() => {
+    timerIdRef.current = setTimeout(() => {
       onReadMessages();
       unreadMessages.current.clear();
     }, 1000);
@@ -51,17 +51,6 @@ export const ExistingChat = ({ chat, messages }: Props) => {
     firstUnreadMessageRef.current = null;
   };
 
-  useEffect(() => {
-    onReadMessages();
-  }, [onReadMessages, messages.length]);
-
-  useEffect(() => {
-    return () => {
-      if (timeout.current) {
-        clearTimeout(timeout.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -94,6 +83,25 @@ export const ExistingChat = ({ chat, messages }: Props) => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timerIdRef.current) {
+        clearTimeout(timerIdRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // such way I get the freshest unreadMessages ref
+    const timerId = setTimeout(() => {
+      onReadMessages();
+    }, 1000);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [onReadMessages, messages.length]);
 
   return (
     <>
