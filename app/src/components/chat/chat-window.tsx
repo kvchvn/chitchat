@@ -41,7 +41,7 @@ export const ChatWindow = ({ companionName }: Props) => {
 
   return (
     <ChatIdProvider chatId={data.chat.id}>
-      <ExistingChat messages={data.messages} />
+      <ExistingChat messages={data.messages} blockedBy={data.chat.blockedBy} />
     </ChatIdProvider>
   );
 };

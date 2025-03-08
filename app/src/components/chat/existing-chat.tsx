@@ -10,12 +10,14 @@ import { useNewReadMessagesSubscription } from '~/hooks/use-new-read-messages-su
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { api } from '~/trpc/react';
 import { useUserId } from '../contexts/user-id-provider';
+import { ChatBlock } from './chat-block';
 
 type Props = {
   messages: (ChatMessage | null)[];
+  blockedBy: string | null;
 };
 
-export const ExistingChat = ({ messages }: Props) => {
+export const ExistingChat = ({ messages, blockedBy }: Props) => {
   const userId = useUserId();
   const companionId = useCompanionId();
 
@@ -139,7 +141,11 @@ export const ExistingChat = ({ messages }: Props) => {
           <span className="text-gray-dark dark:text-gray-light">There are no messages yet...</span>
         </div>
       )}
-      <ChatForm onSubmitSideEffect={onSendMessageSideEffect} />
+      {blockedBy ? (
+        <ChatBlock byCurrentUser={blockedBy === userId} />
+      ) : (
+        <ChatForm onSubmitSideEffect={onSendMessageSideEffect} />
+      )}
     </>
   );
 };
