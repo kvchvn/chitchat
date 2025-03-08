@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { UserItemMemo } from '~/components/user/user-item';
 import { useChatPreviewSubscription } from '~/hooks/use-chat-preview-subscription';
+import { useRemoveMessagesSubscription } from '~/hooks/use-remove-messages-subscription';
 import { api } from '~/trpc/react';
 import { UserItemSkeleton } from './user-item-skeleton';
 
@@ -20,6 +21,7 @@ export const UsersList = ({ currentUserId }: Props) => {
   } = api.users.getAllWithChatPreview.useQuery(undefined, { retry: false });
 
   useChatPreviewSubscription({ userId: currentUserId });
+  useRemoveMessagesSubscription({ userId: currentUserId });
 
   const handleClick = () => {
     void refetch();
