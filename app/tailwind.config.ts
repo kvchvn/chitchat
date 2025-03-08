@@ -135,15 +135,15 @@ export default {
           },
         },
         error: {
-          light: colors.rose[100],
-          dark: colors.rose[900],
+          light: colors.red[400],
+          dark: colors.red[900],
           hover: {
-            light: colors.rose[200],
-            dark: colors.rose[800],
+            light: colors.red[500],
+            dark: colors.red[800],
           },
           active: {
-            light: colors.rose[300],
-            dark: colors.rose[700],
+            light: colors.red[600],
+            dark: colors.red[700],
           },
         },
         gray: {
