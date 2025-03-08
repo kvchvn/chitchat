@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { ChatIsNotCreated } from '~/components/chat/chat-is-not-created';
 import { ChatSkeleton } from '~/components/chat/chat-skeleton';
 import { ExistingChat } from '~/components/chat/existing-chat';
@@ -13,13 +14,24 @@ type Props = {
 
 export const ChatWindow = ({ companionName }: Props) => {
   const companionId = useCompanionId();
+  const utils = api.useUtils();
 
-  const { isError, isLoading, data } = api.chats.getByCompanionId.useQuery(
+  const { isError, isPending, data } = api.chats.getByCompanionId.useQuery(
     { companionId },
     { retry: false, refetchOnMount: 'always' }
   );
 
-  if (isLoading) {
+  useEffect(() => {
+    /**
+     * reset the chat's cache on unmount
+     * in order to load the freshest data on the next mount
+     */
+    return () => {
+      void utils.chats.getByCompanionId.reset({ companionId });
+    };
+  }, [companionId, utils.chats.getByCompanionId]);
+
+  if (isPending) {
     return <ChatSkeleton />;
   }
 
