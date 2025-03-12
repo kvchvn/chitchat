@@ -123,14 +123,14 @@ export default {
           },
         },
         success: {
-          light: colors.emerald[100],
-          dark: colors.emerald[900],
+          light: colors.emerald[500],
+          dark: colors.emerald[600],
           hover: {
-            light: colors.emerald[200],
-            dark: colors.emerald[800],
+            light: colors.emerald[400],
+            dark: colors.emerald[500],
           },
           active: {
-            light: colors.emerald[300],
+            light: colors.emerald[600],
             dark: colors.emerald[700],
           },
         },
