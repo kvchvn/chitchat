@@ -16,7 +16,7 @@ export const ChatWindow = ({ companionName }: Props) => {
   const companionId = useCompanionId();
   const utils = api.useUtils();
 
-  const { isError, isPending, data } = api.chats.getByCompanionId.useQuery(
+  const { isError, isPending, data, isSuccess } = api.chats.getByCompanionId.useQuery(
     { companionId },
     { retry: false, refetchOnMount: 'always' }
   );
@@ -26,10 +26,12 @@ export const ChatWindow = ({ companionName }: Props) => {
      * reset the chat's cache on unmount
      * in order to load the freshest data on the next mount
      */
-    return () => {
-      void utils.chats.getByCompanionId.reset({ companionId });
-    };
-  }, [companionId, utils.chats.getByCompanionId]);
+    if (isSuccess) {
+      return () => {
+        void utils.chats.getByCompanionId.reset({ companionId });
+      };
+    }
+  }, [isSuccess, utils.chats.getByCompanionId, companionId]);
 
   if (isPending) {
     return <ChatSkeleton />;
