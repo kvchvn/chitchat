@@ -3,56 +3,60 @@ import {
   type ChangeEventHandler,
   type FormEventHandler,
   type KeyboardEventHandler,
-  useId,
+  useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
-import { type ChatPretty } from '~/server/db/schema/chats';
 import { api } from '~/trpc/react';
+import { useChatId } from '../contexts/chat-id-provider';
+import { useUserId } from '../contexts/user-id-provider';
 
 type Props = {
-  chat: ChatPretty;
   onSubmitSideEffect: () => void;
 };
 
-export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
+export const ChatForm = ({ onSubmitSideEffect }: Props) => {
+  const userId = useUserId();
+  const companionId = useCompanionId();
+  const chatId = useChatId();
+
   const utils = api.useUtils();
-  const newMessageId = useId();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
+  const timerIdRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const { mutate: sendMessage } = api.messages.create.useMutation({
     onMutate: async (newMessage) => {
       setMessage('');
 
-      await utils.chats.getByMembersIds.cancel();
+      await utils.chats.getByCompanionId.cancel({ companionId });
 
-      const previousChat = utils.chats.getByMembersIds.getData();
+      const previousChat = utils.chats.getByCompanionId.getData();
 
-      utils.chats.getByMembersIds.setData(
-        { userId: chat.userId, companionId: chat.companionId },
-        (oldData) =>
-          oldData
-            ? {
-                chat: oldData.chat,
-                messages: [
-                  ...oldData.messages,
-                  {
-                    id: newMessageId,
-                    chatId: newMessage.chatId,
-                    senderId: newMessage.senderId,
-                    receiverId: newMessage.receiverId,
-                    text: newMessage.text,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    isRead: false,
-                    isSent: false,
-                  },
-                ],
-              }
-            : oldData
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
+        oldData
+          ? {
+              chat: oldData.chat,
+              messages: [
+                ...oldData.messages,
+                {
+                  id: `${Math.random()}`,
+                  chatId: newMessage.chatId,
+                  senderId: newMessage.senderId,
+                  receiverId: newMessage.receiverId,
+                  text: newMessage.text,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  isRead: newMessage.senderId === newMessage.receiverId,
+                  isSent: false,
+                },
+              ],
+            }
+          : oldData
       );
 
       onSubmitSideEffect();
@@ -60,10 +64,7 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       return { previousChat };
     },
     onError: (_, __, context) => {
-      utils.chats.getByMembersIds.setData(
-        { userId: chat.userId, companionId: chat.companionId },
-        context?.previousChat
-      );
+      utils.chats.getByCompanionId.setData({ companionId }, context?.previousChat);
 
       toast({
         variant: 'destructive',
@@ -72,10 +73,11 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
       });
     },
     onSettled: async () => {
-      await utils.chats.getByMembersIds.invalidate({
-        userId: chat.userId,
-        companionId: chat.companionId,
-      });
+      clearTimeout(timerIdRef.current);
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      timerIdRef.current = setTimeout(async () => {
+        await utils.chats.getByCompanionId.invalidate({ companionId });
+      }, 1000);
     },
   });
 
@@ -87,9 +89,9 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
     }
 
     sendMessage({
-      chatId: chat.chatId,
-      senderId: chat.userId,
-      receiverId: chat.companionId,
+      chatId,
+      senderId: userId,
+      receiverId: companionId,
       text: trimmedMessage,
     });
   };
@@ -111,6 +113,12 @@ export const ChatForm = ({ chat, onSubmitSideEffect }: Props) => {
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setMessage(e.target.value);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timerIdRef.current);
+    };
+  }, []);
 
   return (
     <form

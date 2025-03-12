@@ -4,6 +4,23 @@ import { type ChatMessage } from '~/server/db/schema/messages';
 type AppEvents = {
   sendMessage: (message: ChatMessage) => void;
   readMessages: (unreadMessagesIds: Set<string>) => void;
+  updateChatPreview: (
+    args:
+      | {
+          // undefined - for cases when messages are removed
+          newPreviewMessage: ChatMessage | undefined;
+          resetUnreadMessages: boolean;
+          senderId: string;
+          receiverId: string;
+        }
+      | {
+          isBlocked: boolean;
+          senderId: string;
+          receiverId: string;
+        }
+  ) => void;
+  removeMessages: (args: { chatId: string; userId: string; companionId: string }) => void;
+  toggleBlockChat: (args: { initiatorId: string; blockedUserId: string; block: boolean }) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging

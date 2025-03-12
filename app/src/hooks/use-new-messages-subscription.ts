@@ -5,15 +5,13 @@ export const useNewMessagesSubscription = () => {
 
   api.messages.onCreateMessage.useSubscription(undefined, {
     onData: (newMessage) => {
-      utils.chats.getByMembersIds.setData(
-        { userId: newMessage.receiverId, companionId: newMessage.senderId },
-        (oldData) =>
-          oldData
-            ? {
-                chat: oldData.chat,
-                messages: [...oldData.messages, newMessage],
-              }
-            : oldData
+      utils.chats.getByCompanionId.setData({ companionId: newMessage.senderId }, (oldData) =>
+        oldData
+          ? {
+              chat: oldData.chat,
+              messages: [...oldData.messages, newMessage],
+            }
+          : oldData
       );
     },
   });

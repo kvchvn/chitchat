@@ -2,30 +2,31 @@
 
 import { MessageSquarePlus } from 'lucide-react';
 import { Button } from '~/components/ui/button';
+import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
 import { api } from '~/trpc/react';
 import { LoadingIcon } from '../ui/loading-icon';
 
 type Props = {
-  userId: string;
-  companionId: string;
   companionName: string;
 };
 
-export const ChatIsNotCreated = ({ userId, companionId, companionName }: Props) => {
+export const ChatIsNotCreated = ({ companionName }: Props) => {
+  const companionId = useCompanionId();
+
   const { toast } = useToast();
-  const { mutateAsync: createNewChat, isPending } = api.chats.create.useMutation();
+  const { mutateAsync: createNewChat, isPending } = api.chats.createWithCompanion.useMutation();
   const utils = api.useUtils();
 
   const handleClick = async () => {
-    await createNewChat({ userId: userId, companionId })
+    await createNewChat({ companionId })
       .then(async () => {
         toast({
           variant: 'default',
           title: 'Chat is created',
           description: `Now you can communicate with ${companionName}`,
         });
-        await utils.chats.getByMembersIds.invalidate({ userId, companionId });
+        await utils.chats.getByCompanionId.invalidate({ companionId });
       })
       .catch(() => {
         toast({

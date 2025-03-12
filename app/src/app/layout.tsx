@@ -9,7 +9,7 @@ import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
-  title: 'Chit-Chat v2',
+  title: 'chit-chat',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
@@ -26,7 +26,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       )}>
       <body className="flex h-dvh flex-col items-stretch">
         <TRPCReactProvider>
-          <ThemeProvider attribute="class">{children}</ThemeProvider>
+          <ThemeProvider attribute="class" enableSystem={false}>
+            {children}
+          </ThemeProvider>
         </TRPCReactProvider>
         <Toaster />
       </body>

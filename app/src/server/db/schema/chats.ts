@@ -15,6 +15,7 @@ export const chats = createTable('chats', {
   userId2: varchar('user_id_2', { length: 255 })
     .notNull()
     .references(() => users.id),
+  blockedBy: varchar('blocked_by', { length: 255 }).references(() => users.id),
 });
 
 // RELATIONS
@@ -23,12 +24,17 @@ export const chatsRelations = relations(chats, ({ one, many }) => ({
   user1: one(users, {
     fields: [chats.userId1],
     references: [users.id],
-    relationName: 'user1_in_chats',
+    relationName: 'user_chats_1',
   }),
   user2: one(users, {
     fields: [chats.userId2],
     references: [users.id],
-    relationName: 'user2_in_chats',
+    relationName: 'user_chats_2',
+  }),
+  blockedBy: one(users, {
+    fields: [chats.blockedBy],
+    references: [users.id],
+    relationName: 'blocked_by',
   }),
   messages: many(messages),
 }));
