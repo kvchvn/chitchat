@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { ChatBlock } from '~/components/chat/chat-block';
 import { ChatForm } from '~/components/chat/chat-form';
+import { useUserId } from '~/components/contexts/user-id-provider';
 import { MessageContainer } from '~/components/message/message-container';
 import { MessageStatusBar } from '~/components/message/message-status-bar';
 import { MessageStatusIcon } from '~/components/message/message-status-icon';
 import { MessageTime } from '~/components/message/message-time';
+import { useBlockUserSubscription } from '~/hooks/use-block-user-subscription';
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { useNewMessagesSubscription } from '~/hooks/use-new-messages-subscription';
 import { useNewReadMessagesSubscription } from '~/hooks/use-new-read-messages-subscription';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { api } from '~/trpc/react';
-import { useUserId } from '../contexts/user-id-provider';
-import { ChatBlock } from './chat-block';
 
 type Props = {
   messages: (ChatMessage | null)[];
@@ -30,6 +31,7 @@ export const ExistingChat = ({ messages, blockedBy }: Props) => {
 
   useNewMessagesSubscription();
   useNewReadMessagesSubscription({ companionId });
+  useBlockUserSubscription();
 
   const onReadMessages = useCallback(() => {
     if (unreadMessages.current.size) {

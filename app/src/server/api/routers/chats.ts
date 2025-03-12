@@ -1,9 +1,10 @@
 import { TRPCError } from '@trpc/server';
 import { and, asc, eq, or } from 'drizzle-orm';
 import { z } from 'zod';
+import { ee } from '~/server/api/event-emitter';
+import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
 import { chats } from '~/server/db/schema/chats';
 import { messages } from '~/server/db/schema/messages';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const chatsRouter = createTRPCRouter({
   getByCompanionId: protectedProcedure
@@ -59,4 +60,42 @@ export const chatsRouter = createTRPCRouter({
 
       return newChat;
     }),
+  toggleBlocking: protectedProcedure
+    .input(z.object({ chatId: z.string(), blockedUserId: z.string(), block: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.blockedUserId === ctx.session.user.id) {
+        return null;
+      }
+
+      const [updatedChat] = await ctx.db
+        .update(chats)
+        .set({
+          blockedBy: input.block ? ctx.session.user.id : null,
+        })
+        .where(eq(chats.id, input.chatId))
+        .returning();
+
+      if (updatedChat) {
+        ee.emit('updateChatPreview', {
+          senderId: ctx.session.user.id,
+          receiverId: input.blockedUserId,
+          isBlocked: input.block,
+        });
+        ee.emit('toggleBlockChat', {
+          initiatorId: ctx.session.user.id,
+          blockedUserId: input.blockedUserId,
+          block: input.block,
+        });
+      }
+
+      return updatedChat;
+    }),
+  // subscriptions
+  onToggleBlocking: protectedProcedure.subscription(async function* ({ ctx }) {
+    for await (const [data] of ee.toIterable('toggleBlockChat')) {
+      if (ctx.session.user.id === data.blockedUserId) {
+        yield data;
+      }
+    }
+  }),
 });

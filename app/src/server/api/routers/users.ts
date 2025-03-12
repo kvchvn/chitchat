@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { sessions } from '~/server/db/schema/auth';
+import { chats } from '~/server/db/schema/chats';
 import { messages } from '~/server/db/schema/messages';
 import { users } from '~/server/db/schema/users';
 
@@ -50,6 +51,12 @@ export const usersRouter = createTRPCRouter({
           orderBy: [desc(messages.createdAt)],
           limit: 1,
         },
+        chats1: {
+          where: eq(chats.userId2, ctx.session.user.id),
+        },
+        chats2: {
+          where: eq(chats.userId1, ctx.session.user.id),
+        },
       },
     });
 
@@ -93,14 +100,22 @@ export const usersRouter = createTRPCRouter({
 
     // search for the last message in a chat
     const transformedAllUsers = sortedAllUsers.map((u) => {
-      const sentMessageCreatedAt = Number(u.sentMessages?.[0]?.createdAt);
-      const receivedMessageCreatedAt = Number(u.receivedMessages[0]?.createdAt);
+      const sentMessageCreatedAt = Number(u.sentMessages?.[0]?.createdAt) || 0;
+      const receivedMessageCreatedAt = Number(u.receivedMessages[0]?.createdAt) || 0;
 
       const lastMessage =
         sentMessageCreatedAt < receivedMessageCreatedAt ? u.receivedMessages[0] : u.sentMessages[0];
 
       const unreadMessagesCount = allUsersWithUnreadSentMessagesCount[u.id] ?? 0;
-      return { id: u.id, name: u.name, image: u.image, lastMessage, unreadMessagesCount };
+
+      return {
+        id: u.id,
+        name: u.name,
+        image: u.image,
+        lastMessage,
+        unreadMessagesCount,
+        chat: u.chats1[0] ?? u.chats2[0] ?? null,
+      };
     });
 
     return transformedAllUsers;

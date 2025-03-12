@@ -1,5 +1,6 @@
-import { Trash2 } from 'lucide-react';
+import { Ban, Handshake } from 'lucide-react';
 import { useRef } from 'react';
+import { useChatId } from '~/components/contexts/chat-id-provider';
 import { useUserId } from '~/components/contexts/user-id-provider';
 import {
   AlertDialog,
@@ -16,10 +17,20 @@ import { Button } from '~/components/ui/button';
 import { DropdownMenuItem } from '~/components/ui/dropdown-menu';
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
+import { cn } from '~/lib/utils';
 import { api } from '~/trpc/react';
-import { useChatId } from '../contexts/chat-id-provider';
 
-export const ClearMessagesDropdownItem = () => {
+type Props = {
+  block: boolean;
+};
+
+const BlockUserAlertDialogDescription = ({ block }: Pick<Props, 'block'>) => {
+  return block
+    ? 'This action will block this user for you. If you want to cancel this you may do it later.'
+    : 'This action will unblock this user. You will be able to communicate with him/her again.';
+};
+
+export const BlockUserDropdownItem = ({ block }: Props) => {
   const userId = useUserId();
   const companionId = useCompanionId();
   const chatId = useChatId();
@@ -28,7 +39,7 @@ export const ClearMessagesDropdownItem = () => {
   const { toast } = useToast();
   const utils = api.useUtils();
 
-  const { mutate: removeMessages } = api.messages.removeAllFromChat.useMutation({
+  const { mutate: toggleBlock } = api.chats.toggleBlocking.useMutation({
     onMutate: async () => {
       await utils.chats.getByCompanionId.cancel();
 
@@ -37,8 +48,8 @@ export const ClearMessagesDropdownItem = () => {
       utils.chats.getByCompanionId.setData({ companionId }, (staleChat) =>
         staleChat
           ? {
-              chat: staleChat.chat,
-              messages: [],
+              chat: { ...staleChat.chat, blockedBy: userId },
+              messages: staleChat.messages,
             }
           : staleChat
       );
@@ -50,7 +61,7 @@ export const ClearMessagesDropdownItem = () => {
 
       toast({
         variant: 'destructive',
-        title: 'Messages removing failed',
+        title: 'User block failed',
         description: 'Something went wrong. Please try again later',
       });
     },
@@ -60,8 +71,13 @@ export const ClearMessagesDropdownItem = () => {
   });
 
   const handleClick = () => {
-    removeMessages({ chatId, userId, companionId });
+    void toggleBlock({ chatId, blockedUserId: companionId, block });
   };
+
+  if (userId === companionId) {
+    // Cannot block yourself
+    return null;
+  }
 
   return (
     <AlertDialog>
@@ -69,16 +85,31 @@ export const ClearMessagesDropdownItem = () => {
         onClick={(e) => {
           e.preventDefault();
           triggerRef.current?.click();
-        }}>
-        <Trash2 />
-        Clear messages
+        }}
+        className={cn(
+          block &&
+            'text-error-light hover:text-error-light focus:text-error-light dark:text-error-dark dark:hover:text-error-dark dark:focus:text-error-dark',
+          !block &&
+            'text-success-light hover:text-success-hover-light focus:text-success-light dark:text-success-dark dark:hover:text-success-hover-dark dark:focus:text-success-dark'
+        )}>
+        {block ? (
+          <>
+            <Ban />
+            Block user
+          </>
+        ) : (
+          <>
+            <Handshake />
+            Unblock user
+          </>
+        )}
         <AlertDialogTrigger ref={triggerRef} />
       </DropdownMenuItem>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete all messages in the chat.
+            <BlockUserAlertDialogDescription block={block} />
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -88,8 +119,12 @@ export const ClearMessagesDropdownItem = () => {
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button size="sm" variant="destructive" className="min-w-24" onClick={handleClick}>
-              Clear
+            <Button
+              size="sm"
+              variant={block ? 'destructive' : 'default'}
+              className="min-w-24"
+              onClick={handleClick}>
+              {block ? 'Block' : 'Unblock'}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

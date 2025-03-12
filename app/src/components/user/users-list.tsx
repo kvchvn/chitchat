@@ -22,7 +22,7 @@ export const UsersList = () => {
   } = api.users.getAllWithChatPreview.useQuery(undefined, { retry: false });
 
   useChatPreviewSubscription({ userId });
-  useRemoveMessagesSubscription({ userId, companionId });
+  useRemoveMessagesSubscription({ companionId });
 
   const handleClick = () => {
     void refetch();
@@ -56,6 +56,7 @@ export const UsersList = () => {
           image={user.image}
           lastMessage={user.lastMessage}
           unreadMessagesCount={user.unreadMessagesCount}
+          isBlocked={Boolean(user.chat?.blockedBy)}
         />
       ))}
     </ul>

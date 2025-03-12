@@ -1,26 +1,22 @@
 import { api } from '~/trpc/react';
 
 type Args = {
-  userId: string;
   companionId: string;
 };
 
-export const useRemoveMessagesSubscription = ({ userId, companionId }: Args) => {
+export const useRemoveMessagesSubscription = ({ companionId }: Args) => {
   const utils = api.useUtils();
 
-  api.messages.onRemoveMessages.useSubscription(
-    { userId },
-    {
-      onData: () => {
-        utils.chats.getByCompanionId.setData({ companionId }, (staleChat) => {
-          return staleChat
-            ? {
-                chat: staleChat.chat,
-                messages: [],
-              }
-            : staleChat;
-        });
-      },
-    }
-  );
+  api.messages.onRemoveMessages.useSubscription(undefined, {
+    onData: () => {
+      utils.chats.getByCompanionId.setData({ companionId }, (staleChat) => {
+        return staleChat
+          ? {
+              chat: staleChat.chat,
+              messages: [],
+            }
+          : staleChat;
+      });
+    },
+  });
 };

@@ -112,22 +112,18 @@ export const messagesRouter = createTRPCRouter({
       yield messagesIds;
     }
   }),
-  onUpdateChatPreview: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .subscription(async function* ({ input }) {
-      for await (const [data] of ee.toIterable('updateChatPreview')) {
-        if (input.userId === data.receiverId || input.userId === data.senderId) {
-          yield data;
-        }
+  onUpdateChatPreview: protectedProcedure.subscription(async function* ({ ctx }) {
+    for await (const [data] of ee.toIterable('updateChatPreview')) {
+      if (ctx.session.user.id === data.receiverId || ctx.session.user.id === data.senderId) {
+        yield data;
       }
-    }),
-  onRemoveMessages: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .subscription(async function* ({ input }) {
-      for await (const [data] of ee.toIterable('removeMessages')) {
-        if (input.userId === data.companionId) {
-          yield data;
-        }
+    }
+  }),
+  onRemoveMessages: protectedProcedure.subscription(async function* ({ ctx }) {
+    for await (const [data] of ee.toIterable('removeMessages')) {
+      if (ctx.session.user.id === data.companionId) {
+        yield data;
       }
-    }),
+    }
+  }),
 });

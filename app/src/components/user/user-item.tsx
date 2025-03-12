@@ -15,15 +15,23 @@ type Props = {
   name: string | null;
   lastMessage: ChatMessage | undefined;
   unreadMessagesCount: number | undefined;
+  isBlocked: boolean;
 };
 
-export const UserItem = ({ id, image, name, lastMessage, unreadMessagesCount }: Props) => {
+export const UserItem = ({
+  id,
+  image,
+  name,
+  lastMessage,
+  unreadMessagesCount,
+  isBlocked,
+}: Props) => {
   const userId = useUserId();
   const companionId = useCompanionId();
   const lastMessageTime = lastMessage ? getHoursMinutes(lastMessage.createdAt) : null;
 
   return (
-    <li className="border-b last:border-b-0">
+    <li className={cn('border-b last:border-b-0', isBlocked && 'opacity-40')}>
       <Link
         href={`/${id}`}
         className={clsx(
@@ -48,11 +56,9 @@ export const UserItem = ({ id, image, name, lastMessage, unreadMessagesCount }: 
           </div>
           <div className="flex items-center justify-between gap-2">
             {lastMessage ? (
-              <div className="flex max-w-[70%] items-center gap-1">
+              <div className="flex max-w-[70%] items-center gap-1 text-sm">
                 {lastMessage.senderId === userId ? <i className="text-gray-500">You: </i> : null}
-                <span className="line-clamp-1 text-ellipsis break-words text-sm">
-                  {lastMessage.text}
-                </span>
+                <span className="line-clamp-1 text-ellipsis break-words">{lastMessage.text}</span>
               </div>
             ) : (
               <span className="text-sm italic text-gray-400">No messages</span>
