@@ -24,7 +24,8 @@ export const users = createTable('user', {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
-  chats: many(chats),
+  chats1: many(chats, { relationName: 'user_chats_1' }),
+  chats2: many(chats, { relationName: 'user_chats_2' }),
   sentMessages: many(messages, { relationName: 'message_sender' }),
   receivedMessages: many(messages, { relationName: 'message_receiver' }),
 }));
