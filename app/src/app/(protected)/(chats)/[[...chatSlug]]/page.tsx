@@ -22,7 +22,7 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
 
   return (
     <ChatContainer className="flex-col items-start justify-stretch pb-1 pt-0">
-      <header className="relative flex w-full items-center border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-16 after:w-full after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
+      <header className="relative flex w-full items-center border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-full after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
         <h3>{companion.name}</h3>
         <UserIdProvider userId={session.user.id}>
           <ChatSettings />

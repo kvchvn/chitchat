@@ -63,14 +63,8 @@ export const messagesRouter = createTRPCRouter({
         )
         .returning();
 
-      const readMessagesIds = new Set<string>();
-
-      readMessages?.forEach((message) => {
-        readMessagesIds.add(message.id);
-      });
-
       if (readMessages.length) {
-        ee.emit('readMessages', readMessagesIds);
+        ee.emit('readMessages', readMessages);
       }
 
       return readMessages;
@@ -108,8 +102,8 @@ export const messagesRouter = createTRPCRouter({
     }
   }),
   onReadMessages: protectedProcedure.subscription(async function* () {
-    for await (const [messagesIds] of ee.toIterable('readMessages')) {
-      yield messagesIds;
+    for await (const [messages] of ee.toIterable('readMessages')) {
+      yield messages;
     }
   }),
   onUpdateChatPreview: protectedProcedure.subscription(async function* ({ ctx }) {

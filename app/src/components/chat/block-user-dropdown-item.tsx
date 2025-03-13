@@ -45,13 +45,13 @@ export const BlockUserDropdownItem = ({ block }: Props) => {
 
       const previousChat = utils.chats.getByCompanionId.getData();
 
-      utils.chats.getByCompanionId.setData({ companionId }, (staleChat) =>
-        staleChat
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
+        oldData
           ? {
-              chat: { ...staleChat.chat, blockedBy: userId },
-              messages: staleChat.messages,
+              ...oldData,
+              chat: { ...oldData.chat, blockedBy: userId },
             }
-          : staleChat
+          : oldData
       );
 
       return { previousChat };

@@ -3,7 +3,7 @@ import { type ChatMessage } from '~/server/db/schema/messages';
 
 type AppEvents = {
   sendMessage: (message: ChatMessage) => void;
-  readMessages: (unreadMessagesIds: Set<string>) => void;
+  readMessages: (unreadMessages: ChatMessage[]) => void;
   updateChatPreview: (
     args:
       | {

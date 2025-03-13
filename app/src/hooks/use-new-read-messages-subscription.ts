@@ -1,3 +1,4 @@
+import { generateChatDateKey } from '~/lib/utils';
 import { api } from '~/trpc/react';
 
 type Args = {
@@ -8,21 +9,30 @@ export const useNewReadMessagesSubscription = ({ companionId }: Args) => {
   const utils = api.useUtils();
 
   api.messages.onReadMessages.useSubscription(undefined, {
-    onData: (messagesIds) => {
-      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
-        oldData
-          ? {
-              chat: oldData.chat,
-              messages: oldData.messages.map((message) => {
-                if (message && messagesIds.has(message.id)) {
-                  return { ...message, isRead: true };
-                }
+    onData: (newlyReadMessages) => {
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) => {
+        if (oldData) {
+          const updatedMessagesMap = new Map(oldData.messagesMap);
 
-                return message;
-              }),
+          newlyReadMessages.forEach((message) => {
+            const dateKey = generateChatDateKey(message.createdAt);
+
+            const dateMessages = updatedMessagesMap.get(dateKey);
+            const foundMessage = dateMessages?.find((m) => m.id === message.id);
+
+            if (foundMessage) {
+              foundMessage.isRead = true;
             }
-          : oldData
-      );
+          });
+
+          return {
+            chat: oldData.chat,
+            messagesMap: updatedMessagesMap,
+          };
+        }
+
+        return oldData;
+      });
 
       // reset indicator at the chat preview
       utils.users.getAllWithChatPreview.setData(undefined, (staleUsers) => {
@@ -38,7 +48,8 @@ export const useNewReadMessagesSubscription = ({ companionId }: Args) => {
 
           const updatedCompanion: typeof companion = {
             ...companion,
-            unreadMessagesCount: count > messagesIds.size ? count - messagesIds.size : 0,
+            unreadMessagesCount:
+              count > newlyReadMessages.length ? count - newlyReadMessages.length : 0,
           };
 
           return staleUsers

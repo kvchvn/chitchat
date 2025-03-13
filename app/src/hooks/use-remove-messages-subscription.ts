@@ -13,7 +13,7 @@ export const useRemoveMessagesSubscription = ({ companionId }: Args) => {
         return staleChat
           ? {
               chat: staleChat.chat,
-              messages: [],
+              messagesMap: new Map(),
             }
           : staleChat;
       });

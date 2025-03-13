@@ -11,6 +11,8 @@ import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { useToast } from '~/hooks/use-toast';
+import { generateChatDateKey } from '~/lib/utils';
+import { type ChatMessage } from '~/server/db/schema/messages';
 import { api } from '~/trpc/react';
 import { useChatId } from '../contexts/chat-id-provider';
 import { useUserId } from '../contexts/user-id-provider';
@@ -37,27 +39,37 @@ export const ChatForm = ({ onSubmitSideEffect }: Props) => {
 
       const previousChat = utils.chats.getByCompanionId.getData();
 
-      utils.chats.getByCompanionId.setData({ companionId }, (oldData) =>
-        oldData
-          ? {
-              chat: oldData.chat,
-              messages: [
-                ...oldData.messages,
-                {
-                  id: `${Math.random()}`,
-                  chatId: newMessage.chatId,
-                  senderId: newMessage.senderId,
-                  receiverId: newMessage.receiverId,
-                  text: newMessage.text,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  isRead: newMessage.senderId === newMessage.receiverId,
-                  isSent: false,
-                },
-              ],
-            }
-          : oldData
-      );
+      utils.chats.getByCompanionId.setData({ companionId }, (oldData) => {
+        if (oldData) {
+          const messageDraft: ChatMessage = {
+            id: `${Math.random()}`,
+            chatId: newMessage.chatId,
+            senderId: newMessage.senderId,
+            receiverId: newMessage.receiverId,
+            text: newMessage.text,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isRead: newMessage.senderId === newMessage.receiverId,
+            isSent: false,
+          };
+
+          const updatedMessagesMap = new Map(oldData.messagesMap);
+          const dateKey = generateChatDateKey(messageDraft.createdAt);
+
+          if (!updatedMessagesMap.has(dateKey)) {
+            updatedMessagesMap.set(dateKey, []);
+          }
+
+          updatedMessagesMap.get(dateKey)?.push(messageDraft);
+
+          return {
+            chat: oldData.chat,
+            messagesMap: updatedMessagesMap,
+          };
+        }
+
+        return oldData;
+      });
 
       onSubmitSideEffect();
 
