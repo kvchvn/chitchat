@@ -38,7 +38,7 @@ export const ClearMessagesDropdownItem = () => {
         staleChat
           ? {
               chat: staleChat.chat,
-              messages: [],
+              messagesMap: new Map(),
             }
           : staleChat
       );
