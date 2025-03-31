@@ -1,6 +1,5 @@
 import { SendHorizonal } from 'lucide-react';
 import {
-  type ChangeEventHandler,
   type FormEventHandler,
   type KeyboardEventHandler,
   useEffect,
@@ -9,140 +8,115 @@ import {
 } from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
+import { useEditMessageOptimisticMutation } from '~/hooks/mutations/use-edit-message-optimistic-mutation';
+import { useSendMessageOptimisticMutation } from '~/hooks/mutations/use-send-message-optimistic-mutation';
 import { useCompanionId } from '~/hooks/use-companion-id';
-import { useToast } from '~/hooks/use-toast';
 import { generateChatDateKey } from '~/lib/utils';
-import { type ChatMessage } from '~/server/db/schema/messages';
-import { api } from '~/trpc/react';
+import { useStore } from '~/store/store';
 import { useChatId } from '../contexts/chat-id-provider';
 import { useUserId } from '../contexts/user-id-provider';
 
 type Props = {
-  onSubmitSideEffect: () => void;
+  onFormSubmitSideEffect: () => void;
 };
 
-export const ChatForm = ({ onSubmitSideEffect }: Props) => {
+export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
+  const TEXTAREA_NAME = 'message';
+
   const userId = useUserId();
   const companionId = useCompanionId();
   const chatId = useChatId();
 
-  const utils = api.useUtils();
-  const { toast } = useToast();
   const [message, setMessage] = useState('');
-  const timerIdRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  const { mutate: sendMessage } = api.messages.create.useMutation({
-    onMutate: async (newMessage) => {
-      setMessage('');
+  const messageToEdit = useStore.use.messageToEdit();
+  const setMessageToEdit = useStore.use.setMessageToEdit();
 
-      await utils.chats.getByCompanionId.cancel({ companionId });
+  const onSendMessageSideEffect = () => {
+    setMessage('');
+    onFormSubmitSideEffect();
+  };
 
-      const previousChat = utils.chats.getByCompanionId.getData();
+  const onEditMessageSideEffect = () => {
+    setMessage('');
+    setMessageToEdit(null);
+  };
 
-      utils.chats.getByCompanionId.setData({ companionId }, (oldData) => {
-        if (oldData) {
-          const messageDraft: ChatMessage = {
-            id: `${Math.random()}`,
-            chatId: newMessage.chatId,
-            senderId: newMessage.senderId,
-            receiverId: newMessage.receiverId,
-            text: newMessage.text,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isRead: newMessage.senderId === newMessage.receiverId,
-            isSent: false,
-          };
-
-          const updatedMessagesMap = new Map(oldData.messagesMap);
-          const dateKey = generateChatDateKey(messageDraft.createdAt);
-
-          if (!updatedMessagesMap.has(dateKey)) {
-            updatedMessagesMap.set(dateKey, []);
-          }
-
-          updatedMessagesMap.get(dateKey)?.push(messageDraft);
-
-          return {
-            chat: oldData.chat,
-            messagesMap: updatedMessagesMap,
-          };
-        }
-
-        return oldData;
-      });
-
-      onSubmitSideEffect();
-
-      return { previousChat };
-    },
-    onError: (_, __, context) => {
-      utils.chats.getByCompanionId.setData({ companionId }, context?.previousChat);
-
-      toast({
-        variant: 'destructive',
-        title: 'Message sending failed',
-        description: 'Something went wrong. Please try again later',
-      });
-    },
-    onSettled: async () => {
-      clearTimeout(timerIdRef.current);
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      timerIdRef.current = setTimeout(async () => {
-        await utils.chats.getByCompanionId.invalidate({ companionId });
-      }, 1000);
-    },
+  const { mutate: sendMessage } = useSendMessageOptimisticMutation({
+    onMutateSideEffect: onSendMessageSideEffect,
   });
 
-  const onSubmit = () => {
+  const { mutate: editMessage } = useEditMessageOptimisticMutation({
+    onMutateSideEffect: onEditMessageSideEffect,
+  });
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
     const trimmedMessage = message.trim();
 
     if (!trimmedMessage) {
       return;
     }
 
-    sendMessage({
-      chatId,
-      senderId: userId,
-      receiverId: companionId,
-      text: trimmedMessage,
-    });
-  };
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    onSubmit();
-  };
-
-  const handleKeyDown: KeyboardEventHandler<HTMLFormElement> = (e) => {
-    if (e.ctrlKey && e.code === 'Enter') {
-      setMessage((prevMessage) => `${prevMessage}\n`);
-    } else if (!e.shiftKey && e.code === 'Enter') {
-      e.preventDefault();
-      onSubmit();
+    if (!messageToEdit) {
+      sendMessage({
+        chatId,
+        senderId: userId,
+        receiverId: companionId,
+        text: trimmedMessage,
+      });
+    } else {
+      editMessage({
+        id: messageToEdit.id,
+        newText: trimmedMessage,
+        receiverId: messageToEdit.receiverId,
+        dateKey: generateChatDateKey(messageToEdit.createdAt),
+      });
     }
   };
 
-  const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-    setMessage(e.target.value);
+  const handleKeyDown: KeyboardEventHandler<HTMLFormElement> = (e) => {
+    if (e.code === 'Enter') {
+      if (e.ctrlKey || e.shiftKey) {
+        setMessage((prevMessage) => `${prevMessage}\n`);
+      } else {
+        handleSubmit(e);
+      }
+    }
   };
 
   useEffect(() => {
-    return () => {
-      clearTimeout(timerIdRef.current);
-    };
-  }, []);
+    if (messageToEdit) {
+      setMessage(messageToEdit?.text);
+
+      const textarea = formRef.current?.elements.namedItem(TEXTAREA_NAME);
+
+      if (textarea instanceof HTMLElement) {
+        console.log('focus');
+        textarea.focus();
+      }
+    } else {
+      setMessage('');
+    }
+  }, [messageToEdit]);
+
+  console.log('RENDER', message);
 
   return (
     <form
+      ref={formRef}
       onKeyDown={handleKeyDown}
       onSubmit={handleSubmit}
       className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
       <Textarea
-        className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[6px] dark:bg-slate-700"
+        name={TEXTAREA_NAME}
+        className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
         value={message}
         placeholder="Type your message..."
         maxRows={8}
-        onChange={handleChange}
+        onChange={(e) => setMessage(e.target.value)}
       />
       <Button type="submit" size="icon-lg" disabled={!message} className="shrink-0 rounded-full">
         <SendHorizonal />
