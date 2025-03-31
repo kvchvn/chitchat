@@ -18,10 +18,7 @@ export const messages = createTable('messages', {
     .references(() => users.id),
   text: varchar('text', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: 'date' })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
   isRead: boolean('is_read').notNull().default(false),
   isSent: boolean('is_sent').notNull().default(true),
 });
