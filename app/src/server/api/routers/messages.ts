@@ -34,16 +34,64 @@ export const messagesRouter = createTRPCRouter({
         .returning();
 
       if (newMessage) {
-        ee.emit('sendMessage', newMessage);
-        ee.emit('updateChatPreview', {
-          newPreviewMessage: newMessage,
-          resetUnreadMessages: false,
-          senderId: newMessage.senderId,
-          receiverId: newMessage.receiverId,
+        ee.emit('event', {
+          action: 'onSendMessage',
+          eventReceiverId: newMessage.receiverId,
+          data: {
+            newMessage,
+          },
+        });
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: newMessage.receiverId,
+          data: {
+            chatWithId: newMessage.senderId,
+            previewMessage: newMessage,
+            unreadMessagesDiff: 1,
+          },
         });
       }
 
       return newMessage;
+    }),
+  edit: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        newText: z.string().min(1),
+        dateKey: z.string(),
+        receiverId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [updatedMessage] = await ctx.db
+        .update(messages)
+        .set({ text: input.newText, updatedAt: new Date() })
+        .where(eq(messages.id, input.id))
+        .returning();
+
+      if (updatedMessage) {
+        ee.emit('event', {
+          action: 'onEditMessage',
+          eventReceiverId: updatedMessage.receiverId,
+          data: {
+            updatedMessage,
+          },
+        });
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: updatedMessage.receiverId,
+          data: {
+            chatWithId: updatedMessage.senderId,
+            previewMessage: updatedMessage,
+            // the rest params will leave the same
+          },
+        });
+      }
+
+      return updatedMessage;
     }),
   readUnreadMessages: protectedProcedure
     .input(
@@ -64,13 +112,19 @@ export const messagesRouter = createTRPCRouter({
         .returning();
 
       if (readMessages.length) {
-        ee.emit('readMessages', readMessages);
+        ee.emit('event', {
+          action: 'onReadMessages',
+          eventReceiverId: input.senderId,
+          data: {
+            readMessages,
+          },
+        });
       }
 
       return readMessages;
     }),
-  removeAllFromChat: protectedProcedure
-    .input(z.object({ chatId: z.string(), userId: z.string(), companionId: z.string() }))
+  clearAllFromChat: protectedProcedure
+    .input(z.object({ chatId: z.string(), companionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const removedMessages = await ctx.db
         .delete(messages)
@@ -78,46 +132,25 @@ export const messagesRouter = createTRPCRouter({
         .returning();
 
       if (removedMessages.length) {
-        ee.emit('removeMessages', {
-          chatId: input.chatId,
-          userId: input.userId,
-          companionId: input.companionId,
+        ee.emit('event', {
+          action: 'onClearChat',
+          eventReceiverId: input.companionId,
+          data: {
+            clearedById: ctx.session.user.id,
+          },
         });
-        ee.emit('updateChatPreview', {
-          newPreviewMessage: undefined,
-          receiverId: input.companionId,
-          senderId: input.userId,
-          resetUnreadMessages: true,
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: input.companionId,
+          data: {
+            chatWithId: ctx.session.user.id,
+            previewMessage: null,
+            unreadMessagesDiff: 0,
+          },
         });
       }
 
       return removedMessages.length;
     }),
-  // subscriptions
-  onCreateMessage: protectedProcedure.subscription(async function* () {
-    for await (const [message] of ee.toIterable('sendMessage')) {
-      if (message.senderId !== message.receiverId) {
-        yield message;
-      }
-    }
-  }),
-  onReadMessages: protectedProcedure.subscription(async function* () {
-    for await (const [messages] of ee.toIterable('readMessages')) {
-      yield messages;
-    }
-  }),
-  onUpdateChatPreview: protectedProcedure.subscription(async function* ({ ctx }) {
-    for await (const [data] of ee.toIterable('updateChatPreview')) {
-      if (ctx.session.user.id === data.receiverId || ctx.session.user.id === data.senderId) {
-        yield data;
-      }
-    }
-  }),
-  onRemoveMessages: protectedProcedure.subscription(async function* ({ ctx }) {
-    for await (const [data] of ee.toIterable('removeMessages')) {
-      if (ctx.session.user.id === data.companionId) {
-        yield data;
-      }
-    }
-  }),
 });

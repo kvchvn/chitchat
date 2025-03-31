@@ -93,26 +93,25 @@ export const chatsRouter = createTRPCRouter({
         .returning();
 
       if (updatedChat) {
-        ee.emit('updateChatPreview', {
-          senderId: ctx.session.user.id,
-          receiverId: input.blockedUserId,
-          isBlocked: input.block,
+        ee.emit('event', {
+          action: 'onBlockChat',
+          eventReceiverId: input.blockedUserId,
+          data: {
+            blockedById: ctx.session.user.id,
+            shouldBlock: input.block,
+          },
         });
-        ee.emit('toggleBlockChat', {
-          initiatorId: ctx.session.user.id,
-          blockedUserId: input.blockedUserId,
-          block: input.block,
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: input.blockedUserId,
+          data: {
+            chatWithId: ctx.session.user.id,
+            blockedBy: input.block ? ctx.session.user.id : null,
+          },
         });
       }
 
       return updatedChat;
     }),
-  // subscriptions
-  onToggleBlocking: protectedProcedure.subscription(async function* ({ ctx }) {
-    for await (const [data] of ee.toIterable('toggleBlockChat')) {
-      if (ctx.session.user.id === data.blockedUserId) {
-        yield data;
-      }
-    }
-  }),
 });
