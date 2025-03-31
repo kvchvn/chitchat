@@ -169,6 +169,20 @@ export default {
       containers: {
         '2xs': '130px',
       },
+      keyframes: {
+        'new-message-pulse': {
+          '0%, 100%': { 'background-color': colors.zinc[300] },
+          '50%': { 'background-color': 'transparent' },
+        },
+        'new-message-pulse-dark': {
+          '0%, 100%': { 'background-color': colors.zinc[600] },
+          '50%': { 'background-color': 'transparent' },
+        },
+      },
+      animation: {
+        'new-message-pulse': 'new-message-pulse 2s ease-in-out infinite',
+        'new-message-pulse-dark': 'new-message-pulse-dark 2s ease-in-out infinite',
+      },
     },
   },
   plugins: [
