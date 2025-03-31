@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import type React from 'react';
+import { EventsSubscriber } from '~/components/global/events-subscriber';
 import { Header } from '~/components/global/header';
 import { Wrapper } from '~/components/ui/wrapper';
 import { ROUTES } from '~/constants/routes';
@@ -14,6 +15,7 @@ export default async function ProtectedLayout({ children }: React.PropsWithChild
 
   return (
     <>
+      <EventsSubscriber />
       <Header />
       <main className="flex max-h-full grow items-stretch bg-background-light pb-6 pt-16 dark:bg-background-dark">
         <Wrapper>{children}</Wrapper>
