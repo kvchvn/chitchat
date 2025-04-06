@@ -97,7 +97,7 @@ export const useSendMessageOptimisticMutation = ({ onMutateSideEffect }: Args) =
 
       toast({
         variant: 'destructive',
-        title: 'Message editing failed',
+        title: 'Sending the message failed',
         description: 'Something went wrong. Please try again later',
       });
     },

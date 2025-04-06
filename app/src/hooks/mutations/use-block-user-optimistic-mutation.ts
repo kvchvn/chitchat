@@ -63,7 +63,7 @@ export const useBlockUserOptimisticMutation = () => {
 
       toast({
         variant: 'destructive',
-        title: 'User blocking failed',
+        title: 'Blocking the user failed',
         description: 'Something went wrong. Please try again later',
       });
     },
