@@ -19,7 +19,6 @@ export const onUpdateChatPreviewHandler = ({
         }
 
         if (currentUserCopy.chat && typeof data.blockedBy !== 'undefined') {
-          console.log('blocked');
           currentUserCopy.chat = {
             ...currentUserCopy.chat,
             blockedBy: data.blockedBy,

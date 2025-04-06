@@ -8,7 +8,6 @@ type Props = {
 };
 
 export const EditMessageDropdownItem = ({ message }: Props) => {
-  console.log({ message });
   const setMessageToEdit = useStore.use.setMessageToEdit();
 
   const handleClick = () => {

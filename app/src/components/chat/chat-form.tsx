@@ -94,15 +94,12 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
       const textarea = formRef.current?.elements.namedItem(TEXTAREA_NAME);
 
       if (textarea instanceof HTMLElement) {
-        console.log('focus');
         textarea.focus();
       }
     } else {
       setMessage('');
     }
   }, [messageToEdit]);
-
-  console.log('RENDER', message);
 
   return (
     <form
