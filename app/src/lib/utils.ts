@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import { type User } from 'next-auth';
 import { twMerge } from 'tailwind-merge';
 
@@ -43,3 +44,5 @@ export const getHoursMinutes = (date: Date) => {
 
   return `${hours}:${minutes}`;
 };
+
+export const generateChatDateKey = (date: Date) => dayjs(date).format('DD MMMM YYYY');

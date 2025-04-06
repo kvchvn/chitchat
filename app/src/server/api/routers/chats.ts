@@ -1,10 +1,11 @@
 import { TRPCError } from '@trpc/server';
 import { and, asc, eq, or } from 'drizzle-orm';
 import { z } from 'zod';
+import { generateChatDateKey } from '~/lib/utils';
 import { ee } from '~/server/api/event-emitter';
 import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
 import { chats } from '~/server/db/schema/chats';
-import { messages } from '~/server/db/schema/messages';
+import { type ChatMessage, messages } from '~/server/db/schema/messages';
 
 export const chatsRouter = createTRPCRouter({
   getByCompanionId: protectedProcedure
@@ -32,12 +33,28 @@ export const chatsRouter = createTRPCRouter({
         });
       }
 
+      const messagesMap = new Map<string, ChatMessage[]>();
+
       const chat = result[0].chat;
-      const chatMessages = result.filter((row) => row.messages).map((row) => row.messages);
+      const chatMessages = result.map((row) => row.messages);
+
+      chatMessages.forEach((message) => {
+        if (!message) {
+          return;
+        }
+
+        const dateKey = generateChatDateKey(message.createdAt);
+
+        if (!messagesMap.has(dateKey)) {
+          messagesMap.set(dateKey, []);
+        }
+
+        messagesMap.get(dateKey)?.push(message);
+      });
 
       return {
         chat,
-        messages: chatMessages,
+        messagesMap,
       };
     }),
   createWithCompanion: protectedProcedure
@@ -76,26 +93,25 @@ export const chatsRouter = createTRPCRouter({
         .returning();
 
       if (updatedChat) {
-        ee.emit('updateChatPreview', {
-          senderId: ctx.session.user.id,
-          receiverId: input.blockedUserId,
-          isBlocked: input.block,
+        ee.emit('event', {
+          action: 'onBlockChat',
+          eventReceiverId: input.blockedUserId,
+          data: {
+            blockedById: ctx.session.user.id,
+            shouldBlock: input.block,
+          },
         });
-        ee.emit('toggleBlockChat', {
-          initiatorId: ctx.session.user.id,
-          blockedUserId: input.blockedUserId,
-          block: input.block,
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: input.blockedUserId,
+          data: {
+            chatWithId: ctx.session.user.id,
+            blockedBy: input.block ? ctx.session.user.id : null,
+          },
         });
       }
 
       return updatedChat;
     }),
-  // subscriptions
-  onToggleBlocking: protectedProcedure.subscription(async function* ({ ctx }) {
-    for await (const [data] of ee.toIterable('toggleBlockChat')) {
-      if (ctx.session.user.id === data.blockedUserId) {
-        yield data;
-      }
-    }
-  }),
 });

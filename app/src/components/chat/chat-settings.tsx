@@ -18,10 +18,6 @@ export const ChatSettings = () => {
   const companionId = useCompanionId();
   const { data: chat } = api.chats.getByCompanionId.useQuery({ companionId }, { enabled: false });
 
-  if (!chat) {
-    return null;
-  }
-
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -29,16 +25,18 @@ export const ChatSettings = () => {
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
-      <ChatIdProvider chatId={chat.chat.id}>
-        <DropdownMenuContent align="end">
-          {/* Clear messages */}
-          <ClearMessagesDropdownItem />
-          {/* Block user */}
-          {chat.chat.blockedBy === companionId ? null : (
-            <BlockUserDropdownItem block={!chat.chat.blockedBy} />
-          )}
-        </DropdownMenuContent>
-      </ChatIdProvider>
+      {chat ? (
+        <ChatIdProvider chatId={chat.chat.id}>
+          <DropdownMenuContent align="end">
+            {/* Clear messages */}
+            <ClearMessagesDropdownItem disabled={!chat.messagesMap.size} />
+            {/* Block user */}
+            {chat.chat.blockedBy === companionId ? null : (
+              <BlockUserDropdownItem block={!chat.chat.blockedBy} />
+            )}
+          </DropdownMenuContent>
+        </ChatIdProvider>
+      ) : null}
     </DropdownMenu>
   );
 };

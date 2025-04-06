@@ -15,10 +15,9 @@ import {
 } from '~/components/ui/alert-dialog';
 import { Button } from '~/components/ui/button';
 import { DropdownMenuItem } from '~/components/ui/dropdown-menu';
+import { useBlockUserOptimisticMutation } from '~/hooks/mutations/use-block-user-optimistic-mutation';
 import { useCompanionId } from '~/hooks/use-companion-id';
-import { useToast } from '~/hooks/use-toast';
 import { cn } from '~/lib/utils';
-import { api } from '~/trpc/react';
 
 type Props = {
   block: boolean;
@@ -36,42 +35,11 @@ export const BlockUserDropdownItem = ({ block }: Props) => {
   const chatId = useChatId();
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const { toast } = useToast();
-  const utils = api.useUtils();
 
-  const { mutate: toggleBlock } = api.chats.toggleBlocking.useMutation({
-    onMutate: async () => {
-      await utils.chats.getByCompanionId.cancel();
-
-      const previousChat = utils.chats.getByCompanionId.getData();
-
-      utils.chats.getByCompanionId.setData({ companionId }, (staleChat) =>
-        staleChat
-          ? {
-              chat: { ...staleChat.chat, blockedBy: userId },
-              messages: staleChat.messages,
-            }
-          : staleChat
-      );
-
-      return { previousChat };
-    },
-    onError: (_, __, context) => {
-      utils.chats.getByCompanionId.setData({ companionId }, context?.previousChat);
-
-      toast({
-        variant: 'destructive',
-        title: 'User block failed',
-        description: 'Something went wrong. Please try again later',
-      });
-    },
-    onSettled: async () => {
-      await utils.chats.getByCompanionId.invalidate({ companionId });
-    },
-  });
+  const { mutate: toggleBlock } = useBlockUserOptimisticMutation();
 
   const handleClick = () => {
-    void toggleBlock({ chatId, blockedUserId: companionId, block });
+    toggleBlock({ chatId, blockedUserId: companionId, block });
   };
 
   if (userId === companionId) {

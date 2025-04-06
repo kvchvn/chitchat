@@ -1,28 +1,20 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-import { useUserId } from '~/components/contexts/user-id-provider';
 import { Button } from '~/components/ui/button';
 import { UserItemMemo } from '~/components/user/user-item';
-import { useChatPreviewSubscription } from '~/hooks/use-chat-preview-subscription';
-import { useCompanionId } from '~/hooks/use-companion-id';
-import { useRemoveMessagesSubscription } from '~/hooks/use-remove-messages-subscription';
 import { api } from '~/trpc/react';
-import { UserItemSkeleton } from './user-item-skeleton';
+import { LoadingIcon } from '../ui/loading-icon';
+import { UserListSkeleton } from './user-list-skeleton';
 
 export const UsersList = () => {
-  const userId = useUserId();
-  const companionId = useCompanionId();
-
   const {
     isLoading,
+    isFetching,
     isError,
     data: users,
     refetch,
   } = api.users.getAllWithChatPreview.useQuery(undefined, { retry: false });
-
-  useChatPreviewSubscription({ userId });
-  useRemoveMessagesSubscription({ companionId });
 
   const handleClick = () => {
     void refetch();
@@ -31,7 +23,7 @@ export const UsersList = () => {
   if (isLoading) {
     return (
       <ul className="flex flex-col">
-        <UserItemSkeleton count={5} />
+        <UserListSkeleton count={5} />
       </ul>
     );
   }
@@ -40,7 +32,7 @@ export const UsersList = () => {
     return (
       <div className="flex h-full items-center justify-center">
         <Button onClick={handleClick} size="icon" className="rounded-full">
-          <RefreshCw />
+          {isFetching ? <LoadingIcon /> : <RefreshCw />}
         </Button>
       </div>
     );
