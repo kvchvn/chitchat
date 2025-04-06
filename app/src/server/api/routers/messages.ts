@@ -1,4 +1,4 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { messages } from '~/server/db/schema/messages';
 import { ee } from '../event-emitter';
@@ -92,6 +92,47 @@ export const messagesRouter = createTRPCRouter({
       }
 
       return updatedMessage;
+    }),
+  remove: protectedProcedure
+    .input(
+      z.object({ id: z.string(), dateKey: z.string(), receiverId: z.string(), chatId: z.string() })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const [lastMessage, secondToLastMessage] = await ctx.db
+        .select()
+        .from(messages)
+        .where(eq(messages.chatId, input.chatId))
+        .orderBy(desc(messages.createdAt))
+        .limit(2);
+
+      const [removedMessage] = await ctx.db
+        .delete(messages)
+        .where(eq(messages.id, input.id))
+        .returning();
+
+      if (removedMessage) {
+        ee.emit('event', {
+          action: 'onRemoveMessage',
+          eventReceiverId: input.receiverId,
+          data: {
+            removedMessage,
+          },
+        });
+
+        const isLastMessage = lastMessage?.id === removedMessage.id;
+
+        ee.emit('event', {
+          action: 'onUpdateChatPreview',
+          eventReceiverId: input.receiverId,
+          data: {
+            chatWithId: ctx.session.user.id,
+            previewMessage: isLastMessage ? secondToLastMessage : undefined,
+            unreadMessagesDiff: removedMessage.isRead ? undefined : -1,
+          },
+        });
+      }
+
+      return removedMessage;
     }),
   readUnreadMessages: protectedProcedure
     .input(

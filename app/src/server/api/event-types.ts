@@ -6,7 +6,8 @@ export type EventAction =
   | 'onEditMessage'
   | 'onUpdateChatPreview'
   | 'onClearChat'
-  | 'onBlockChat';
+  | 'onBlockChat'
+  | 'onRemoveMessage';
 
 export type EventData =
   | OnSendMessageEvent
@@ -14,7 +15,8 @@ export type EventData =
   | OnReadMessages
   | OnUpdateChatPreview
   | OnClearChat
-  | OnBlockChat;
+  | OnBlockChat
+  | OnRemoveMessage;
 
 type EventDataGenerator<Action extends EventAction, Data extends Record<string, unknown>> = {
   action: Action;
@@ -55,6 +57,7 @@ export type OnUpdateChatPreview = EventDataGenerator<
     // undefined - leave a preview message the same, null - to remove a preview message
     previewMessage?: ChatMessage | null;
     blockedBy?: string | null;
+    // undefined - keep it the same, 0 (zero) - to reset the value
     unreadMessagesDiff?: number;
   }
 >;
@@ -71,5 +74,12 @@ export type OnBlockChat = EventDataGenerator<
   {
     blockedById: string;
     shouldBlock: boolean;
+  }
+>;
+
+export type OnRemoveMessage = EventDataGenerator<
+  'onRemoveMessage',
+  {
+    removedMessage: ChatMessage;
   }
 >;

@@ -11,6 +11,7 @@ import { type ChatMessage } from '~/server/db/schema/messages';
 import { useUserId } from '../contexts/user-id-provider';
 import { EditMessageDropdownItem } from './edit-message-dropdown-item';
 import { LikeMessageDropdownItem } from './like-message-dropdown-item';
+import { RemoveMessageDropdownItem } from './remove-message-dropdown-item';
 
 type Props = {
   message: ChatMessage;
@@ -34,8 +35,13 @@ export const MessageSettings = ({ message }: Props) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align={userId === message.senderId ? 'end' : 'start'}>
-        {message.senderId === userId ? <EditMessageDropdownItem message={message} /> : null}
-        <LikeMessageDropdownItem />
+        {message.senderId === userId ? (
+          <>
+            <EditMessageDropdownItem message={message} />
+            <RemoveMessageDropdownItem message={message} />
+          </>
+        ) : null}
+        {message.senderId !== userId ? <LikeMessageDropdownItem /> : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -3,6 +3,7 @@ import { onBlockChatHandler } from './event-handlers/on-block-chat-handler';
 import { onClearChatHandler } from './event-handlers/on-clear-chat-handler';
 import { onEditMessageHandler } from './event-handlers/on-edit-message-handler';
 import { onReadMessagesHandler } from './event-handlers/on-read-messages-handler';
+import { onRemoveMessageHandler } from './event-handlers/on-remove-message-handler';
 import { onSendMessageHandler } from './event-handlers/on-send-message-handler';
 import { onUpdateChatPreviewHandler } from './event-handlers/on-update-chat-preview-handler';
 
@@ -29,6 +30,9 @@ export const onEvents = () => {
           break;
         case 'onUpdateChatPreview':
           onUpdateChatPreviewHandler({ utils, data });
+          break;
+        case 'onRemoveMessage':
+          onRemoveMessageHandler({ utils, data });
           break;
       }
     },
