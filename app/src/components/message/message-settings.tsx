@@ -41,7 +41,7 @@ export const MessageSettings = ({ message }: Props) => {
             <RemoveMessageDropdownItem message={message} />
           </>
         ) : null}
-        {message.senderId !== userId ? <LikeMessageDropdownItem /> : null}
+        {message.senderId !== userId ? <LikeMessageDropdownItem message={message} /> : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

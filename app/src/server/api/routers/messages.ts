@@ -134,6 +134,29 @@ export const messagesRouter = createTRPCRouter({
 
       return removedMessage;
     }),
+  like: protectedProcedure
+    .input(z.object({ id: z.string(), dateKey: z.string(), like: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const [message] = await ctx.db
+        .update(messages)
+        .set({
+          isLiked: input.like,
+        })
+        .where(eq(messages.id, input.id))
+        .returning();
+
+      if (message) {
+        ee.emit('event', {
+          action: 'onLikeMessage',
+          eventReceiverId: message.senderId,
+          data: {
+            likedMessage: message,
+          },
+        });
+      }
+
+      return message;
+    }),
   readUnreadMessages: protectedProcedure
     .input(
       z.object({ senderId: z.string(), receiverId: z.string(), messagesIds: z.array(z.string()) })

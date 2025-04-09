@@ -26,8 +26,8 @@ export const ChatSkeleton = () => {
         </div>
       </div>
       <div className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
-        <Skeleton className="h-[35px] w-full rounded-md" />
-        <Skeleton className="h-[35px] w-[35px] shrink-0 rounded-full" />
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
       </div>
     </>
   );

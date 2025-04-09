@@ -1,33 +1,41 @@
 import React, { forwardRef, memo, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { cn } from '~/lib/utils';
+import { useLikeMessageOptimisticMutation } from '~/hooks/mutations/use-like-message-optimistic-mutation';
+import { cn, generateChatDateKey } from '~/lib/utils';
+import { type ChatMessage } from '~/server/db/schema/messages';
+import { useUserId } from '../contexts/user-id-provider';
 
 type Props = React.PropsWithChildren & {
-  messageId: string;
-  fromCurrentUser: boolean;
-  unreadMessages: Set<string>;
-  isRead: boolean;
+  message: ChatMessage;
   isEditing: boolean;
+  unreadMessages: Set<string>;
 };
 
 const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
-  (
-    { children, messageId, fromCurrentUser, unreadMessages, isRead, isEditing },
-    firstUnreadMessageRef
-  ) => {
+  ({ children, unreadMessages, message, isEditing }, firstUnreadMessageRef) => {
     const { ref: inViewRef, inView } = useInView({ threshold: 1, delay: 100 });
+    const userId = useUserId();
+
+    const { mutate: toggleLikeMessage } = useLikeMessageOptimisticMutation();
+
+    const handleDoubleClick: React.MouseEventHandler = (e) => {
+      e.preventDefault();
+
+      const dateKey = generateChatDateKey(message.createdAt);
+      toggleLikeMessage({ id: message.id, dateKey, like: !message.isLiked });
+    };
 
     useEffect(() => {
-      if (inView && !isRead && !fromCurrentUser) {
-        unreadMessages.add(messageId);
+      if (inView && !message.isRead && message.senderId !== userId) {
+        unreadMessages.add(message.id);
       }
-    }, [inView, isRead, fromCurrentUser, unreadMessages, messageId]);
+    }, [inView, message.isRead, message.senderId, userId, unreadMessages, message.id]);
 
     useEffect(() => {
-      if (isRead) {
-        unreadMessages.delete(messageId);
+      if (message.isRead) {
+        unreadMessages.delete(message.id);
       }
-    }, [isRead, messageId, unreadMessages]);
+    }, [message.isRead, message.id, unreadMessages]);
 
     return (
       <li
@@ -38,26 +46,27 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
             firstUnreadMessageRef &&
             'current' in firstUnreadMessageRef &&
             !firstUnreadMessageRef.current &&
-            !fromCurrentUser &&
-            !isRead
+            message.senderId !== userId &&
+            !message.isRead
           ) {
             firstUnreadMessageRef.current = el;
           }
         }}
         className={cn(
           'group flex w-full items-end justify-end gap-1',
-          fromCurrentUser && 'self-message self-end',
-          !fromCurrentUser && 'companion-message flex-row-reverse'
+          message.senderId === userId && 'self-message self-end',
+          message.senderId !== userId && 'companion-message flex-row-reverse'
         )}>
         <div
+          onDoubleClick={message.senderId !== userId ? handleDoubleClick : undefined}
           className={cn(
-            'relative flex w-fit min-w-24 max-w-[80%] flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6',
+            'relative flex w-fit min-w-32 max-w-[80%] cursor-pointer flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6',
             {
               'border-primary-hover-light bg-primary-light dark:border-primary-hover-dark dark:bg-primary-dark':
-                fromCurrentUser,
-              'border-zinc-400': !fromCurrentUser,
+                message.senderId === userId,
+              'border-zinc-400': message.senderId !== userId,
               'animate-new-message-pulse dark:animate-new-message-pulse-dark':
-                !fromCurrentUser && !isRead,
+                message.senderId !== userId && !message.isRead,
               'bg-primary-hover-light dark:bg-primary-active-dark/10': isEditing,
             }
           )}>
@@ -69,11 +78,14 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
 );
 
 export const MessageContainerMemo = memo(MessageContainer, (oldProps, newProps) => {
+  // Comparing only the properties that are used in the component
   return Boolean(
-    oldProps.fromCurrentUser === newProps.fromCurrentUser &&
-      oldProps.isRead === newProps.isRead &&
+    oldProps.message.senderId === newProps.message.senderId &&
+      oldProps.message.isRead === newProps.message.isRead &&
       oldProps.isEditing === newProps.isEditing &&
-      oldProps.messageId === newProps.messageId &&
+      oldProps.message.id === newProps.message.id &&
+      oldProps.message.isLiked === newProps.message.isLiked &&
+      Number(oldProps.message.createdAt) === Number(newProps.message.createdAt) &&
       [...oldProps.unreadMessages].join('') === [...newProps.unreadMessages].join('')
   );
 });

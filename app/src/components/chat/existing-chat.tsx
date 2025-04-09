@@ -1,4 +1,4 @@
-import { PencilLine } from 'lucide-react';
+import { Heart, PencilLine } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { ChatBlock } from '~/components/chat/chat-block';
 import { ChatForm } from '~/components/chat/chat-form';
@@ -128,16 +128,15 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
                   {messages.map((message) => (
                     <MessageContainerMemo
                       key={`${message.id}-${message.text}`}
-                      messageId={message.id}
-                      fromCurrentUser={userId === message.senderId}
-                      isRead={message.isRead}
-                      isEditing={messageToEdit?.id === message.id}
+                      message={message}
+                      isEditing={message.id === messageToEdit?.id}
                       unreadMessages={unreadMessages.current}
                       ref={firstUnreadMessageRef}>
                       {!blockedBy ? <MessageSettings message={message} /> : null}
                       <span className="px-5">{message.text}</span>
                       <MessageStatusBar fromCurrentUser={userId === message.senderId}>
                         <MessageTime createdAt={message.createdAt} />
+                        {message.isLiked ? <Heart className="h-3 w-3" fill="currentColor" /> : null}
                         {Number(message.createdAt) !== Number(message.updatedAt) ? (
                           <PencilLine className="h-3 w-3" />
                         ) : null}
@@ -161,9 +160,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
       {blockedBy ? (
         <ChatBlock byCurrentUser={blockedBy === userId} />
       ) : (
-        <>
-          <ChatForm onFormSubmitSideEffect={onSendMessageSideEffect} />
-        </>
+        <ChatForm onFormSubmitSideEffect={onSendMessageSideEffect} />
       )}
     </>
   );

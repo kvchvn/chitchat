@@ -7,7 +7,8 @@ export type EventAction =
   | 'onUpdateChatPreview'
   | 'onClearChat'
   | 'onBlockChat'
-  | 'onRemoveMessage';
+  | 'onRemoveMessage'
+  | 'onLikeMessage';
 
 export type EventData =
   | OnSendMessageEvent
@@ -16,7 +17,8 @@ export type EventData =
   | OnUpdateChatPreview
   | OnClearChat
   | OnBlockChat
-  | OnRemoveMessage;
+  | OnRemoveMessage
+  | OnLikeMessage;
 
 type EventDataGenerator<Action extends EventAction, Data extends Record<string, unknown>> = {
   action: Action;
@@ -81,5 +83,12 @@ export type OnRemoveMessage = EventDataGenerator<
   'onRemoveMessage',
   {
     removedMessage: ChatMessage;
+  }
+>;
+
+export type OnLikeMessage = EventDataGenerator<
+  'onLikeMessage',
+  {
+    likedMessage: ChatMessage;
   }
 >;

@@ -21,20 +21,12 @@ export const messages = createTable('messages', {
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
   isRead: boolean('is_read').notNull().default(false),
   isSent: boolean('is_sent').notNull().default(true),
-});
-
-export const messageLikes = createTable('message_likes', {
-  id: varchar('id', { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  messageId: varchar('message_id', { length: 255 }).notNull(),
-  likedById: varchar('liked_by_id', { length: 255 }).notNull(),
+  isLiked: boolean('is_liked').notNull().default(false),
 });
 
 // RELATIONS
 
-export const messagesRelations = relations(messages, ({ one, many }) => ({
+export const messagesRelations = relations(messages, ({ one }) => ({
   chat: one(chats, {
     fields: [messages.chatId],
     references: [chats.id],
@@ -48,18 +40,6 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
     fields: [messages.receiverId],
     references: [users.id],
     relationName: 'message_receiver',
-  }),
-  likes: many(messageLikes),
-}));
-
-export const messageLikesRelations = relations(messageLikes, ({ one }) => ({
-  message: one(messages, {
-    fields: [messageLikes.messageId],
-    references: [messages.id],
-  }),
-  likedBy: one(users, {
-    fields: [messageLikes.likedById],
-    references: [users.id],
   }),
 }));
 
