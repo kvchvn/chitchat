@@ -61,6 +61,10 @@
   .text-subtitle {
     @apply text-lg font-medium;
   }
+
+  .scrollbar-stable {
+    scrollbar-gutter: stable;
+  }
 }
 
 svg {
@@ -85,5 +89,20 @@ svg {
 
   &:has(+ .companion-message) > div {
     @apply rounded-bl-lg;
+  }
+}
+
+.message,
+.message-date {
+  transition: filter 0.1s ease-in-out;
+}
+
+body:has(.message-settings[data-radix-menu-content][data-state='open']) {
+  & :is(.message, .message-date):not(.message_settings-open) {
+    filter: blur(3px);
+  }
+
+  & .messages-container {
+    overflow-y: hidden;
   }
 }

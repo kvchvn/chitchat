@@ -5,7 +5,6 @@ import { ChatForm } from '~/components/chat/chat-form';
 import { EditMessagePreview } from '~/components/chat/edit-message-preview';
 import { useUserId } from '~/components/contexts/user-id-provider';
 import { MessageContainerMemo } from '~/components/message/message-container';
-import { MessageSettings } from '~/components/message/message-settings';
 import { MessageStatusBar } from '~/components/message/message-status-bar';
 import { MessageStatusIcon } from '~/components/message/message-status-icon';
 import { MessageTime } from '~/components/message/message-time';
@@ -117,22 +116,22 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="relative mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
+          className="scrollbar-stable messages-container relative mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
           <div className="flex min-h-full w-full flex-col justify-end pt-10">
             {messagesEntries.map(([date, messages]) => (
               <Fragment key={date}>
-                <span className="mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
+                <span className="message-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
                   {date}
                 </span>
                 <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto px-1 py-8">
                   {messages.map((message) => (
                     <MessageContainerMemo
                       key={`${message.id}-${message.text}`}
+                      isBlockedChat={Boolean(blockedBy)}
                       message={message}
                       isEditing={message.id === messageToEdit?.id}
                       unreadMessages={unreadMessages.current}
                       ref={firstUnreadMessageRef}>
-                      {!blockedBy ? <MessageSettings message={message} /> : null}
                       <span className="px-5">{message.text}</span>
                       <MessageStatusBar fromCurrentUser={userId === message.senderId}>
                         <MessageTime createdAt={message.createdAt} />
