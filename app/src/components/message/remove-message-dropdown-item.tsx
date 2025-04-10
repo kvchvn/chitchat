@@ -41,6 +41,7 @@ export const RemoveMessageDropdownItem = ({ message }: Props) => {
       <DropdownMenuItem
         onClick={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           triggerRef.current?.click();
         }}>
         <Trash2 />

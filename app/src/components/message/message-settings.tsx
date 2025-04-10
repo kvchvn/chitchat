@@ -9,6 +9,7 @@ import { useCompanionId } from '~/hooks/use-companion-id';
 import { cn } from '~/lib/utils';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { useUserId } from '../contexts/user-id-provider';
+import { CopyMessageDropdownItem } from './copy-message-dropdown-item';
 import { EditMessageDropdownItem } from './edit-message-dropdown-item';
 import { LikeMessageDropdownItem } from './like-message-dropdown-item';
 import { RemoveMessageDropdownItem } from './remove-message-dropdown-item';
@@ -43,7 +44,7 @@ export const MessageSettings = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className='message-settings'
+        className="message-settings"
         side="top"
         align={userId === message.senderId ? 'end' : 'start'}
         onInteractOutside={(e) => {
@@ -59,6 +60,7 @@ export const MessageSettings = ({
           </>
         ) : null}
         {message.senderId !== userId ? <LikeMessageDropdownItem message={message} /> : null}
+        <CopyMessageDropdownItem text={message.text} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
