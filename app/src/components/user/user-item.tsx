@@ -5,6 +5,7 @@ import Link from 'next/link';
 import React from 'react';
 import { useUserId } from '~/components/contexts/user-id-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { NOTES_TITLE } from '~/constants/global';
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { cn, getHoursMinutes, getNameInitials } from '~/lib/utils';
 import { type ChatMessage } from '~/server/db/schema/messages';
@@ -30,6 +31,8 @@ export const UserItem = ({
   const companionId = useCompanionId();
   const lastMessageTime = lastMessage ? getHoursMinutes(lastMessage.createdAt) : null;
 
+  const formattedName = userId === id ? NOTES_TITLE : name;
+
   return (
     <li className={cn('border-b last:border-b-0', isBlocked && 'opacity-40')}>
       <Link
@@ -43,13 +46,13 @@ export const UserItem = ({
         <Avatar className={cn('h-10 w-10', userId === id && 'rounded-none')}>
           <AvatarImage
             src={userId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
-            alt={name ?? "user's avatar"}
+            alt={formattedName ?? ''}
           />
-          <AvatarFallback className="text-sm">{getNameInitials(name)}</AvatarFallback>
+          <AvatarFallback className="text-sm">{getNameInitials(formattedName)}</AvatarFallback>
         </Avatar>
         <div className="flex w-full min-w-32 flex-col @container">
           <div className="flex items-center justify-between gap-2">
-            <span className="shrink-0 text-sm font-semibold">{userId === id ? 'Notes' : name}</span>
+            <span className="shrink-0 text-sm font-semibold">{formattedName}</span>
             <span className="cursor-default font-mono text-xs text-gray-400">
               {lastMessageTime}
             </span>
