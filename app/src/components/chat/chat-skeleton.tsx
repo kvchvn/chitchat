@@ -19,7 +19,7 @@ export const ChatSkeleton = () => {
                     'self-message self-end': i % 3 === 0,
                     'companion-message flex-row-reverse': i % 3 !== 0,
                   })}>
-                  <Skeleton className={`h-[51px] w-40 min-w-24 max-w-[80%] rounded-3xl`} />
+                  <Skeleton className={`h-[58px] w-40 min-w-24 max-w-[80%] rounded-3xl`} />
                 </li>
               ))}
           </ul>

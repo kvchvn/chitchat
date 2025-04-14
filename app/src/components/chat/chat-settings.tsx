@@ -12,16 +12,22 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { useCompanionId } from '~/hooks/use-companion-id';
+import { useStore } from '~/store/store';
 import { api } from '~/trpc/react';
 
 export const ChatSettings = () => {
+  const isChatSearchOn = useStore.use.isSearchOn();
   const companionId = useCompanionId();
   const { data: chat } = api.chats.getByCompanionId.useQuery({ companionId }, { enabled: false });
 
+  if (isChatSearchOn) {
+    return null;
+  }
+
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button size="icon-sm" variant="outline" className="ml-auto">
+      <DropdownMenuTrigger asChild disabled={!chat}>
+        <Button size="icon-sm" variant="outline">
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
