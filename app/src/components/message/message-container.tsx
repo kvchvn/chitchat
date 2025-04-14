@@ -11,10 +11,16 @@ type Props = React.PropsWithChildren & {
   isEditing: boolean;
   isBlockedChat: boolean;
   unreadMessages: Set<string>;
+  isActiveSearchMessage: boolean;
 };
 
+let i = 0;
+
 const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
-  ({ children, unreadMessages, message, isEditing, isBlockedChat }, firstUnreadMessageRef) => {
+  (
+    { children, unreadMessages, message, isEditing, isBlockedChat, isActiveSearchMessage },
+    firstUnreadMessageRef
+  ) => {
     const { ref: inViewRef, inView } = useInView({ threshold: 1, delay: 100 });
     const containerRef = useRef<HTMLDivElement | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -81,7 +87,7 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
               'border-zinc-400': message.senderId !== userId,
               'animate-new-message-pulse dark:animate-new-message-pulse-dark':
                 message.senderId !== userId && !message.isRead,
-              'bg-primary-hover-light dark:bg-primary-active-dark/10': isEditing,
+              'bg-primary-hover-light dark:bg-primary-dark/40': isEditing || isActiveSearchMessage,
             }
           )}>
           {!isBlockedChat ? (
@@ -109,6 +115,7 @@ export const MessageContainerMemo = memo(MessageContainer, (oldProps, newProps) 
       oldProps.message.id === newProps.message.id &&
       oldProps.message.isLiked === newProps.message.isLiked &&
       Number(oldProps.message.createdAt) === Number(newProps.message.createdAt) &&
+      oldProps.isActiveSearchMessage === newProps.isActiveSearchMessage &&
       [...oldProps.unreadMessages].join('') === [...newProps.unreadMessages].join('')
   );
 });

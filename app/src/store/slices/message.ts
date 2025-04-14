@@ -1,7 +1,7 @@
 import { type StateCreator } from 'zustand';
-import { type MessageSlice } from '../types';
+import { type AppStore, type MessageSlice } from '../types';
 
-export const createMessageSlice: StateCreator<MessageSlice, [], [], MessageSlice> = (set) => ({
+export const createMessageSlice: StateCreator<AppStore, [], [], MessageSlice> = (set) => ({
   messageToEdit: null,
   setMessageToEdit: (message) => set({ messageToEdit: message }),
 });

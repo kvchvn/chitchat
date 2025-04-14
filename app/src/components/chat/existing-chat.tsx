@@ -12,6 +12,7 @@ import { useReadNewMessagesOptimisticMutation } from '~/hooks/mutations/use-read
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { useStore } from '~/store/store';
+import { MessageTextMemo } from '../message/message-text';
 
 type Props = {
   messagesMap: Map<string, ChatMessage[]>;
@@ -21,7 +22,7 @@ type Props = {
 export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
   const messagesEntries = Array.from(messagesMap);
   const todayMessages = messagesEntries.at(-1)?.[1];
-  const messageToEdit = useStore.use.messageToEdit();
+  const { messageToEdit, activeSearchMessageId, searchQuery } = useStore();
 
   const userId = useUserId();
   const companionId = useCompanionId();
@@ -123,7 +124,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
                 <span className="message-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
                   {date}
                 </span>
-                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto px-1 py-8">
+                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto overflow-x-hidden px-1 py-8">
                   {messages.map((message) => (
                     <MessageContainerMemo
                       key={`${message.id}-${message.text}`}
@@ -131,8 +132,13 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
                       message={message}
                       isEditing={message.id === messageToEdit?.id}
                       unreadMessages={unreadMessages.current}
+                      isActiveSearchMessage={activeSearchMessageId === message.id}
                       ref={firstUnreadMessageRef}>
-                      <span className="px-5">{message.text}</span>
+                      <MessageTextMemo
+                        text={message.text}
+                        searchQuery={searchQuery}
+                        isActiveSearchMessage={activeSearchMessageId === message.id}
+                      />
                       <MessageStatusBar fromCurrentUser={userId === message.senderId}>
                         <MessageTime createdAt={message.createdAt} />
                         {message.isLiked ? <Heart className="h-3 w-3" fill="currentColor" /> : null}

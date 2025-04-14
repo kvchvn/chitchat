@@ -5,4 +5,15 @@ export type MessageSlice = {
   setMessageToEdit: (message: ChatMessage | null) => void;
 };
 
-export type AppStore = MessageSlice;
+export type ChatSlice = {
+  isSearchOn: boolean;
+  toggleOnSearch: () => void;
+  toggleOffSearch: () => void;
+  activeSearchMessageId: string | null;
+  setActiveSearchMessageId: (id: string) => void;
+  resetActiveSearchMessageId: () => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+};
+
+export type AppStore = MessageSlice & ChatSlice;
