@@ -3,7 +3,6 @@ import tailwindScrollbar from 'tailwind-scrollbar';
 import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import colors from 'tailwindcss/colors';
-import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
   content: ['./src/**/*.tsx'],
@@ -17,7 +16,7 @@ export default {
       },
       screens: {
         xs: '480px',
-        ...defaultTheme.screens,
+        '2xl': '1440px',
       },
       colors: {
         auth: {
