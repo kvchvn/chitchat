@@ -177,10 +177,19 @@ export default {
           '0%, 100%': { 'background-color': colors.zinc[600] },
           '50%': { 'background-color': 'transparent' },
         },
+        'warning-bounce': {
+          '0%, 15%, 25%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '10%, 20%': {
+            transform: 'translateY(-40%)',
+          },
+        },
       },
       animation: {
-        'new-message-pulse': 'new-message-pulse 2s ease-in-out infinite',
-        'new-message-pulse-dark': 'new-message-pulse-dark 2s ease-in-out infinite',
+        'new-message-pulse': '2s new-message-pulse ease-in-out infinite',
+        'new-message-pulse-dark': '2s new-message-pulse-dark ease-in-out infinite',
+        'avatar-upload-btn-bounce': '10s warning-bounce 4s ease-in-out infinite',
       },
     },
   },

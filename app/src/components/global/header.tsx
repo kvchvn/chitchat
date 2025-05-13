@@ -22,12 +22,15 @@ export const Header = async () => {
         <HeaderLinkBack />
         <ThemeToggler className="ml-auto h-8 w-8 rounded-full" />
         <Link href={ROUTES.profile}>
-          <Avatar className="hover:contrast-150">
+          <Avatar>
             <AvatarImage
               src={session.user.image ?? undefined}
               alt={session.user.name ?? 'Your avatar'}
+              className="hover:contrast-125"
             />
-            <AvatarFallback className="text-sm">{nameInitials}</AvatarFallback>
+            <AvatarFallback className="text-sm hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-600">
+              {nameInitials}
+            </AvatarFallback>
           </Avatar>
         </Link>
       </div>

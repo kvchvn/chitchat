@@ -29,3 +29,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sentMessages: many(messages, { relationName: 'message_sender' }),
   receivedMessages: many(messages, { relationName: 'message_receiver' }),
 }));
+
+// TYPES
+
+export type User = typeof users.$inferSelect;

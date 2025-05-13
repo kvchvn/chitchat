@@ -10,6 +10,14 @@ import { users } from '~/server/db/schema/users';
 
 export const usersRouter = createTRPCRouter({
   // queries
+  getCurrent: protectedProcedure.query(async ({ ctx }) => {
+    const [currentUser] = await ctx.db
+      .select()
+      .from(users)
+      .where(eq(users.id, ctx.session.user.id));
+
+    return currentUser;
+  }),
   isExisting: protectedProcedure
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
@@ -148,5 +156,19 @@ export const usersRouter = createTRPCRouter({
         .returning();
 
       return expiredSessions;
+    }),
+  updateCurrentUser: protectedProcedure
+    // Maybe another modifiable fields will be added later
+    .input(z.object({ name: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const [updatedUser] = await ctx.db
+        .update(users)
+        .set({
+          name: input.name,
+        })
+        .where(eq(users.id, ctx.session.user.id))
+        .returning();
+      
+      return updatedUser;
     }),
 });

@@ -29,7 +29,7 @@ export default async function ChatsLayout({ children }: React.PropsWithChildren)
 
   return (
     <>
-      <ResizablePanelGroup direction="horizontal" autoSaveId={RESIZABLE_GROUP_ID}>
+      <ResizablePanelGroup direction="horizontal" autoSaveId={RESIZABLE_GROUP_ID} className="pt-6">
         <ResizablePanel defaultSize={defaultResizableLayout?.[0]} maxSize={30} className="min-w-14">
           <UserIdProvider userId={session.user.id}>
             <UsersList />

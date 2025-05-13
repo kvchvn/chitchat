@@ -26,7 +26,7 @@ export default async function SignInPage({ searchParams }: Props) {
       <h1>Sign in to your account</h1>
       <h3>Choose your preferred sign in method</h3>
       <AuthProviders providers={providers} />
-      <p className="text-sm text-gray-400 dark:text-gray-500">
+      <p className="text-gray-400 dark:text-gray-500">
         By signing in, you agree our{' '}
         <Link href="/terms" className="link">
           Terms of Service

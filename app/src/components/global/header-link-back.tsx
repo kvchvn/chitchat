@@ -1,26 +1,24 @@
 'use client';
 
 import { ChevronLeft } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ROUTES } from '~/constants/routes';
 import { Button } from '../ui/button';
 
 export const HeaderLinkBack = () => {
   const pathname = usePathname();
-  const router = useRouter();
 
-  if (pathname !== ROUTES.profile) {
+  if (!pathname.startsWith(ROUTES.profile)) {
     return null;
   }
 
-  const handleClick = () => {
-    router.back();
-  };
-
   return (
-    <Button size="sm" variant="ghost" onClick={handleClick} className="px-0">
-      <ChevronLeft className="h-4 w-4" />
-      Back
+    <Button asChild size="sm" variant="link" className="px-0">
+      <Link href={ROUTES.chats}>
+        <ChevronLeft className="h-4 w-4" />
+        Chats
+      </Link>
     </Button>
   );
 };

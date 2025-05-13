@@ -1,24 +1,75 @@
+import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
 import { cn } from '~/lib/utils';
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+const inputVariants = cva(
+  'p-1 flex h-10 rounded-md shadow-sm w-full text-sm transition-colors placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-text-light focus-visible:ring-offset-1 dark:focus-visible:ring-slate-400',
+  {
+    variants: {
+      variant: {
+        default: 'bg-transparent',
+        primary: 'bg-slate-200 px-2 tracking-wider border border-transparent dark:bg-slate-600',
+      },
+      file: {
+        true: 'cursor-pointer focus-within:outline-none focus-within:ring-1 focus-within:ring-text-light focus-within:ring-offset-1 dark:focus-within:ring-slate-400',
+        false:
+          'read-only:bg-slate-300 read-only:border-slate-400 dark:read-only:bg-slate-700 read-only:border-dashed',
+      },
+      disabled: {
+        true: 'bg-slate-300 border-slate-400 border-dashed',
+      },
+      withError: {
+        true: 'border-error-light dark:border-error-dark bg-error-light/5 dark:bg-error-dark/10',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      file: false,
+      disabled: false,
+      withError: false,
+    },
+  }
+);
+
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
+  VariantProps<typeof inputVariants> & {
+    withError?: boolean;
+    postfix?: React.ReactElement;
+    suffix?: React.ReactElement;
+  };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, variant, suffix, postfix, withError, ...props }, ref) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          'flex h-10 w-full rounded-md bg-transparent p-1 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-text-light placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-text-light focus-visible:ring-offset-1 dark:focus-visible:ring-slate-400',
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
+      <>
+        {suffix}
+        <input
+          type={type}
+          className={cn(inputVariants({ variant, withError: withError }), className)}
+          ref={ref}
+          {...props}
+        />
+        {postfix}
+      </>
     );
   }
 );
+
 Input.displayName = 'Input';
 
-export { Input };
+const InputFile = React.forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(
+  ({ className, variant, children, ...props }, ref) => {
+    return (
+      <label
+        className={cn(inputVariants({ variant, file: true, disabled: props.disabled }), className)}>
+        <input type="file" className="h-0 w-0 opacity-0" ref={ref} {...props} />
+        {children}
+      </label>
+    );
+  }
+);
+
+InputFile.displayName = 'InputFile';
+
+export { Input, InputFile };

@@ -46,3 +46,5 @@ export const getHoursMinutes = (date: Date) => {
 };
 
 export const generateChatDateKey = (date: Date) => dayjs(date).format('DD MMMM YYYY');
+
+export const calcShare = (step: number, steps: number) => (1 / steps) * step;
