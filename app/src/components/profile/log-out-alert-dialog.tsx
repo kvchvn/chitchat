@@ -1,21 +1,27 @@
+import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/alert-dialog';
 import { Button } from '../ui/button';
+import { LoadingIcon } from '../ui/loading-icon';
 
 type Props = React.PropsWithChildren;
 
 export const LogOutAlertDialog = ({ children }: Props) => {
-  const handleClick = () => {
-    signOut();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async () => {
+    setIsLoading(true);
+    await signOut();
   };
 
   return (
@@ -24,15 +30,21 @@ export const LogOutAlertDialog = ({ children }: Props) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+          <AlertDialogDescription>We will miss you</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button size="sm" variant="outline" className="min-w-24">
+            <Button variant="outline" className="min-w-24">
               Cancel
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button size="sm" variant="destructive" className="min-w-24" onClick={handleClick}>
+            <Button
+              disabled={isLoading}
+              variant="destructive"
+              className="min-w-24"
+              onClick={handleClick}>
+              {isLoading ? <LoadingIcon /> : <LogOut />}
               Sign out
             </Button>
           </AlertDialogAction>
