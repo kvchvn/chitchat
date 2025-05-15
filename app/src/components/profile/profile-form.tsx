@@ -105,7 +105,7 @@ export const ProfileForm = ({ user }: Props) => {
               control={form.control}
               name={formField.name}
               render={({ field, fieldState }) => {
-                const isReadOnly = formField.readOnly || !isEditMode;
+                const isReadOnly = formField.readOnly ?? !isEditMode;
 
                 return (
                   <FormItem>

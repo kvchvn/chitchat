@@ -15,7 +15,7 @@ export const CopyButton = ({
   disabled,
   ...props
 }: Props) => {
-  const TIMEOUT_MS = 5000;
+  const TIMEOUT_MS = 2000;
   const [isCopied, setIsCopied] = useState(false);
 
   const handleClick: React.MouseEventHandler = async (e) => {
@@ -34,7 +34,7 @@ export const CopyButton = ({
       onClick={handleClick}
       variant={variant}
       size={size}
-      disabled={disabled || isCopied}
+      disabled={disabled ?? isCopied}
       {...props}>
       {isCopied ? <ClipboardCheck /> : <Clipboard />}
     </Button>
