@@ -28,6 +28,8 @@ export const env = createEnv({
 
     FACEBOOK_ID: z.string(),
     FACEBOOK_SECRET: z.string(),
+
+    UPLOADTHING_TOKEN: z.string(),
   },
 
   /**
@@ -56,6 +58,7 @@ export const env = createEnv({
     YANDEX_SECRET: process.env.YANDEX_SECRET,
     FACEBOOK_ID: process.env.FACEBOOK_ID,
     FACEBOOK_SECRET: process.env.FACEBOOK_SECRET,
+    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

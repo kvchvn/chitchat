@@ -13,20 +13,29 @@ const config = {
   images: {
     remotePatterns: [
       {
+        // github
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
       },
       {
+        // google
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
       {
+        // yandex
         protocol: 'https',
         hostname: 'avatars.yandex.net',
       },
       {
+        // facebook
         protocol: 'https',
         hostname: 'platform-lookaside.fbsbx.com',
+      },
+      {
+        // uploadthing
+        protocol: 'https',
+        hostname: 'cgaeud8ce2.ufs.sh',
       },
     ],
   },

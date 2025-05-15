@@ -42,6 +42,7 @@ const config = {
         drizzleObjectName: ['db', 'ctx.db'],
       },
     ],
+    '@typescript-eslint/only-throw-error': 'off',
   },
 };
 module.exports = config;

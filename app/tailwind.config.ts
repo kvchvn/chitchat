@@ -3,8 +3,10 @@ import tailwindScrollbar from 'tailwind-scrollbar';
 import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import colors from 'tailwindcss/colors';
+import { withUt } from 'uploadthing/tw';
 
-export default {
+// withUt - uploadthing's
+export default withUt({
   content: ['./src/**/*.tsx'],
   darkMode: 'class',
   theme: {
@@ -202,4 +204,4 @@ export default {
       preferredStrategy: 'pseudoelements',
     }),
   ],
-} satisfies Config;
+}) satisfies Config;
