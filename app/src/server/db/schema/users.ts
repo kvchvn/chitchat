@@ -17,6 +17,7 @@ export const users = createTable('user', {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar('image', { length: 255 }),
+  fileKey: varchar('file_key', { length: 255 }),
   isNewUser: boolean('is_new_user').default(true),
 });
 

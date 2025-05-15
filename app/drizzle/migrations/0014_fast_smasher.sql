@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_user" ADD COLUMN "file_key" varchar(255);
