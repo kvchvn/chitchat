@@ -26,7 +26,7 @@ export const useUpdateUserOptimisticMutation = () => {
 
       toast({
         variant: 'destructive',
-        title: 'Updating the user info failed',
+        title: 'Updating the user data failed',
         description: 'Something went wrong. Please try again later',
       });
     },
