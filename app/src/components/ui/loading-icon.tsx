@@ -1,11 +1,8 @@
 import { LoaderCircle, type LucideProps } from 'lucide-react';
+import { cn } from '~/lib/utils';
 
 type Props = LucideProps;
 
 export const LoadingIcon = (props: Props) => {
-  return (
-    <div className="animate-spin">
-      <LoaderCircle {...props} />
-    </div>
-  );
+  return <LoaderCircle {...props} className={cn('animate-spin', props.className)} />;
 };
