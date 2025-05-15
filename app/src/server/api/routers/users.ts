@@ -159,13 +159,20 @@ export const usersRouter = createTRPCRouter({
     }),
   updateCurrentUser: protectedProcedure
     // Maybe another modifiable fields will be added later
-    .input(z.object({ name: z.string().optional(), image: z.string().optional() }))
+    .input(
+      z.object({
+        name: z.string().optional(),
+        image: z.string().optional(),
+        fileKey: z.string().optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const [updatedUser] = await ctx.db
         .update(users)
         .set({
           name: input.name,
           image: input.image,
+          fileKey: input.fileKey,
         })
         .where(eq(users.id, ctx.session.user.id))
         .returning();

@@ -1,7 +1,7 @@
 'use client';
 
 import { Ban, Check, ImageUp } from 'lucide-react';
-import { type ChangeEventHandler, useState } from 'react';
+import { type ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useUpdateUserOptimisticMutation } from '~/hooks/mutations/use-update-user-optimistic-mutation';
 import { useUploadThing } from '~/hooks/uploadthing';
 import { useToast } from '~/hooks/use-toast';
@@ -15,10 +15,17 @@ export const ProfilePromoAvatar = () => {
   const [isResult, setIsResult] = useState<'success' | 'error' | null>(null);
   const { data: user } = api.users.getCurrent.useQuery();
   const { toast } = useToast();
-  const { mutateAsync: updateUser, isPending } = useUpdateUserOptimisticMutation();
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const { mutateAsync: updateUser, isPending: isPendingUpdateUser } =
+    useUpdateUserOptimisticMutation();
+  const { mutateAsync: removeFiles, isPending: isPendingRemoveFiles } =
+    api.uploadthing.removeFiles.useMutation();
 
   const { isUploading, startUpload } = useUploadThing('avatarUploader', {
+    signal: abortControllerRef.current?.signal,
     onUploadError: () => {
+      abortControllerRef.current = null;
+
       toast({
         variant: 'destructive',
         title: 'Updating the avatar failed',
@@ -26,14 +33,25 @@ export const ProfilePromoAvatar = () => {
           'Unable to upload your image. Choose another image (less than 1 MB) or try again later',
       });
     },
-    onClientUploadComplete: async (e) => {
-      const image = e[0]?.ufsUrl;
+    onClientUploadComplete: async (files) => {
+      abortControllerRef.current = null;
+      const file = files[0];
+      const prevFileKey = user?.fileKey;
 
-      if (image) {
+      if (file) {
         try {
-          await updateUser({ image });
+          await updateUser({ image: file.ufsUrl, fileKey: file.key });
+          if (prevFileKey) {
+            // remove previous avatar if it has been saved on uploadthing
+            await removeFiles({ fileKeys: [prevFileKey] });
+          }
+
           setIsResult('success');
         } catch {
+          const fileKeys = files.map((f) => f.key);
+          // remove the file if its url hasn't been saved in the database
+          await removeFiles({ fileKeys });
+
           setIsResult('error');
         } finally {
           setTimeout(() => {
@@ -48,12 +66,21 @@ export const ProfilePromoAvatar = () => {
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
     if (e.target.files) {
+      abortControllerRef.current = new AbortController();
       const files = Array.from(e.target.files);
       await startUpload(files);
     }
   };
 
-  const isProcessing = isUploading || isPending;
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  const isProcessing = isUploading || isPendingUpdateUser || isPendingRemoveFiles;
   const isDelay = Boolean(isProcessing || isResult);
 
   const ResultIcon = isResult === 'success' ? Check : Ban;
