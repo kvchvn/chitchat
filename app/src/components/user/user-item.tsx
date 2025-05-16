@@ -47,6 +47,7 @@ export const UserItem = ({
           <AvatarImage
             src={userId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
             alt={formattedName ?? ''}
+            className={cn(userId === id && 'bg-transparent dark:bg-transparent')}
           />
           <AvatarFallback className="text-sm">{getNameInitials(formattedName)}</AvatarFallback>
         </Avatar>

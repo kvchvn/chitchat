@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --radius: 0.5rem;
-  }
-
   html {
     @apply h-dvh overflow-y-auto text-sm sm:text-base;
   }
