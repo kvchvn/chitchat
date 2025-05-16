@@ -1,1 +1,1 @@
-export const NOTES_TITLE = 'Your notes';
+export const NOTES_TITLE = 'My notes';

@@ -84,7 +84,6 @@ export const ChatSearch = () => {
         onClick={chat ? toggleOnSearch : undefined}
         size="icon-sm"
         variant="ghost"
-        className="mr-2"
         disabled={!chat.messagesMap.size}>
         <Search />
       </Button>

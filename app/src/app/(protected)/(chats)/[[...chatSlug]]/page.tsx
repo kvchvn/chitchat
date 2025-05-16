@@ -5,7 +5,9 @@ import { ChatSearch } from '~/components/chat/chat-search';
 import { ChatSettings } from '~/components/chat/chat-settings';
 import { ChatWindow } from '~/components/chat/chat-window';
 import { UserIdProvider } from '~/components/contexts/user-id-provider';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { NOTES_TITLE } from '~/constants/global';
+import { cn, getNameInitials } from '~/lib/utils';
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
 
@@ -22,9 +24,20 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
     return <ChatNotFound />;
   }
 
+  const isNotes = companion.id === session.user.id;
+  const formattedName = isNotes ? NOTES_TITLE : companion.name;
+
   return (
-    <ChatContainer className="flex-col items-start justify-stretch pb-1 pt-0">
-      <header className="relative flex min-h-12 w-full items-center border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-full after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
+    <ChatContainer className="flex-col items-start justify-stretch">
+      <header className="relative flex min-h-12 w-full items-center gap-2 border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-full after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
+        <Avatar className={cn('h-8 w-8', isNotes && 'rounded-none')}>
+          <AvatarImage
+            src={isNotes ? '/svg/bookmark.svg' : (companion.image ?? undefined)}
+            alt={formattedName ?? 'Companion avatar'}
+            className={cn(isNotes && 'bg-transparent dark:bg-transparent')}
+          />
+          <AvatarFallback className="text-sm">{getNameInitials(formattedName)}</AvatarFallback>
+        </Avatar>
         <h3 className="mr-auto">
           {session.user.id === companion.id ? NOTES_TITLE : companion.name}
         </h3>

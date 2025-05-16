@@ -29,7 +29,7 @@ export const UsersList = () => {
     return (
       <>
         {/* Mobile skeleton */}
-        <Skeleton className="h-10 w-10 rounded-full md:mt-3 lg:hidden" />
+        <Skeleton className="h-8 w-8 rounded-full lg:hidden" />
         {/* Desktop skeleton */}
         <ul className="flex flex-col max-lg:hidden">
           <UserListSkeleton count={5} />
@@ -41,10 +41,10 @@ export const UsersList = () => {
   if (isLessThanBreakpoint) {
     return (
       <Sheet>
-        <SheetTrigger className="md:mt-3" asChild>
-          <Button className="rounded-full md:w-10 md:p-0">
-            <MessageCircle />
-            <span className="md:hidden">Chats list</span>
+        <SheetTrigger asChild>
+          <Button size="xs" className="rounded-full md:w-8 md:p-0">
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm md:hidden">Chats list</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="px-4 py-10">
