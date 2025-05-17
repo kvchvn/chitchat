@@ -24,17 +24,17 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
     return <ChatNotFound />;
   }
 
-  const isNotes = companion.id === session.user.id;
-  const formattedName = isNotes ? NOTES_TITLE : companion.name;
+  const isUsersNotes = companion.id === session.user.id;
+  const formattedName = isUsersNotes ? NOTES_TITLE : companion.name;
 
   return (
     <ChatContainer className="flex-col items-start justify-stretch">
       <header className="relative flex min-h-12 w-full items-center gap-2 border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-full after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
-        <Avatar className={cn('h-8 w-8', isNotes && 'rounded-none')}>
+        <Avatar className={cn('h-8 w-8 lg:hidden', isUsersNotes && 'rounded-none')}>
           <AvatarImage
-            src={isNotes ? '/svg/bookmark.svg' : (companion.image ?? undefined)}
+            src={isUsersNotes ? '/svg/bookmark.svg' : (companion.image ?? undefined)}
             alt={formattedName ?? 'Companion avatar'}
-            className={cn(isNotes && 'bg-transparent dark:bg-transparent')}
+            className={cn(isUsersNotes && 'bg-transparent dark:bg-transparent')}
           />
           <AvatarFallback className="text-sm">{getNameInitials(formattedName)}</AvatarFallback>
         </Avatar>

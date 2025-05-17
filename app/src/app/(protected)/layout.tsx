@@ -20,7 +20,7 @@ export default async function ProtectedLayout({ children }: React.PropsWithChild
       <HeaderDynamicBg>
         <Header />
       </HeaderDynamicBg>
-      <main className="relative mt-12 flex max-h-full grow items-stretch bg-background-light pb-6 dark:bg-background-dark">
+      <main className="relative mt-12 flex max-h-[calc(100dvh-3rem)] grow items-stretch bg-background-light pb-6 dark:bg-background-dark">
         <Wrapper>{children}</Wrapper>
       </main>
     </>

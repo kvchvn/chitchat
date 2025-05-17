@@ -9,6 +9,7 @@ import { NOTES_TITLE } from '~/constants/global';
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { cn, getHoursMinutes, getNameInitials } from '~/lib/utils';
 import { type ChatMessage } from '~/server/db/schema/messages';
+import { Indicator } from '../ui/indicator';
 
 type Props = {
   id: string;
@@ -31,23 +32,24 @@ export const UserItem = ({
   const companionId = useCompanionId();
   const lastMessageTime = lastMessage ? getHoursMinutes(lastMessage.createdAt) : null;
 
-  const formattedName = userId === id ? NOTES_TITLE : name;
+  const isUsersNotes = userId === id;
+  const formattedName = isUsersNotes ? NOTES_TITLE : name;
 
   return (
-    <li className={cn('border-b last:border-b-0', isBlocked && 'opacity-40')}>
+    <li className={cn('last:border-b-0 lg:border-b', isBlocked && 'opacity-40')}>
       <Link
         href={`/${id}`}
         className={clsx(
-          'relative flex items-center gap-2 px-2 py-4 hover:bg-primary-hover-light active:bg-primary-active-light dark:border-b-slate-800 dark:hover:bg-primary-hover-dark dark:active:bg-primary-active-dark',
+          'relative flex items-center gap-2 px-4 py-4 hover:bg-primary-hover-light active:bg-primary-active-light dark:border-b-slate-800 dark:hover:bg-primary-hover-dark dark:active:bg-primary-active-dark max-lg:rounded-[3rem] lg:px-2',
           {
             'bg-primary-hover-light dark:bg-primary-hover-dark': companionId === id,
           }
         )}>
-        <Avatar className={cn('h-10 w-10', userId === id && 'rounded-none')}>
+        <Avatar className={cn('h-10 w-10', isUsersNotes && 'rounded-none')}>
           <AvatarImage
-            src={userId === id ? '/svg/bookmark.svg' : (image ?? undefined)}
+            src={isUsersNotes ? '/svg/bookmark.svg' : (image ?? undefined)}
             alt={formattedName ?? ''}
-            className={cn(userId === id && 'bg-transparent dark:bg-transparent')}
+            className={cn(isUsersNotes && 'bg-transparent dark:bg-transparent')}
           />
           <AvatarFallback className="text-sm">{getNameInitials(formattedName)}</AvatarFallback>
         </Avatar>
@@ -67,11 +69,10 @@ export const UserItem = ({
             ) : (
               <span className="text-sm italic text-gray-400">No messages</span>
             )}
-            {unreadMessagesCount ? (
-              <span className="border- absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full border border-current bg-highlight-light font-mono text-xs leading-none @2xs:static @2xs:border-none dark:bg-highlight-dark">
-                {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-              </span>
-            ) : null}
+            <Indicator
+              count={unreadMessagesCount}
+              className="absolute left-1 top-1 @2xs:static @2xs:border-none"
+            />
           </div>
         </div>
       </Link>

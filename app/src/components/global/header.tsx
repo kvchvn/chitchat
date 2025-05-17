@@ -19,7 +19,7 @@ export const Header = () => {
       <div className="flex w-full items-center gap-2">
         <HeaderLinkBack />
         <ThemeToggler className="ml-auto h-8 w-8 rounded-full" />
-        <Link href={ROUTES.profile}>
+        <Link href={ROUTES.profile} className="rounded-full">
           <Avatar>
             <AvatarImage
               src={user?.image ?? undefined}

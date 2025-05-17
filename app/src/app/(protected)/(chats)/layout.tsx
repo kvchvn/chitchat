@@ -9,6 +9,7 @@ import { getServerAuthSession } from '~/server/auth';
 const log = logger.child({ module: '(protected)/(chats)/layout.tsx' });
 
 const RESIZABLE_GROUP_ID = 'chats';
+const SIDEBAR_SIZE_PERCENT = 30;
 
 export default async function ChatsLayout({ children }: React.PropsWithChildren) {
   const session = (await getServerAuthSession())!;
@@ -32,17 +33,21 @@ export default async function ChatsLayout({ children }: React.PropsWithChildren)
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={RESIZABLE_GROUP_ID}
-        className="pt-2 max-md:!flex-col lg:pt-6">
+        className="!overflow-visible pt-2 lg:pt-6">
         <ResizablePanel
-          defaultSize={defaultResizableLayout?.[0]}
-          maxSize={30}
-          className="max-lg:fixed max-lg:top-2 max-lg:z-3 max-lg:h-8 lg:min-w-14 lg:max-w-none">
+          defaultSize={defaultResizableLayout?.[0] ?? SIDEBAR_SIZE_PERCENT}
+          maxSize={SIDEBAR_SIZE_PERCENT}
+          className="max-lg:fixed max-lg:top-2 max-lg:z-3 max-lg:h-8 max-lg:!overflow-visible lg:min-w-14 lg:max-w-none">
           <UserIdProvider userId={session.user.id}>
             <UsersList />
           </UserIdProvider>
         </ResizablePanel>
         <ResizableHandle withHandle className="hidden lg:flex" />
-        <ResizablePanel defaultSize={defaultResizableLayout?.[1]}>{children}</ResizablePanel>
+        <ResizablePanel
+          defaultSize={defaultResizableLayout?.[1] ?? 100 - SIDEBAR_SIZE_PERCENT}
+          className="!overflow-visible">
+          {children}
+        </ResizablePanel>
       </ResizablePanelGroup>
     </>
   );
