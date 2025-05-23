@@ -7,16 +7,13 @@ import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
 
 export default async function SignInWelcomePage() {
-  const session = await getServerAuthSession();
+  // Checking is in (public)/layout.tsx
+  const session = (await getServerAuthSession())!;
 
-  if (session) {
-    if (!session.user.hasApprovedName) {
-      redirect(ROUTES.signInUsername, RedirectType.replace);
-    } else if (session.user.isNewUser) {
-      await api.users.makeAsNotNew({ id: session.user.id });
-    }
-  } else {
-    redirect(ROUTES.signIn, RedirectType.replace);
+  if (!session.user.hasApprovedName) {
+    redirect(ROUTES.signInUsername, RedirectType.replace);
+  } else if (session.user.isNewUser) {
+    await api.users.makeAsNotNew({ id: session.user.id });
   }
 
   return (

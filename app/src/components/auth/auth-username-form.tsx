@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Save } from 'lucide-react';
 import { type Session } from 'next-auth';
+import { PrefetchKind } from 'next/dist/client/components/router-reducer/router-reducer-types';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -43,7 +44,11 @@ export const AuthUsernameForm = ({ user }: Props) => {
     defaultValues: { name: user.name ?? '' },
     mode: 'onSubmit',
   });
-  const { mutateAsync: updateUser } = api.users.updateCurrentUser.useMutation();
+  const {
+    mutateAsync: updateUser,
+    isPending,
+    isSuccess,
+  } = api.users.updateCurrentUser.useMutation();
   const router = useRouter();
 
   const { isUniqueName, isChecking, checkNameUniqueness } = useCheckNameUniqueness<FormSchema>({
@@ -116,8 +121,17 @@ export const AuthUsernameForm = ({ user }: Props) => {
           )}
         />
         <Button
+          onMouseEnter={() => {
+            console.log('onMouseEnter');
+            router.prefetch(ROUTES.signInWelcome, { kind: PrefetchKind.FULL });
+          }}
           disabled={
-            !form.formState.isValid || isChecking || !isUniqueName || form.formState.isSubmitting
+            isPending ||
+            isSuccess ||
+            !form.formState.isValid ||
+            isChecking ||
+            !isUniqueName ||
+            form.formState.isSubmitting
           }
           className="mt-8 w-fit self-end">
           {form.formState.isSubmitting ? <LoadingIcon /> : <Save />}

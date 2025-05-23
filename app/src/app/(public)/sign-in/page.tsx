@@ -1,18 +1,29 @@
 import { getProviders } from 'next-auth/react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import { AuthProviders } from '~/components/auth/auth-providers';
 import { AuthProvidersFetchError } from '~/components/auth/auth-providers-fetch-error';
 import { ROUTES } from '~/constants/routes';
+import { getServerAuthSession } from '~/server/auth';
 
 type Props = {
   searchParams: Record<string, string>;
 };
 
 export default async function SignInPage({ searchParams }: Props) {
+  const session = await getServerAuthSession();
+
   if ('error' in searchParams) {
     const sp = new URLSearchParams({ error: searchParams.error });
     redirect(`${ROUTES.signInError}?${sp.toString()}`);
+  }
+
+  if (session) {
+    if (!session.user.hasApprovedName) {
+      redirect(ROUTES.signInUsername, RedirectType.replace);
+    } else if (session.user.isNewUser) {
+      redirect(ROUTES.signInWelcome, RedirectType.replace);
+    }
   }
 
   const providers = await getProviders();

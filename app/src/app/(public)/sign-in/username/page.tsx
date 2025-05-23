@@ -4,14 +4,11 @@ import { ROUTES } from '~/constants/routes';
 import { getServerAuthSession } from '~/server/auth';
 
 export default async function SignInUsername() {
-  const session = await getServerAuthSession();
+  // Checking is in (public)/layout.tsx
+  const session = (await getServerAuthSession())!;
 
-  if (session) {
-    if (session.user.hasApprovedName) {
-      redirect(ROUTES.chats, RedirectType.replace);
-    }
-  } else {
-    redirect(ROUTES.signIn, RedirectType.replace);
+  if (session.user.hasApprovedName && session.user.isNewUser) {
+    redirect(ROUTES.signInWelcome, RedirectType.replace);
   }
 
   return (
