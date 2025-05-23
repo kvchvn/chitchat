@@ -34,11 +34,10 @@ export const SignOutAlertDialog = ({ children }: Props) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button variant="outline" className="min-w-24">
+            <Button disabled={isLoading} variant="outline" className="min-w-24">
               Cancel
             </Button>
           </AlertDialogCancel>
-          {/* <AlertDialogAction asChild> */}
           <Button
             disabled={isLoading}
             variant="destructive"
@@ -47,7 +46,6 @@ export const SignOutAlertDialog = ({ children }: Props) => {
             {isLoading ? <LoadingIcon /> : <LogOut />}
             Sign out
           </Button>
-          {/* </AlertDialogAction> */}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

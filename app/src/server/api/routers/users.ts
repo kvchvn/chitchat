@@ -203,7 +203,14 @@ export const usersRouter = createTRPCRouter({
         })
         .where(eq(users.id, ctx.session.user.id))
         .returning();
-
       return updatedUser;
     }),
+  removeCurrentUser: protectedProcedure.mutation(async ({ ctx }) => {
+    const [removedUser] = await ctx.db
+      .delete(users)
+      .where(eq(users.id, ctx.session.user.id))
+      .returning();
+
+    return removedUser;
+  }),
 });

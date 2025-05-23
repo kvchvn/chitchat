@@ -11,7 +11,7 @@ export const useCheckNameUniqueness = <FormSchema extends Record<string, string>
   form,
   inputName,
 }: UseCheckNameUniquenessArgs<FormSchema>) => {
-  const ERROR_MESSAGE = 'Name needs to be unique. The entered name is already taken';
+  const ERROR_MESSAGE = 'The entered name is already taken';
   const TIMEOUT_MS = 500;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 

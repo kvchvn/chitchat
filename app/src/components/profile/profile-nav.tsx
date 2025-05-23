@@ -1,7 +1,7 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
-import { EllipsisVertical, LogOut, UserRoundPen } from 'lucide-react';
+import { EllipsisVertical, LogOut, UserRoundPen, UserRoundX } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRef } from 'react';
@@ -16,12 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { ProfileNavSkeleton } from './profile-nav-skeleton';
+import { RemoveAccountAlertDialog } from './remove-account-alert-dialog';
 import { SignOutAlertDialog } from './sign-out-alert-dialog';
 
-const navItemVariants = cva('flex items-center gap-2 active:bg-slate-300 text-md', {
+const navItemVariants = cva('flex items-center justify-start gap-2 active:bg-slate-300 text-md', {
   variants: {
     variant: {
-      default: '',
       destructive:
         'text-error-hover-light hover:text-error-hover-light dark:text-error-hover-dark dark:hover:text-error-hover-dark',
     },
@@ -39,7 +39,8 @@ const navItemVariants = cva('flex items-center gap-2 active:bg-slate-300 text-md
 export const ProfileNav = () => {
   const pathname = usePathname();
   const { isClient, isLessThanBreakpoint, isMoreOrEqualThanBreakpoint } = useMediaQuery('lg');
-  const alertDialogTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const signOutAlertDialogTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const removeAccountAlertDialogTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   if (!isClient) {
     return <ProfileNavSkeleton navItemsCount={3} />;
@@ -76,25 +77,39 @@ export const ProfileNav = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  alertDialogTriggerRef.current?.click();
+                  signOutAlertDialogTriggerRef.current?.click();
                 }}
                 className={navItemVariants({ variant: 'destructive' })}>
                 <LogOut />
                 Sign out
               </DropdownMenuItem>
-              <AlertDialogTrigger ref={alertDialogTriggerRef} />
+              <AlertDialogTrigger className="hidden" ref={signOutAlertDialogTriggerRef} />
             </SignOutAlertDialog>
+            <RemoveAccountAlertDialog>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeAccountAlertDialogTriggerRef.current?.click();
+                }}
+                className={navItemVariants({ variant: 'destructive' })}>
+                <UserRoundX />
+                Remove account
+              </DropdownMenuItem>
+              <AlertDialogTrigger className="hidden" ref={removeAccountAlertDialogTriggerRef} />
+            </RemoveAccountAlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     );
   } else if (isMoreOrEqualThanBreakpoint) {
     return (
-      <nav className="sticky top-16 flex h-fit min-w-36 flex-col gap-4">
-        <Button variant="ghost" asChild>
-          <Link
-            href={ROUTES.profile}
-            className={navItemVariants({ active: pathname === ROUTES.profile })}>
+      <nav className="sticky top-16 flex h-fit min-w-52 flex-col gap-4">
+        <Button
+          variant="ghost"
+          asChild
+          className={navItemVariants({ active: pathname === ROUTES.profile })}>
+          <Link href={ROUTES.profile}>
             <UserRoundPen />
             Personal
           </Link>
@@ -115,6 +130,14 @@ export const ProfileNav = () => {
             </Button>
           </AlertDialogTrigger>
         </SignOutAlertDialog>
+        <RemoveAccountAlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" className={navItemVariants({ variant: 'destructive' })}>
+              <UserRoundX />
+              Remove account
+            </Button>
+          </AlertDialogTrigger>
+        </RemoveAccountAlertDialog>
       </nav>
     );
   }

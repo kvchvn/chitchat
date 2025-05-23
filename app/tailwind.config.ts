@@ -176,8 +176,8 @@ export default withUt({
       },
       keyframes: {
         'new-message-pulse': {
-          '0%, 100%': { 'background-color': colors.zinc[300] },
-          '50%': { 'background-color': 'transparent' },
+          '0%, 100%': { 'background-color': 'transparent' },
+          '50%': { 'background-color': colors.zinc[300] },
         },
         'new-message-pulse-dark': {
           '0%, 100%': { 'background-color': colors.zinc[600] },
