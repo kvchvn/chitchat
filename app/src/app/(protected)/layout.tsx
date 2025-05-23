@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import type React from 'react';
 import { EventsSubscriber } from '~/components/global/events-subscriber';
 import { Header } from '~/components/global/header';
@@ -11,7 +11,9 @@ export default async function ProtectedLayout({ children }: React.PropsWithChild
   const session = await getServerAuthSession();
 
   if (!session) {
-    redirect(ROUTES.signIn);
+    redirect(ROUTES.signIn, RedirectType.replace);
+  } else if (!session.user.hasApprovedName) {
+    redirect(ROUTES.signInUsername, RedirectType.replace);
   }
 
   return (

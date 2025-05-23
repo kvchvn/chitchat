@@ -19,6 +19,7 @@ export const users = createTable('user', {
   image: varchar('image', { length: 255 }),
   fileKey: varchar('file_key', { length: 255 }),
   isNewUser: boolean('is_new_user').default(true),
+  hasApprovedName: boolean('has_approved_name').default(false),
 });
 
 // RELATIONS

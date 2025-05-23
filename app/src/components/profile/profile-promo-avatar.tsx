@@ -3,7 +3,7 @@
 import { Ban, Check, ImageUp } from 'lucide-react';
 import { type ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useUpdateUserOptimisticMutation } from '~/hooks/mutations/use-update-user-optimistic-mutation';
-import { useUploadThing } from '~/hooks/uploadthing';
+import { useUploadThing } from '~/hooks/use-upload-thing';
 import { useToast } from '~/hooks/use-toast';
 import { cn, getNameInitials } from '~/lib/utils';
 import { api } from '~/trpc/react';

@@ -6,7 +6,7 @@ const MESSAGES_COUNT = 7;
 export const ChatSkeleton = () => {
   return (
     <>
-      <div className="mt-2 w-[calc(100%+8px)] grow overflow-hidden pr-[8px]">
+      <div className="scrollbar-stable mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
         <div className="flex min-h-full w-full flex-col justify-end pt-10">
           <Skeleton className="mx-auto h-[21px] w-24 rounded-3xl" />
           <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto px-1 py-8">
@@ -19,7 +19,9 @@ export const ChatSkeleton = () => {
                     'self-message self-end': i % 3 === 0,
                     'companion-message flex-row-reverse': i % 3 !== 0,
                   })}>
-                  <Skeleton className={`h-[58px] w-40 min-w-24 max-w-[80%] rounded-3xl`} />
+                  <Skeleton
+                    className={`h-[50px] w-40 min-w-24 max-w-[80%] rounded-3xl sm:h-[58px]`}
+                  />
                 </li>
               ))}
           </ul>

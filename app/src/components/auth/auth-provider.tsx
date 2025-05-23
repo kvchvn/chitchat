@@ -39,7 +39,7 @@ export const AuthProvider = ({ id, name }: Props) => {
        * if the user signs in not for the first time
        * he/she will be redirected to main page (from layout.tsx)
        */
-      await signIn(id, { callbackUrl: ROUTES.signInWelcome });
+      await signIn(id, { callbackUrl: ROUTES.signInUsername });
     }
   };
 

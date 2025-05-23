@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, lt } from 'drizzle-orm';
+import { and, desc, eq, ilike, lt, ne } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
@@ -128,6 +128,16 @@ export const usersRouter = createTRPCRouter({
 
     return transformedAllUsers;
   }),
+  checkNameUniqueness: protectedProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const usersWithTheSameName = await ctx.db
+        .select()
+        .from(users)
+        .where(and(ilike(users.name, input.name), ne(users.id, ctx.session.user.id)));
+
+      return { isUniqueName: !usersWithTheSameName.length };
+    }),
   // mutations
   makeAsNotNew: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -164,15 +174,32 @@ export const usersRouter = createTRPCRouter({
         name: z.string().optional(),
         image: z.string().optional(),
         fileKey: z.string().optional(),
+        hasApprovedName: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // checking uniqueness
+      if (input.name) {
+        const usersWithTheSameName = await ctx.db
+          .select()
+          .from(users)
+          .where(and(ilike(users.name, input.name), ne(users.id, ctx.session.user.id)));
+
+        if (usersWithTheSameName.length) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `The name (${input.name}) is not unique!`,
+          });
+        }
+      }
+
       const [updatedUser] = await ctx.db
         .update(users)
         .set({
           name: input.name,
           image: input.image,
           fileKey: input.fileKey,
+          hasApprovedName: input.hasApprovedName,
         })
         .where(eq(users.id, ctx.session.user.id))
         .returning();

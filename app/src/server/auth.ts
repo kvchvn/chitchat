@@ -27,11 +27,13 @@ declare module 'next-auth' {
     user: {
       id: string;
       isNewUser: boolean;
+      hasApprovedName: boolean;
     } & DefaultSession['user'];
   }
 
   interface User {
     isNewUser: boolean;
+    hasApprovedName: boolean;
   }
 }
 
@@ -48,6 +50,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: user.id,
         isNewUser: user.isNewUser,
+        hasApprovedName: user.hasApprovedName,
       },
     }),
     async signIn({ user }) {

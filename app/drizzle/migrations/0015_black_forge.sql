@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_user" ADD COLUMN "has_approved_name" boolean DEFAULT false;

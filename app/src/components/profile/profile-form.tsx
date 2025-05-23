@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useUpdateUserOptimisticMutation } from '~/hooks/mutations/use-update-user-optimistic-mutation';
+import { useCheckNameUniqueness } from '~/hooks/use-check-name-uniqueness';
 import { type User } from '~/server/db/schema/users';
 import { Button } from '../ui/button';
 import { CopyButton } from '../ui/copy-button';
@@ -49,18 +50,18 @@ export const PROFILE_FORM_FIELDS: FormField[] = [
     name: 'name',
     labelText: 'Your name',
     placeholder: 'Enter your name',
-    descriptionText: 'This is how other users can recognize you',
+    descriptionText: 'Name needs to be unique. This is how other users can recognize you',
   },
   {
     name: 'id',
     labelText: 'Your ID',
-    descriptionText: `You can use it to share link to your chat with somebody, i.e. https://<current-url>/<ID>`,
+    descriptionText: `You can use this ID to share link to your chat with somebody, i.e. https://<current-url>/<ID>`,
     readOnly: true,
   },
   {
     name: 'email',
     labelText: 'You email',
-    descriptionText: 'Email used during the first authorization',
+    descriptionText: 'Email is used during the first authorization',
     readOnly: true,
   },
 ] as const;
@@ -72,6 +73,10 @@ export const ProfileForm = ({ user }: Props) => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const { isChecking, checkNameUniqueness } = useCheckNameUniqueness({
+    form,
+    inputName: 'name',
+  });
   const { mutateAsync: updateUser, isPending } = useUpdateUserOptimisticMutation();
 
   const toggleEditMode = () => {
@@ -114,6 +119,10 @@ export const ProfileForm = ({ user }: Props) => {
                       <FormControl>
                         <Input
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            void checkNameUniqueness();
+                          }}
                           placeholder={formField.placeholder}
                           variant="primary"
                           readOnly={isReadOnly}
@@ -124,7 +133,7 @@ export const ProfileForm = ({ user }: Props) => {
                               <CopyButton
                                 variant="outline"
                                 textToCopy={field.value}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 md:invisible md:group-hover:visible"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 md:invisible md:group-hover:visible"
                               />
                             ) : undefined
                           }
@@ -134,7 +143,16 @@ export const ProfileForm = ({ user }: Props) => {
                     {fieldState.error ? (
                       <FormMessage />
                     ) : (
-                      <FormDescription>{formField.descriptionText}</FormDescription>
+                      <FormDescription className="flex max-h-[0.8rem] items-center gap-2">
+                        {field.name === 'name' && isChecking ? (
+                          <>
+                            <LoadingIcon className="h-4 w-4" />
+                            Checking uniqueness...
+                          </>
+                        ) : (
+                          formField.descriptionText
+                        )}
+                      </FormDescription>
                     )}
                   </FormItem>
                 );

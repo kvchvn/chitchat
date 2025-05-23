@@ -1,6 +1,6 @@
 import { MessageCircle, UserRound } from 'lucide-react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import { Button } from '~/components/ui/button';
 import { ROUTES } from '~/constants/routes';
 import { getServerAuthSession } from '~/server/auth';
@@ -10,24 +10,28 @@ export default async function SignInWelcomePage() {
   const session = await getServerAuthSession();
 
   if (session) {
-    if (session.user.isNewUser) {
+    if (!session.user.hasApprovedName) {
+      redirect(ROUTES.signInUsername, RedirectType.replace);
+    } else if (session.user.isNewUser) {
       await api.users.makeAsNotNew({ id: session.user.id });
     }
   } else {
-    redirect(ROUTES.signIn);
+    redirect(ROUTES.signIn, RedirectType.replace);
   }
 
   return (
     <>
       <h2>Welcome!</h2>
-      <h4>We are happy you are using our app</h4>
+      <h4>We&apos;re glad you&apos;ve joined our app!</h4>
       <div>
-        <p>If you will have questions or problems with the app, you can respond to our email:</p>
+        <p className="px-4">
+          If you have any questions or issues with the app, you can reply to our email:
+        </p>
         <Link href="mailto:chitchat.app.2024@gmail.com" className="link mt-2">
           chitchat.app.2024@gmail.com
         </Link>
       </div>
-      <div className="mt-8 flex gap-3 xs:mt-4">
+      <div className="mt-8 flex w-full justify-center gap-3 max-xs:flex-col xs:mt-4">
         <Button variant="secondary" asChild>
           <Link href={ROUTES.profile}>
             <UserRound />
@@ -35,7 +39,7 @@ export default async function SignInWelcomePage() {
           </Link>
         </Button>
         <Button asChild>
-          <Link href={ROUTES.chats}>
+          <Link replace={true} href={ROUTES.chats}>
             <MessageCircle />
             Go to Chats
           </Link>
