@@ -12,10 +12,10 @@ export const messages = createTable('messages', {
   chatId: varchar('chat_id', { length: 255 }).notNull(),
   senderId: varchar('sender_id', { length: 255 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   receiverId: varchar('receiver_id', { length: 255 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   text: varchar('text', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),

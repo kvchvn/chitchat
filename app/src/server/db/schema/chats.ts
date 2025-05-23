@@ -11,10 +11,10 @@ export const chats = createTable('chats', {
     .$defaultFn(() => crypto.randomUUID()),
   userId1: varchar('user_id_1', { length: 255 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   userId2: varchar('user_id_2', { length: 255 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   blockedBy: varchar('blocked_by', { length: 255 }).references(() => users.id),
 });
 
