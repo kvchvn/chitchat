@@ -1,9 +1,9 @@
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import React, { useState } from 'react';
+import { ROUTES } from '~/constants/routes';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -16,12 +16,12 @@ import { LoadingIcon } from '../ui/loading-icon';
 
 type Props = React.PropsWithChildren;
 
-export const LogOutAlertDialog = ({ children }: Props) => {
+export const SignOutAlertDialog = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
     setIsLoading(true);
-    await signOut();
+    await signOut({ callbackUrl: ROUTES.signIn });
   };
 
   return (
@@ -38,16 +38,16 @@ export const LogOutAlertDialog = ({ children }: Props) => {
               Cancel
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button
-              disabled={isLoading}
-              variant="destructive"
-              className="min-w-24"
-              onClick={handleClick}>
-              {isLoading ? <LoadingIcon /> : <LogOut />}
-              Sign out
-            </Button>
-          </AlertDialogAction>
+          {/* <AlertDialogAction asChild> */}
+          <Button
+            disabled={isLoading}
+            variant="destructive"
+            className="min-w-24"
+            onClick={handleClick}>
+            {isLoading ? <LoadingIcon /> : <LogOut />}
+            Sign out
+          </Button>
+          {/* </AlertDialogAction> */}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

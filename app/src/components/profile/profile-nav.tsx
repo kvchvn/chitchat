@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { LogOutAlertDialog } from './log-out-alert-dialog';
 import { ProfileNavSkeleton } from './profile-nav-skeleton';
+import { SignOutAlertDialog } from './sign-out-alert-dialog';
 
 const navItemVariants = cva('flex items-center gap-2 active:bg-slate-300 text-md', {
   variants: {
@@ -71,7 +71,7 @@ export const ProfileNav = () => {
             Settings
           </Link>
         </DropdownMenuItem> */}
-            <LogOutAlertDialog>
+            <SignOutAlertDialog>
               <DropdownMenuItem
                 onClick={(e) => {
                   e.preventDefault();
@@ -83,7 +83,7 @@ export const ProfileNav = () => {
                 Sign out
               </DropdownMenuItem>
               <AlertDialogTrigger ref={alertDialogTriggerRef} />
-            </LogOutAlertDialog>
+            </SignOutAlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -107,14 +107,14 @@ export const ProfileNav = () => {
             Settings
           </Link>
         </Button> */}
-        <LogOutAlertDialog>
+        <SignOutAlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" className={navItemVariants({ variant: 'destructive' })}>
               <LogOut />
               Sign out
             </Button>
           </AlertDialogTrigger>
-        </LogOutAlertDialog>
+        </SignOutAlertDialog>
       </nav>
     );
   }
