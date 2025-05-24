@@ -28,7 +28,7 @@ const config = {
       },
     ],
     '@typescript-eslint/require-await': 'off',
-    '@typescript-eslint/no-misused-promises': 'warn',
+    '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
     '@typescript-eslint/no-require-imports': 'off',
     'drizzle/enforce-delete-with-where': [
       'error',

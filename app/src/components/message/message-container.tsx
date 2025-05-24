@@ -14,8 +14,6 @@ type Props = React.PropsWithChildren & {
   isActiveSearchMessage: boolean;
 };
 
-let i = 0;
-
 const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
   (
     { children, unreadMessages, message, isEditing, isBlockedChat, isActiveSearchMessage },

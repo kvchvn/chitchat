@@ -22,7 +22,7 @@ export const uploadRouter = {
 
       return { userId: session.user.id };
     })
-    .onUploadComplete(async ({ metadata, file }) => {
+    .onUploadComplete(async ({ metadata }) => {
       // This code RUNS ON THE SERVER after upload
       log.info('Upload avatar complete for userId:', metadata.userId);
 

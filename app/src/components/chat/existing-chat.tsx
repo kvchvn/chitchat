@@ -22,6 +22,8 @@ type Props = {
 export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
   const messagesEntries = Array.from(messagesMap);
   const todayMessages = messagesEntries.at(-1)?.[1];
+  const latestTodayMessage = todayMessages?.at(-1);
+
   const { messageToEdit, activeSearchMessageId, searchQuery } = useStore();
 
   const userId = useUserId();
@@ -70,13 +72,13 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
 
     // scroll to the bottom when send a message
     // the latest (by date) array of messages. And the latest message in there
-    if (todayMessages?.at(-1)?.senderId === userId || containerOffset < 200) {
+    if (latestTodayMessage?.senderId === userId || containerOffset < 200) {
       containerRef.current?.scrollTo({
         top: containerRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  }, [todayMessages?.length, userId]);
+  }, [latestTodayMessage, userId]);
 
   useLayoutEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat

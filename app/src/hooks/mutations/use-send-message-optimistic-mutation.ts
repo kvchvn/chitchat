@@ -35,6 +35,7 @@ export const useSendMessageOptimisticMutation = ({ onMutateSideEffect }: Args) =
         updatedAt: new Date(),
         isRead: newMessage.senderId === newMessage.receiverId,
         isSent: false,
+        isLiked: false,
       };
 
       await Promise.allSettled([
