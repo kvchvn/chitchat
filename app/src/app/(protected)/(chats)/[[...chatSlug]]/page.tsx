@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import { ChatContainer } from '~/components/chat/chat-container';
 import { ChatNotFound } from '~/components/chat/chat-not-found';
 import { ChatSearch } from '~/components/chat/chat-search';
@@ -7,6 +7,7 @@ import { ChatWindow } from '~/components/chat/chat-window';
 import { UserIdProvider } from '~/components/contexts/user-id-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { NOTES_TITLE } from '~/constants/global';
+import { ROUTES } from '~/constants/routes';
 import { cn, getNameInitials } from '~/lib/utils';
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
@@ -14,13 +15,17 @@ import { api } from '~/trpc/server';
 export default async function ChatPage(props: { params: Promise<{ chatSlug: string[] }> }) {
   const [params, session] = await Promise.all([props.params, getServerAuthSession()]);
 
+  if (!session) {
+    redirect(ROUTES.signIn, RedirectType.replace);
+  }
+
   if (params?.chatSlug?.[1]) {
-    redirect(`/${params.chatSlug[0]}`);
+    redirect(`/${params.chatSlug[0]}`, RedirectType.replace);
   }
 
   const companion = await api.users.isExisting({ id: params?.chatSlug?.[0] });
 
-  if (!companion || !session) {
+  if (!companion) {
     return <ChatNotFound />;
   }
 

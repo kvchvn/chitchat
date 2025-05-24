@@ -17,7 +17,7 @@ export const uploadRouter = {
       const session = await getServerAuthSession();
 
       if (!session) {
-        throw new UploadThingError('Unauthorized');
+        throw new UploadThingError('UNAUTHORIZED');
       }
 
       return { userId: session.user.id };

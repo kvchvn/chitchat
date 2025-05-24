@@ -7,8 +7,11 @@ import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
 
 export default async function SignInWelcomePage() {
-  // Checking is in (public)/layout.tsx
-  const session = (await getServerAuthSession())!;
+  const session = await getServerAuthSession();
+
+  if (!session) {
+    redirect(ROUTES.signIn, RedirectType.replace);
+  }
 
   if (!session.user.hasApprovedName) {
     redirect(ROUTES.signInUsername, RedirectType.replace);

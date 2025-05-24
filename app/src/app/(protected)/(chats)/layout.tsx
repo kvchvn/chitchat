@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers';
+import { redirect, RedirectType } from 'next/navigation';
 import type React from 'react';
 import { UserIdProvider } from '~/components/contexts/user-id-provider';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '~/components/ui/resizable';
 import { UsersList } from '~/components/user/users-list';
+import { ROUTES } from '~/constants/routes';
 import { logger } from '~/lib/logger';
 import { getServerAuthSession } from '~/server/auth';
 
@@ -12,7 +14,12 @@ const RESIZABLE_GROUP_ID = 'chats';
 const SIDEBAR_SIZE_PERCENT = 30;
 
 export default async function ChatsLayout({ children }: React.PropsWithChildren) {
-  const session = (await getServerAuthSession())!;
+  const session = await getServerAuthSession();
+
+  if (!session) {
+    redirect(ROUTES.signIn, RedirectType.replace);
+  }
+
   const resizableLayout = cookies().get(`react-resizable-panels:${RESIZABLE_GROUP_ID}`);
   let defaultResizableLayout: number[] | undefined = undefined;
 
