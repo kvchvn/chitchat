@@ -17,7 +17,9 @@ export const users = createTable('user', {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar('image', { length: 255 }),
+  fileKey: varchar('file_key', { length: 255 }),
   isNewUser: boolean('is_new_user').default(true),
+  hasApprovedName: boolean('has_approved_name').default(false),
 });
 
 // RELATIONS
@@ -29,3 +31,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sentMessages: many(messages, { relationName: 'message_sender' }),
   receivedMessages: many(messages, { relationName: 'message_receiver' }),
 }));
+
+// TYPES
+
+export type User = typeof users.$inferSelect;

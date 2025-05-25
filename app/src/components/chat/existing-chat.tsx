@@ -1,11 +1,10 @@
-import { PencilLine } from 'lucide-react';
+import { Heart, PencilLine } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { ChatBlock } from '~/components/chat/chat-block';
 import { ChatForm } from '~/components/chat/chat-form';
 import { EditMessagePreview } from '~/components/chat/edit-message-preview';
 import { useUserId } from '~/components/contexts/user-id-provider';
 import { MessageContainerMemo } from '~/components/message/message-container';
-import { MessageSettings } from '~/components/message/message-settings';
 import { MessageStatusBar } from '~/components/message/message-status-bar';
 import { MessageStatusIcon } from '~/components/message/message-status-icon';
 import { MessageTime } from '~/components/message/message-time';
@@ -13,6 +12,7 @@ import { useReadNewMessagesOptimisticMutation } from '~/hooks/mutations/use-read
 import { useCompanionId } from '~/hooks/use-companion-id';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { useStore } from '~/store/store';
+import { MessageTextMemo } from '../message/message-text';
 
 type Props = {
   messagesMap: Map<string, ChatMessage[]>;
@@ -22,7 +22,9 @@ type Props = {
 export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
   const messagesEntries = Array.from(messagesMap);
   const todayMessages = messagesEntries.at(-1)?.[1];
-  const messageToEdit = useStore.use.messageToEdit();
+  const latestTodayMessage = todayMessages?.at(-1);
+
+  const { messageToEdit, activeSearchMessageId, searchQuery } = useStore();
 
   const userId = useUserId();
   const companionId = useCompanionId();
@@ -70,13 +72,13 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
 
     // scroll to the bottom when send a message
     // the latest (by date) array of messages. And the latest message in there
-    if (todayMessages?.at(-1)?.senderId === userId || containerOffset < 200) {
+    if (latestTodayMessage?.senderId === userId || containerOffset < 200) {
       containerRef.current?.scrollTo({
         top: containerRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  }, [todayMessages?.length, userId]);
+  }, [latestTodayMessage, userId]);
 
   useLayoutEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat
@@ -117,27 +119,31 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="relative mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
+          className="scrollbar-stable messages-container relative mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
           <div className="flex min-h-full w-full flex-col justify-end pt-10">
             {messagesEntries.map(([date, messages]) => (
               <Fragment key={date}>
-                <span className="mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
+                <span className="message-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
                   {date}
                 </span>
-                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto px-1 py-8">
+                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto overflow-x-hidden px-1 py-8">
                   {messages.map((message) => (
                     <MessageContainerMemo
                       key={`${message.id}-${message.text}`}
-                      messageId={message.id}
-                      fromCurrentUser={userId === message.senderId}
-                      isRead={message.isRead}
-                      isEditing={messageToEdit?.id === message.id}
+                      isBlockedChat={Boolean(blockedBy)}
+                      message={message}
+                      isEditing={message.id === messageToEdit?.id}
                       unreadMessages={unreadMessages.current}
+                      isActiveSearchMessage={activeSearchMessageId === message.id}
                       ref={firstUnreadMessageRef}>
-                      {!blockedBy ? <MessageSettings message={message} /> : null}
-                      <span className="px-5">{message.text}</span>
+                      <MessageTextMemo
+                        text={message.text}
+                        searchQuery={searchQuery}
+                        isActiveSearchMessage={activeSearchMessageId === message.id}
+                      />
                       <MessageStatusBar fromCurrentUser={userId === message.senderId}>
                         <MessageTime createdAt={message.createdAt} />
+                        {message.isLiked ? <Heart className="h-3 w-3" fill="currentColor" /> : null}
                         {Number(message.createdAt) !== Number(message.updatedAt) ? (
                           <PencilLine className="h-3 w-3" />
                         ) : null}
@@ -161,9 +167,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
       {blockedBy ? (
         <ChatBlock byCurrentUser={blockedBy === userId} />
       ) : (
-        <>
-          <ChatForm onFormSubmitSideEffect={onSendMessageSideEffect} />
-        </>
+        <ChatForm onFormSubmitSideEffect={onSendMessageSideEffect} />
       )}
     </>
   );

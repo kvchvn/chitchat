@@ -1,4 +1,5 @@
 import { Skeleton } from '~/components/ui/skeleton';
+import { calcShare } from '~/lib/utils';
 
 type Props = {
   count: number;
@@ -8,10 +9,10 @@ export const UserListSkeleton = ({ count }: Props = { count: 1 }) => {
   return Array(count)
     .fill(null)
     .map((_, i) => {
-      const opacity = 1 - (1 / count) * i;
+      const share = calcShare(i, count);
 
       return (
-        <li style={{ opacity }} key={i} className="border-b last:border-b-0">
+        <li style={{ opacity: 1 - share }} key={i} className="border-b last:border-b-0">
           <div className="flex items-center gap-2 px-2 py-4 dark:border-b-slate-800">
             <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
             <div className="flex w-full min-w-32 flex-col gap-1">

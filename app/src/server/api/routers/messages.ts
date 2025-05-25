@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { messages } from '~/server/db/schema/messages';
 import { ee } from '../event-emitter';
@@ -10,6 +10,17 @@ export const messagesRouter = createTRPCRouter({
     .input(z.object({ chatId: z.string() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.select().from(messages).where(eq(messages.chatId, input.chatId));
+    }),
+  getBySearch: protectedProcedure
+    .input(z.object({ chatId: z.string(), query: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const foundMessages = await ctx.db
+        .select()
+        .from(messages)
+        .where(and(eq(messages.chatId, input.chatId), ilike(messages.text, `%${input.query}%`)))
+        .orderBy(asc(messages.createdAt));
+
+      return foundMessages;
     }),
   // mutations
   create: protectedProcedure
@@ -133,6 +144,29 @@ export const messagesRouter = createTRPCRouter({
       }
 
       return removedMessage;
+    }),
+  like: protectedProcedure
+    .input(z.object({ id: z.string(), dateKey: z.string(), like: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const [message] = await ctx.db
+        .update(messages)
+        .set({
+          isLiked: input.like,
+        })
+        .where(eq(messages.id, input.id))
+        .returning();
+
+      if (message) {
+        ee.emit('event', {
+          action: 'onLikeMessage',
+          eventReceiverId: message.senderId,
+          data: {
+            likedMessage: message,
+          },
+        });
+      }
+
+      return message;
     }),
   readUnreadMessages: protectedProcedure
     .input(

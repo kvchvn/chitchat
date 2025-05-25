@@ -3,9 +3,10 @@ import tailwindScrollbar from 'tailwind-scrollbar';
 import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import colors from 'tailwindcss/colors';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import { withUt } from 'uploadthing/tw';
 
-export default {
+// withUt - uploadthing's
+export default withUt({
   content: ['./src/**/*.tsx'],
   darkMode: 'class',
   theme: {
@@ -17,7 +18,7 @@ export default {
       },
       screens: {
         xs: '480px',
-        ...defaultTheme.screens,
+        '2xl': '1440px',
       },
       colors: {
         auth: {
@@ -158,6 +159,10 @@ export default {
           light: colors.gray[500],
           dark: colors.gray[400],
         },
+        ring: {
+          light: colors.slate[900],
+          dark: colors.slate[400],
+        },
       },
       scale: {
         '30': '0.3',
@@ -171,17 +176,26 @@ export default {
       },
       keyframes: {
         'new-message-pulse': {
-          '0%, 100%': { 'background-color': colors.zinc[300] },
-          '50%': { 'background-color': 'transparent' },
+          '0%, 100%': { 'background-color': 'transparent' },
+          '50%': { 'background-color': colors.zinc[300] },
         },
         'new-message-pulse-dark': {
           '0%, 100%': { 'background-color': colors.zinc[600] },
           '50%': { 'background-color': 'transparent' },
         },
+        'warning-bounce': {
+          '0%, 15%, 25%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '10%, 20%': {
+            transform: 'translateY(-40%)',
+          },
+        },
       },
       animation: {
-        'new-message-pulse': 'new-message-pulse 2s ease-in-out infinite',
-        'new-message-pulse-dark': 'new-message-pulse-dark 2s ease-in-out infinite',
+        'new-message-pulse': '2s new-message-pulse ease-in-out infinite',
+        'new-message-pulse-dark': '2s new-message-pulse-dark ease-in-out infinite',
+        'avatar-upload-btn-bounce': '10s warning-bounce 4s ease-in-out infinite',
       },
     },
   },
@@ -194,4 +208,4 @@ export default {
       preferredStrategy: 'pseudoelements',
     }),
   ],
-} satisfies Config;
+}) satisfies Config;

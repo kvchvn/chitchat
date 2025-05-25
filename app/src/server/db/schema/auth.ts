@@ -16,7 +16,7 @@ export const accounts = createTable(
   {
     userId: varchar('user_id', { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: 'cascade' }),
     type: varchar('type', { length: 255 }).$type<AdapterAccount['type']>().notNull(),
     provider: varchar('provider', { length: 255 }).notNull(),
     providerAccountId: varchar('provider_account_id', {
@@ -44,7 +44,7 @@ export const sessions = createTable(
     sessionToken: varchar('session_token', { length: 255 }).notNull().primaryKey(),
     userId: varchar('user_id', { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: 'cascade' }),
     expires: timestamp('expires', {
       mode: 'date',
       withTimezone: true,

@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, lt } from 'drizzle-orm';
+import { and, desc, eq, ilike, lt, ne } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
@@ -10,6 +10,14 @@ import { users } from '~/server/db/schema/users';
 
 export const usersRouter = createTRPCRouter({
   // queries
+  getCurrent: protectedProcedure.query(async ({ ctx }) => {
+    const [currentUser] = await ctx.db
+      .select()
+      .from(users)
+      .where(eq(users.id, ctx.session.user.id));
+
+    return currentUser;
+  }),
   isExisting: protectedProcedure
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
@@ -120,6 +128,16 @@ export const usersRouter = createTRPCRouter({
 
     return transformedAllUsers;
   }),
+  checkNameUniqueness: protectedProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const usersWithTheSameName = await ctx.db
+        .select()
+        .from(users)
+        .where(and(ilike(users.name, input.name), ne(users.id, ctx.session.user.id)));
+
+      return { isUniqueName: !usersWithTheSameName.length };
+    }),
   // mutations
   makeAsNotNew: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -149,4 +167,50 @@ export const usersRouter = createTRPCRouter({
 
       return expiredSessions;
     }),
+  updateCurrentUser: protectedProcedure
+    // Maybe another modifiable fields will be added later
+    .input(
+      z.object({
+        name: z.string().optional(),
+        image: z.string().optional(),
+        fileKey: z.string().optional(),
+        hasApprovedName: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // checking uniqueness
+      if (input.name) {
+        const usersWithTheSameName = await ctx.db
+          .select()
+          .from(users)
+          .where(and(ilike(users.name, input.name), ne(users.id, ctx.session.user.id)));
+
+        if (usersWithTheSameName.length) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `The name (${input.name}) is not unique!`,
+          });
+        }
+      }
+
+      const [updatedUser] = await ctx.db
+        .update(users)
+        .set({
+          name: input.name,
+          image: input.image,
+          fileKey: input.fileKey,
+          hasApprovedName: input.hasApprovedName,
+        })
+        .where(eq(users.id, ctx.session.user.id))
+        .returning();
+      return updatedUser;
+    }),
+  removeCurrentUser: protectedProcedure.mutation(async ({ ctx }) => {
+    const [removedUser] = await ctx.db
+      .delete(users)
+      .where(eq(users.id, ctx.session.user.id))
+      .returning();
+
+    return removedUser;
+  }),
 });

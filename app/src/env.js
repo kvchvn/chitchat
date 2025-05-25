@@ -1,5 +1,5 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
 
 export const env = createEnv({
   /**
@@ -8,19 +8,14 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
-    NEXTAUTH_SECRET:
-      process.env.NODE_ENV === "production"
-        ? z.string()
-        : z.string().optional(),
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    NEXTAUTH_SECRET: process.env.NODE_ENV === 'production' ? z.string() : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
       // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
       // Since NextAuth.js automatically uses the VERCEL_URL if present.
       (str) => process.env.VERCEL_URL ?? str,
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string() : z.string().url(),
+      process.env.VERCEL ? z.string() : z.string().url()
     ),
     GITHUB_ID: z.string(),
     GITHUB_SECRET: z.string(),
@@ -33,6 +28,8 @@ export const env = createEnv({
 
     FACEBOOK_ID: z.string(),
     FACEBOOK_SECRET: z.string(),
+
+    UPLOADTHING_TOKEN: z.string(),
   },
 
   /**
@@ -61,6 +58,7 @@ export const env = createEnv({
     YANDEX_SECRET: process.env.YANDEX_SECRET,
     FACEBOOK_ID: process.env.FACEBOOK_ID,
     FACEBOOK_SECRET: process.env.FACEBOOK_SECRET,
+    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

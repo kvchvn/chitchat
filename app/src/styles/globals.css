@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --radius: 0.5rem;
-  }
-
   html {
     @apply h-dvh overflow-y-auto text-sm sm:text-base;
   }
@@ -61,6 +57,10 @@
   .text-subtitle {
     @apply text-lg font-medium;
   }
+
+  .scrollbar-stable {
+    scrollbar-gutter: stable;
+  }
 }
 
 svg {
@@ -85,5 +85,15 @@ svg {
 
   &:has(+ .companion-message) > div {
     @apply rounded-bl-lg;
+  }
+}
+
+body:has(.message-settings[data-radix-menu-content][data-state='open']) {
+  & :is(.message, .message-date):not(.message_settings-open) {
+    filter: blur(3px);
+  }
+
+  & .messages-container {
+    overflow-y: hidden;
   }
 }
