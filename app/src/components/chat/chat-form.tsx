@@ -106,7 +106,7 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
       ref={formRef}
       onKeyDown={handleKeyDown}
       onSubmit={handleSubmit}
-      className="mt-auto flex w-full gap-4 border-t border-slate-300 pt-2">
+      className="relative mt-auto flex w-full gap-4 border-t border-slate-300 pt-2 before:absolute before:bottom-full before:left-0 before:z-3 before:h-10 before:w-full before:-translate-y-[1px] before:bg-gradient-to-t before:from-background-light before:to-transparent dark:before:from-background-dark">
       <Textarea
         name={TEXTAREA_NAME}
         className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
