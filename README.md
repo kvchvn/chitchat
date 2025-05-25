@@ -19,8 +19,8 @@ A real-time messaging application with core chat functionality. Users can send, 
 
 1. Clone the repository:
 ```
-git clone https://github.com/your-username/chit-chat.git
-cd chit-chat
+git clone https://github.com/kvchvn/chitchat-v2.git
+cd chitchat-v2/app
 ```
 2. Install dependencies:
 ```
