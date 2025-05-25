@@ -8,7 +8,7 @@ import { onRemoveMessageHandler } from './event-handlers/on-remove-message-handl
 import { onSendMessageHandler } from './event-handlers/on-send-message-handler';
 import { onUpdateChatPreviewHandler } from './event-handlers/on-update-chat-preview-handler';
 
-export const onEvents = () => {
+export const useOnEvents = () => {
   const utils = api.useUtils();
 
   api.events.onEvent.useSubscription(undefined, {

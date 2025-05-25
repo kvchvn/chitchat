@@ -1,10 +1,10 @@
 'use client';
 
-import { onEvents } from '~/hooks/subscriptions/on-events';
+import { useOnEvents } from '~/hooks/subscriptions/use-on-events';
 
 export const EventsSubscriber = () => {
   // one subscriber to all api subscriptions
-  onEvents();
+  useOnEvents();
 
   return null;
 };
