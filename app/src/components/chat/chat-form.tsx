@@ -1,4 +1,4 @@
-import { SendHorizonal } from 'lucide-react';
+import { Check, SendHorizonal } from 'lucide-react';
 import {
   type FormEventHandler,
   type KeyboardEventHandler,
@@ -106,7 +106,7 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
       ref={formRef}
       onKeyDown={handleKeyDown}
       onSubmit={handleSubmit}
-      className="relative mt-auto flex w-full gap-4 border-t border-slate-300 pt-2 before:absolute before:bottom-full before:left-0 before:z-3 before:h-10 before:w-full before:-translate-y-[1px] before:bg-gradient-to-t before:from-background-light before:to-transparent dark:before:from-background-dark">
+      className="relative mt-auto flex w-full gap-4 border-t border-slate-300 pt-2 before:absolute before:bottom-[calc(100%+8px)] before:left-0 before:z-3 before:h-10 before:w-[calc(100%-8px)] before:-translate-y-[2px] before:bg-gradient-to-t before:from-background-light before:to-transparent dark:before:from-background-dark">
       <Textarea
         name={TEXTAREA_NAME}
         className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
@@ -115,8 +115,12 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
         maxRows={8}
         onChange={(e) => setMessage(e.target.value)}
       />
-      <Button type="submit" size="icon-lg" disabled={!message} className="shrink-0 rounded-full">
-        <SendHorizonal />
+      <Button
+        type="submit"
+        size="icon-lg"
+        disabled={!message || messageToEdit?.text === message}
+        className="shrink-0 rounded-full">
+        {messageToEdit ? <Check /> : <SendHorizonal />}
       </Button>
     </form>
   );

@@ -49,7 +49,9 @@ export const ClearMessagesDropdownItem = ({ disabled }: Props = { disabled: fals
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete all messages in the chat.
+            This will permanently <b>delete all messages</b> in the chat.
+            <br />
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

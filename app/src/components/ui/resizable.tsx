@@ -32,11 +32,10 @@ const ResizableHandle = ({
 }) => (
   <ResizablePrimitive.PanelResizeHandle
     className={cn(
-      'relative flex w-px items-center justify-center bg-slate-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 focus-visible:ring-offset-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[resize-handle-state=drag]:bg-sky-700 data-[resize-handle-state=hover]:bg-sky-500 dark:bg-slate-400 dark:focus-visible:ring-neutral-300 dark:data-[resize-handle-state=drag]:bg-sky-700 dark:data-[resize-handle-state=hover]:bg-sky-500 [&[data-panel-group-direction=vertical]>div]:rotate-90',
+      'focus-ring-default relative flex w-px items-center justify-center bg-slate-300 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[resize-handle-state=drag]:bg-sky-700 data-[resize-handle-state=hover]:bg-sky-500 dark:bg-slate-400 dark:data-[resize-handle-state=drag]:bg-sky-700 dark:data-[resize-handle-state=hover]:bg-sky-500 [&[data-panel-group-direction=vertical]>div]:rotate-90',
       className
     )}
-    {...props}
-  >
+    {...props}>
     {withHandle && (
       <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border border-neutral-200 bg-neutral-200 dark:border-neutral-800 dark:bg-neutral-800">
         <DragHandleDots2Icon className="h-2.5 w-2.5" />

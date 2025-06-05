@@ -1,0 +1,30 @@
+.self-message {
+  & + .self-message > div {
+    @apply rounded-tr-lg;
+  }
+
+  &:has(+ .self-message) > div {
+    @apply rounded-br-lg;
+  }
+}
+
+.companion-message {
+  & + .companion-message > div {
+    @apply rounded-tl-lg;
+  }
+
+  &:has(+ .companion-message) > div {
+    @apply rounded-bl-lg;
+  }
+}
+
+body:has(.message-settings[data-radix-menu-content][data-state='open']) {
+  .messages-list-date,
+  .message > .message-container:not([data-state='open']) {
+    filter: blur(3px);
+  }
+
+  .messages-list-container {
+    overflow-y: hidden;
+  }
+}

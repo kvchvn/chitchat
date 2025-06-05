@@ -4,7 +4,7 @@ import * as React from 'react';
 import { cn } from '~/lib/utils';
 
 const inputVariants = cva(
-  'p-1 flex h-10 rounded-md shadow-sm w-full text-sm transition-colors placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-text-light focus-visible:ring-offset-1 dark:focus-visible:ring-slate-400',
+  'p-1 flex h-10 rounded-md shadow-sm w-full text-sm transition-colors placeholder:text-slate-400 focus-ring-default',
   {
     variants: {
       variant: {
@@ -12,7 +12,7 @@ const inputVariants = cva(
         primary: 'bg-slate-200 px-2 tracking-wider border border-transparent dark:bg-slate-600',
       },
       file: {
-        true: 'cursor-pointer focus-within:outline-none focus-within:ring-1 focus-within:ring-text-light focus-within:ring-offset-1 dark:focus-within:ring-slate-400',
+        true: 'cursor-pointer focus-within:outline-none focus-within:ring-1 focus-within:ring-neutral-950 focus-within:ring-offset-1 dark:focus-within:ring-neutral-300',
         false:
           'read-only:bg-slate-300 read-only:border-slate-400 dark:read-only:bg-slate-700 read-only:border-dashed',
       },
@@ -73,3 +73,4 @@ const InputFile = React.forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(
 InputFile.displayName = 'InputFile';
 
 export { Input, InputFile };
+

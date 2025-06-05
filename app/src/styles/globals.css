@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './message.css';
+
 @layer base {
   html {
     @apply h-dvh overflow-y-auto text-sm sm:text-base;
@@ -61,39 +63,17 @@
   .scrollbar-stable {
     scrollbar-gutter: stable;
   }
+
+  .focus-ring-default {
+    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring-light focus-visible:ring-offset-1 dark:focus-visible:ring-ring-dark;
+  }
+
+  .input-file {
+    @apply absolute h-0 w-0 border-none opacity-0;
+  }
 }
 
 svg {
   width: 20px;
   height: 20px;
-}
-
-.self-message {
-  & + .self-message > div {
-    @apply rounded-tr-lg;
-  }
-
-  &:has(+ .self-message) > div {
-    @apply rounded-br-lg;
-  }
-}
-
-.companion-message {
-  & + .companion-message > div {
-    @apply rounded-tl-lg;
-  }
-
-  &:has(+ .companion-message) > div {
-    @apply rounded-bl-lg;
-  }
-}
-
-body:has(.message-settings[data-radix-menu-content][data-state='open']) {
-  & :is(.message, .message-date):not(.message_settings-open) {
-    filter: blur(3px);
-  }
-
-  & .messages-container {
-    overflow-y: hidden;
-  }
 }
