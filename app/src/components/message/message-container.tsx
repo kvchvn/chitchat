@@ -1,10 +1,11 @@
-import React, { forwardRef, memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLikeMessageOptimisticMutation } from '~/hooks/mutations/use-like-message-optimistic-mutation';
 import { cn, generateChatDateKey } from '~/lib/utils';
 import { type ChatMessage } from '~/server/db/schema/messages';
 import { useUserId } from '../contexts/user-id-provider';
-import { MessageSettings } from './message-settings';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { MessageSettingsDropdownItems } from './message-settings-dropdown-items';
 
 type Props = React.PropsWithChildren & {
   message: ChatMessage;
@@ -21,7 +22,6 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
   ) => {
     const { ref: inViewRef, inView } = useInView({ threshold: 1, delay: 100 });
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const userId = useUserId();
 
     const { mutate: toggleLikeMessage } = useLikeMessageOptimisticMutation();
@@ -31,14 +31,6 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
 
       const dateKey = generateChatDateKey(message.createdAt);
       toggleLikeMessage({ id: message.id, dateKey, like: !message.isLiked });
-    };
-
-    const toggleSettingsOpen = useCallback((open: boolean) => {
-      setIsSettingsOpen(open);
-    }, []);
-
-    const handleClick: React.MouseEventHandler = () => {
-      toggleSettingsOpen(!isSettingsOpen);
     };
 
     useEffect(() => {
@@ -69,35 +61,37 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
           }
         }}
         className={cn('message group flex w-full items-end justify-end gap-1', {
-          'message_settings-open': isSettingsOpen,
           'self-message self-end': message.senderId === userId,
           'companion-message flex-row-reverse': message.senderId !== userId,
         })}>
-        <div
-          onDoubleClick={message.senderId !== userId ? handleDoubleClick : undefined}
-          onClick={!isBlockedChat ? handleClick : undefined}
-          ref={containerRef}
-          className={cn(
-            'relative flex w-fit min-w-32 max-w-[80%] cursor-pointer flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6',
-            {
-              'border-primary-hover-light bg-primary-light dark:border-primary-hover-dark dark:bg-primary-dark':
-                message.senderId === userId,
-              'border-zinc-400': message.senderId !== userId,
-              'animate-new-message-pulse dark:animate-new-message-pulse-dark':
-                message.senderId !== userId && !message.isRead,
-              'bg-primary-hover-light dark:bg-primary-dark/40': isEditing || isActiveSearchMessage,
-            }
-          )}>
-          {!isBlockedChat ? (
-            <MessageSettings
-              message={message}
-              isOpen={isSettingsOpen}
-              messageContainerElement={containerRef.current}
-              toggleOpen={toggleSettingsOpen}
-            />
-          ) : null}
-          {children}
-        </div>
+        {/* Message settings in dropdown menu */}
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild disabled={isBlockedChat}>
+            <div
+              onDoubleClick={message.senderId !== userId ? handleDoubleClick : undefined}
+              ref={containerRef}
+              className={cn(
+                'message-container relative flex w-fit min-w-32 max-w-[80%] cursor-pointer flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6',
+                {
+                  'border-primary-hover-light bg-primary-light dark:border-primary-hover-dark dark:bg-primary-dark':
+                    message.senderId === userId,
+                  'border-zinc-400': message.senderId !== userId,
+                  'animate-new-message-pulse dark:animate-new-message-pulse-dark':
+                    message.senderId !== userId && !message.isRead,
+                  'bg-primary-hover-light dark:bg-primary-dark/40':
+                    isEditing || isActiveSearchMessage,
+                }
+              )}>
+              {children}
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="message-settings"
+            side={message.senderId === userId ? 'left' : 'right'}
+            align="start">
+            <MessageSettingsDropdownItems message={message} />
+          </DropdownMenuContent>
+        </DropdownMenu>
       </li>
     );
   }
