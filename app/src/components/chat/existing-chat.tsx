@@ -24,7 +24,9 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
   const todayMessages = messagesEntries.at(-1)?.[1];
   const latestTodayMessage = todayMessages?.at(-1);
 
-  const { messageToEdit, activeSearchMessageId, searchQuery } = useStore();
+  const messageToEdit = useStore.use.messageToEdit();
+  const activeSearchMessageId = useStore.use.activeSearchMessageId();
+  const searchQuery = useStore.use.searchQuery();
 
   const userId = useUserId();
   const companionId = useCompanionId();
@@ -78,7 +80,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         behavior: 'smooth',
       });
     }
-  }, [latestTodayMessage, userId]);
+  }, [latestTodayMessage?.id, userId]);
 
   useLayoutEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat
@@ -119,11 +121,11 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="scrollbar-stable messages-container relative mt-2 w-[calc(100%+8px)] grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
+          className="focus-ring-default scrollbar-stable messages-list-container relative my-2 w-[calc(100%+8px)] max-w-full grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
           <div className="flex min-h-full w-full flex-col justify-end pt-10">
             {messagesEntries.map(([date, messages]) => (
               <Fragment key={date}>
-                <span className="message-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
+                <span className="messages-list-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
                   {date}
                 </span>
                 <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto overflow-x-hidden px-1 py-8">

@@ -11,8 +11,11 @@ import { ChatSearchInput } from './chat-search-input';
 const MIN_INDEX = 1;
 
 export const ChatSearch = () => {
-  const { isSearchOn, toggleOnSearch, toggleOffSearch, setActiveSearchMessageId, searchQuery } =
-    useStore();
+  const isSearchOn = useStore.use.isSearchOn();
+  const toggleOnSearch = useStore.use.toggleOnSearch();
+  const toggleOffSearch = useStore.use.toggleOffSearch();
+  const setActiveSearchMessageId = useStore.use.setActiveSearchMessageId();
+  const searchQuery = useStore.use.searchQuery();
 
   const [activeIndex, setActiveIndex] = useState(MIN_INDEX);
 
