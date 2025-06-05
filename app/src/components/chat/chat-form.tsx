@@ -95,6 +95,9 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
 
       if (textarea instanceof HTMLElement) {
         textarea.focus();
+        setTimeout(() => {
+          textarea.scrollTo({ top: textarea.scrollHeight });
+        });
       }
     } else {
       setMessage('');
