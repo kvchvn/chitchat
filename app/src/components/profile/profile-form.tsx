@@ -143,10 +143,10 @@ export const ProfileForm = ({ user }: Props) => {
                     {fieldState.error ? (
                       <FormMessage />
                     ) : (
-                      <FormDescription className="flex max-h-[0.8rem] items-center gap-2">
+                      <FormDescription className="flex items-center gap-1">
                         {field.name === 'name' && isChecking ? (
                           <>
-                            <LoadingIcon className="h-4 w-4" />
+                            <LoadingIcon className="h-3 w-3" />
                             Checking uniqueness...
                           </>
                         ) : (
