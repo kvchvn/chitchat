@@ -24,6 +24,8 @@ export const env = createEnv({
     FACEBOOK_SECRET: z.string(),
 
     UPLOADTHING_TOKEN: z.string(),
+
+    SENTRY_AUTH_TOKEN: z.string(),
   },
 
   /**
@@ -32,7 +34,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().url(),
   },
 
   /**
@@ -53,6 +55,8 @@ export const env = createEnv({
     FACEBOOK_ID: process.env.FACEBOOK_ID,
     FACEBOOK_SECRET: process.env.FACEBOOK_SECRET,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
