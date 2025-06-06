@@ -122,7 +122,6 @@ export const AuthUsernameForm = ({ user }: Props) => {
         />
         <Button
           onMouseEnter={() => {
-            console.log('onMouseEnter');
             router.prefetch(ROUTES.signInWelcome, { kind: PrefetchKind.FULL });
           }}
           disabled={
