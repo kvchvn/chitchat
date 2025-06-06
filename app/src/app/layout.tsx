@@ -11,7 +11,7 @@ import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
   title: 'Chit-Chat',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  icons: [{ rel: 'icon', url: '/favicon.png' }],
   other: {
     ...Sentry.getTraceData(),
   },
