@@ -1,5 +1,4 @@
 import { getProviders } from 'next-auth/react';
-import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { AuthProviders } from '~/components/auth/auth-providers';
 import { AuthProvidersFetchError } from '~/components/auth/auth-providers-fetch-error';
@@ -37,7 +36,7 @@ export default async function SignInPage({ searchParams }: Props) {
       <h1>Sign in to your account</h1>
       <h3>Choose your preferred sign in method</h3>
       <AuthProviders providers={providers} />
-      <p className="text-gray-400 dark:text-gray-500">
+      {/* <p className="text-gray-400 dark:text-gray-500">
         By signing in, you agree our{' '}
         <Link href="/terms" className="link">
           Terms of Service
@@ -47,7 +46,7 @@ export default async function SignInPage({ searchParams }: Props) {
           Privacy Policy
         </Link>
         .
-      </p>
+      </p> */}
     </>
   );
 }
