@@ -19,13 +19,14 @@ COPY . .
 
 ARG SENTRY_AUTH_TOKEN
 ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN SKIP_ENV_VALIDATION=1 yarn build
 
 ##### RUNNER
 
-FROM gcr.io/distroless/nodejs20-debian12 AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -39,5 +40,6 @@ COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 ENV PORT=3000
+# ENV HOSTNAME=0.0.0.0
 
-CMD ["server.js"]
+CMD ["node", "server.js"]
