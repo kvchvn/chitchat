@@ -1,5 +1,4 @@
 import { withSentryConfig } from '@sentry/nextjs';
-import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
@@ -14,7 +13,7 @@ const config = (phase) => {
   /** @type {import("next").NextConfig} */
   const nextConfig = {
     // Required for build via Dockerfile
-    output: phase === PHASE_DEVELOPMENT_SERVER ? undefined : 'standalone',
+    // output: phase === PHASE_DEVELOPMENT_SERVER ? undefined : 'standalone',
     reactStrictMode: true,
     experimental: {
       serverComponentsExternalPackages: ['pino', 'pino-pretty'],
