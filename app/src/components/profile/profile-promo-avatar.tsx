@@ -3,11 +3,12 @@
 import { Ban, Check, ImageUp } from 'lucide-react';
 import { type ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useUpdateUserOptimisticMutation } from '~/hooks/mutations/use-update-user-optimistic-mutation';
-import { useUploadThing } from '~/hooks/use-upload-thing';
 import { useToast } from '~/hooks/use-toast';
+import { useUploadThing } from '~/hooks/use-upload-thing';
 import { cn, getNameInitials } from '~/lib/utils';
 import { api } from '~/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { InputFile } from '../ui/input';
 import { LoadingIcon } from '../ui/loading-icon';
 
 export const ProfilePromoAvatar = () => {
@@ -93,16 +94,18 @@ export const ProfilePromoAvatar = () => {
       <AvatarFallback className="text-4xl tracking-wider">{nameInitials}</AvatarFallback>
       <span
         className={cn(
-          'absolute h-full w-full transition-[backdrop-filter] duration-200 lg:group-hover:backdrop-blur-md',
+          'absolute h-full w-full transition-[backdrop-filter] duration-200 lg:focus-within:backdrop-blur-md lg:group-hover:backdrop-blur-md',
           isDelay && 'backdrop-blur-md'
         )}>
-        <label
+        <InputFile
+          disabled={isDelay}
+          onChange={handleChange}
           className={cn(
-            'absolute left-0 top-3/4 z-2 h-1/2 w-full cursor-pointer bg-slate-300 backdrop-blur-lg transition-[top,background-color] group-hover:animate-none group-hover:duration-300 dark:bg-slate-800 lg:top-full lg:animate-avatar-upload-btn-bounce lg:backdrop-blur-none lg:hover:bg-slate-400 lg:group-hover:top-1/2 lg:dark:hover:bg-slate-700',
+            'absolute left-0 top-3/4 z-2 h-1/2 w-full cursor-pointer rounded-none bg-slate-300 backdrop-blur-lg transition-[top,background-color] focus-within:animate-none focus-within:duration-300 group-hover:animate-none group-hover:duration-300 dark:bg-slate-800 lg:top-full lg:animate-avatar-upload-btn-bounce lg:backdrop-blur-none lg:focus-within:top-1/2 lg:focus-within:bg-slate-400 lg:hover:bg-slate-400 lg:group-hover:top-1/2 lg:dark:focus-within:bg-slate-700 lg:dark:hover:bg-slate-700',
             isDelay &&
               'top-1/2 animate-none cursor-default bg-slate-400 dark:bg-slate-700 lg:top-1/2 lg:animate-none lg:bg-slate-400 lg:dark:bg-slate-700'
           )}>
-          <input disabled={isDelay} onChange={handleChange} type="file" hidden />
+          {/* <input disabled={isDelay} onChange={handleChange} type="file" className="input-file" /> */}
           <span
             className={cn(
               'absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-8 scale-75 transition-[transform] lg:h-6 lg:w-6 lg:group-hover:-translate-y-1/2 lg:group-hover:scale-100',
@@ -110,7 +113,7 @@ export const ProfilePromoAvatar = () => {
             )}>
             <Icon className="h-full w-full" />
           </span>
-        </label>
+        </InputFile>
       </span>
     </Avatar>
   );

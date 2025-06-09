@@ -160,8 +160,8 @@ export default withUt({
           dark: colors.gray[400],
         },
         ring: {
-          light: colors.slate[900],
-          dark: colors.slate[400],
+          light: colors.neutral[950],
+          dark: colors.neutral[300],
         },
       },
       scale: {

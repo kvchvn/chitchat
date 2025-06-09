@@ -1,5 +1,6 @@
 import '~/styles/globals.css';
 
+import * as Sentry from '@sentry/nextjs';
 import { type Metadata } from 'next';
 
 import { ThemeProvider } from 'next-themes';
@@ -9,8 +10,11 @@ import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
-  title: 'chit-chat',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  title: 'Chit-Chat',
+  icons: [{ rel: 'icon', url: '/favicon.png' }],
+  other: {
+    ...Sentry.getTraceData(),
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

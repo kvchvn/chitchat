@@ -36,14 +36,18 @@ export const UserItem = ({
   const formattedName = isUsersNotes ? NOTES_TITLE : name;
 
   return (
-    <li className={cn('last:border-b-0 lg:border-b', isBlocked && 'opacity-40')}>
+    <li
+      className={cn(
+        'p-[2px] last:border-b-0 hover:bg-primary-hover-light active:bg-primary-active-light dark:hover:bg-primary-hover-dark dark:active:bg-primary-active-dark lg:border-b',
+        {
+          'opacity-40': isBlocked,
+          'bg-primary-hover-light dark:bg-primary-hover-dark': companionId === id,
+        }
+      )}>
       <Link
         href={`/${id}`}
         className={clsx(
-          'relative flex items-center gap-2 px-4 py-4 hover:bg-primary-hover-light active:bg-primary-active-light dark:border-b-slate-800 dark:hover:bg-primary-hover-dark dark:active:bg-primary-active-dark max-lg:rounded-[3rem] lg:px-2',
-          {
-            'bg-primary-hover-light dark:bg-primary-hover-dark': companionId === id,
-          }
+          'focus-ring-default relative flex items-center gap-2 px-4 py-4 max-lg:rounded-[3rem] lg:px-2'
         )}>
         <Avatar className={cn('h-10 w-10', isUsersNotes && 'rounded-none')}>
           <AvatarImage

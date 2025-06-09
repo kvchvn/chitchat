@@ -40,19 +40,20 @@ export const RemoveAccountAlertDialog = ({ children }: Props) => {
       {children}
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure you want to remove your account?</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone and removes all your data in the app including personal
-            information, chats, messages etc.
+            This action cannot be undone and <b>removes all your data</b> in the app including
+            personal information, chats, messages etc.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button disabled={isPending} variant="outline" className="min-w-24">
+            <Button size="sm" disabled={isPending} variant="outline" className="min-w-24">
               Cancel
             </Button>
           </AlertDialogCancel>
           <Button
+            size="sm"
             disabled={isPending}
             variant="destructive"
             className="min-w-24"

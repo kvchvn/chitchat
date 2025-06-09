@@ -52,7 +52,9 @@ export const RemoveMessageDropdownItem = ({ message }: Props) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this message.
+            This will permanently <b>delete this message</b>.
+            <br />
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

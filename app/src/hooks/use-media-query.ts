@@ -8,14 +8,8 @@ const screens = resolvedTailwindConfig.theme.screens;
 export const useMediaQuery = (breakpoint: keyof typeof screens) => {
   const breakpointValue = parseInt(screens[breakpoint]);
 
-  const [screenWidth, setScreenWidth] = useState<number | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    setIsClient(true);
-    setScreenWidth(window.innerWidth);
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -30,6 +24,7 @@ export const useMediaQuery = (breakpoint: keyof typeof screens) => {
     };
 
     window.addEventListener('resize', handleResize);
+    setScreenWidth(window.innerWidth);
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -41,9 +36,9 @@ export const useMediaQuery = (breakpoint: keyof typeof screens) => {
   }, []);
 
   return {
-    isClient,
+    isClient: Boolean(screenWidth),
     breakpointValue,
-    isLessThanBreakpoint: isClient && screenWidth && screenWidth < breakpointValue,
-    isMoreOrEqualThanBreakpoint: isClient && screenWidth && screenWidth >= breakpointValue,
+    isLessThanBreakpoint: screenWidth && screenWidth < breakpointValue,
+    isMoreOrEqualThanBreakpoint: screenWidth && screenWidth >= breakpointValue,
   };
 };

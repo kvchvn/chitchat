@@ -24,9 +24,21 @@ type Props = {
 };
 
 const BlockUserAlertDialogDescription = ({ block }: Pick<Props, 'block'>) => {
-  return block
-    ? 'This action will block this user for you. If you want to cancel this you may do it later.'
-    : 'This action will unblock this user. You will be able to communicate with him/her again.';
+  return (
+    <AlertDialogDescription>
+      {block ? (
+        <>
+          This action will <b>block this user</b> for you.
+          <br /> If you want to cancel this you may do it later.
+        </>
+      ) : (
+        <>
+          This action will <b>unblock this user</b>.
+          <br /> You will be able to communicate with him again.
+        </>
+      )}
+    </AlertDialogDescription>
+  );
 };
 
 export const BlockUserDropdownItem = ({ block }: Props) => {
@@ -55,10 +67,9 @@ export const BlockUserDropdownItem = ({ block }: Props) => {
           triggerRef.current?.click();
         }}
         className={cn(
-          block &&
-            'text-error-light hover:text-error-light focus:text-error-light dark:text-error-dark dark:hover:text-error-dark dark:focus:text-error-dark',
-          !block &&
-            'text-success-light hover:text-success-hover-light focus:text-success-light dark:text-success-dark dark:hover:text-success-hover-dark dark:focus:text-success-dark'
+          block
+            ? 'text-error-light dark:text-error-dark'
+            : 'text-success-light dark:text-success-dark'
         )}>
         {block ? (
           <>
@@ -76,9 +87,7 @@ export const BlockUserDropdownItem = ({ block }: Props) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            <BlockUserAlertDialogDescription block={block} />
-          </AlertDialogDescription>
+          <BlockUserAlertDialogDescription block={block} />
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>

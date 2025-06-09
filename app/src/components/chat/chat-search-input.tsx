@@ -13,7 +13,9 @@ type Props = {
 };
 
 export const ChatSearchInput = ({ areSearchResultsFetching, fetchSearchResult }: Props) => {
-  const { searchQuery, setSearchQuery, resetActiveSearchMessageId } = useStore();
+  const searchQuery = useStore.use.searchQuery();
+  const setSearchQuery = useStore.use.setSearchQuery();
+  const resetActiveSearchMessageId = useStore.use.resetActiveSearchMessageId();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
