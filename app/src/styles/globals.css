@@ -19,7 +19,7 @@
   h4,
   h5,
   h6 {
-    @apply font-title font-semibold;
+    @apply font-sans font-semibold;
   }
 
   h1 {

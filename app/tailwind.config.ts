@@ -14,7 +14,7 @@ export default withUt({
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-jbmono)'],
-        title: ['var(--font-poppins)'],
+        title: ['var(--font-montserrat)'],
       },
       screens: {
         xs: '480px',
