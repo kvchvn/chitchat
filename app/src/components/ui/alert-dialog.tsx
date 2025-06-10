@@ -44,7 +44,11 @@ const AlertDialogContent = React.forwardRef<
 
   return (
     <AlertDialogPortal>
-      <AlertDialogOverlay onClick={handleOverlayClick} className="backdrop-blur-[1px]" />
+      <AlertDialogOverlay
+        onClick={handleOverlayClick}
+        onDoubleClick={handleOverlayClick}
+        className="backdrop-blur-[1px]"
+      />
       <AlertDialogPrimitive.Content
         ref={ref}
         className={cn(

@@ -34,7 +34,7 @@ export default async function ChatPage(props: { params: Promise<{ chatSlug: stri
 
   return (
     <ChatContainer className="flex-col items-start justify-stretch">
-      <header className="relative flex min-h-12 w-full items-center gap-2 border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-[calc(100%-8px)] after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
+      <header className="relative z-[1] flex min-h-12 w-full items-center gap-2 border-b border-slate-300 py-2 after:absolute after:left-0 after:top-full after:z-3 after:h-10 after:w-[calc(100%-8px)] after:translate-y-2 after:bg-gradient-to-b after:from-background-light after:to-transparent dark:after:from-background-dark">
         <Avatar className={cn('h-8 w-8 lg:hidden', isUsersNotes && 'rounded-none')}>
           <AvatarImage
             src={isUsersNotes ? '/svg/bookmark.svg' : (companion.image ?? undefined)}

@@ -80,7 +80,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         behavior: 'smooth',
       });
     }
-  }, [latestTodayMessage?.id, userId]);
+  }, [latestTodayMessage?.id, userId, latestTodayMessage?.senderId]);
 
   useLayoutEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat
@@ -121,7 +121,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className="focus-ring-default scrollbar-stable messages-list-container relative my-2 w-[calc(100%+8px)] max-w-full grow overflow-y-auto overflow-x-hidden pr-[8px] scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px]">
+          className="focus-ring-default scrollbar-stable messages-list-container relative my-2 w-[calc(100%+8px)] max-w-full grow overflow-y-auto overflow-x-hidden pr-0 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] md:pr-[8px]">
           <div className="flex min-h-full w-full flex-col justify-end pt-10">
             {messagesEntries.map(([date, messages]) => (
               <Fragment key={date}>

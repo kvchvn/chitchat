@@ -10,8 +10,8 @@ export const ChatBlock = ({ byCurrentUser }: Props) => {
       <TriangleAlert className="shrink-0" />
       <p className="text-balance">
         {byCurrentUser
-          ? "You've blocked the user. To send a message you must unblock him/her at first."
-          : 'You are blocked by the user and cannot send any messages.'}
+          ? "You've blocked the user. To send a message you should unblock him at first."
+          : 'You have been blocked by the user and cannot send any message.'}
       </p>
     </div>
   );

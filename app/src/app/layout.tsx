@@ -1,12 +1,12 @@
 import '~/styles/globals.css';
 
 import * as Sentry from '@sentry/nextjs';
-import { type Metadata } from 'next';
+import { type Metadata, type Viewport } from 'next';
 
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '~/components/ui/toaster';
 import { cn } from '~/lib/utils';
-import { inter, jetBransMono, poppins } from '~/styles/fonts/font';
+import { inter, jetBransMono } from '~/styles/fonts/font';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
@@ -17,6 +17,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
@@ -25,8 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       className={cn(
         'h-dvh overflow-x-hidden scrollbar-thin scrollbar-track-gray-300 scrollbar-thumb-gray-400 [&.dark]:scrollbar-track-gray-800 [&.dark]:scrollbar-thumb-gray-950',
         inter.variable,
-        jetBransMono.variable,
-        poppins.variable
+        jetBransMono.variable
       )}>
       <body className="flex min-h-dvh flex-col items-stretch">
         <TRPCReactProvider>
