@@ -80,7 +80,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
         behavior: 'smooth',
       });
     }
-  }, [latestTodayMessage?.id, userId]);
+  }, [latestTodayMessage?.id, userId, latestTodayMessage?.senderId]);
 
   useLayoutEffect(() => {
     // initial scroll to the freshest unread message or to the bottom of the chat
