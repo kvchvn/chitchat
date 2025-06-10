@@ -71,7 +71,7 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
               onDoubleClick={message.senderId !== userId ? handleDoubleClick : undefined}
               ref={containerRef}
               className={cn(
-                'message-container relative flex w-fit min-w-32 max-w-[80%] cursor-pointer flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6',
+                'message-container relative flex w-fit min-w-32 max-w-[65%] cursor-pointer flex-col gap-2 whitespace-pre-line break-words rounded-3xl border py-1 leading-6 md:max-w-[80%]',
                 {
                   'border-primary-hover-light bg-primary-light dark:border-primary-hover-dark dark:bg-primary-dark':
                     message.senderId === userId,

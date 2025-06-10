@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Save } from 'lucide-react';
 import { type Session } from 'next-auth';
-import { PrefetchKind } from 'next/dist/client/components/router-reducer/router-reducer-types';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -121,9 +120,6 @@ export const AuthUsernameForm = ({ user }: Props) => {
           )}
         />
         <Button
-          onMouseEnter={() => {
-            router.prefetch(ROUTES.signInWelcome, { kind: PrefetchKind.FULL });
-          }}
           disabled={
             isPending ||
             isSuccess ||

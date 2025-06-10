@@ -1,5 +1,6 @@
 import { Check, SendHorizonal } from 'lucide-react';
 import {
+  type FocusEventHandler,
   type FormEventHandler,
   type KeyboardEventHandler,
   useEffect,
@@ -51,6 +52,10 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
     onMutateSideEffect: onEditMessageSideEffect,
   });
 
+  const handleFocus: FocusEventHandler<HTMLTextAreaElement> = (e) => {
+    e.target.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
@@ -79,7 +84,12 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
 
   const handleKeyDown: KeyboardEventHandler<HTMLFormElement> = (e) => {
     if (e.code === 'Enter') {
-      if (e.ctrlKey || e.shiftKey) {
+      if (e.shiftKey) {
+        // Move to the next line
+        return;
+      }
+
+      if (e.ctrlKey) {
         setMessage((prevMessage) => `${prevMessage}\n`);
       } else {
         handleSubmit(e);
@@ -114,6 +124,7 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
         name={TEXTAREA_NAME}
         className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
         value={message}
+        onFocus={handleFocus}
         placeholder="Type your message..."
         maxRows={8}
         onChange={(e) => setMessage(e.target.value)}

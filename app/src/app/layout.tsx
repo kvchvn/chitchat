@@ -1,7 +1,7 @@
 import '~/styles/globals.css';
 
 import * as Sentry from '@sentry/nextjs';
-import { type Metadata } from 'next';
+import { type Metadata, type Viewport } from 'next';
 
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '~/components/ui/toaster';
@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   other: {
     ...Sentry.getTraceData(),
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
