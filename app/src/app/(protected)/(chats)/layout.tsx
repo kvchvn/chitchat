@@ -40,7 +40,7 @@ export default async function ChatsLayout({ children }: React.PropsWithChildren)
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={RESIZABLE_GROUP_ID}
-        className="p-[2px] pt-2 lg:pt-6">
+        className="max-h-[calc(100dvh-4.5rem)] p-[2px] pt-2 lg:pt-6">
         <ResizablePanel
           defaultSize={defaultResizableLayout?.[0] ?? SIDEBAR_SIZE_PERCENT}
           maxSize={SIDEBAR_SIZE_PERCENT}
