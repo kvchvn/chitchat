@@ -18,7 +18,7 @@ export default function SignInErrorPage({
 
     return (
       <>
-        <h2>{searchParams.error}</h2>
+        <h2>Error</h2>
         <p className="text-sm">{errorDescription}</p>
         <div className="flex w-full justify-center gap-2 self-center max-[400px]:flex-col max-[400px]:gap-3">
           <Button asChild className="w-full xs:w-auto">
