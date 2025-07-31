@@ -44,7 +44,7 @@ export const messagesRouter = createTRPCRouter({
         })
         .returning();
 
-      if (newMessage) {
+      if (newMessage && input.senderId !== input.receiverId) {
         ee.emit('event', {
           action: 'onSendMessage',
           eventReceiverId: newMessage.receiverId,
