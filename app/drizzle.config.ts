@@ -1,13 +1,16 @@
-import { type Config } from "drizzle-kit";
+import dotenv from 'dotenv';
+import { type Config } from 'drizzle-kit';
 
-import { env } from "~/env";
+dotenv.config({
+  path: process.env.NODE_ENV === 'development' ? '.env.development.local' : '.env.production.local',
+});
 
 export default {
-  schema: "./src/server/db/schema/*",
-  dialect: "postgresql",
+  schema: './src/server/db/schema/*',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: process.env.DATABASE_URL ?? '',
   },
-  tablesFilter: ["chitchat-v2_*"],
-  out: "./drizzle/migrations",
+  tablesFilter: ['chitchat-v2_*'],
+  out: './drizzle/migrations',
 } satisfies Config;
