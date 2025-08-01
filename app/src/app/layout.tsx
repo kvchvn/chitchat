@@ -29,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       suppressHydrationWarning
       className={cn(
-        'h-dvh overflow-x-hidden scrollbar-thin scrollbar-track-gray-300 scrollbar-thumb-gray-400 [&.dark]:scrollbar-track-gray-800 [&.dark]:scrollbar-thumb-gray-950',
+        'h-dvh overflow-x-hidden scrollbar-thin scrollbar-track-gray-300 scrollbar-thumb-gray-400 [&.dark]:scrollbar-track-gray-800 [&.dark]:scrollbar-thumb-gray-500',
         inter.variable,
         jetBransMono.variable
       )}>

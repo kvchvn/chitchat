@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_messages" ALTER COLUMN "text" SET DATA TYPE varchar(200);
