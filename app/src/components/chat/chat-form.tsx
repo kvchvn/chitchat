@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { Button } from '~/components/ui/button';
 import { Textarea } from '~/components/ui/textarea';
+import { MESSAGE_TEXT_MAX_LENGTH } from '~/constants/global';
 import { useEditMessageOptimisticMutation } from '~/hooks/mutations/use-edit-message-optimistic-mutation';
 import { useSendMessageOptimisticMutation } from '~/hooks/mutations/use-send-message-optimistic-mutation';
 import { useCompanionId } from '~/hooks/use-companion-id';
@@ -16,6 +17,7 @@ import { generateChatDateKey } from '~/lib/utils';
 import { useStore } from '~/store/store';
 import { useChatId } from '../contexts/chat-id-provider';
 import { useUserId } from '../contexts/user-id-provider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 type Props = {
   onFormSubmitSideEffect: () => void;
@@ -29,6 +31,7 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
   const chatId = useChatId();
 
   const [message, setMessage] = useState('');
+  const trimmedMessage = message.trim();
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const messageToEdit = useStore.use.messageToEdit();
@@ -58,8 +61,6 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-
-    const trimmedMessage = message.trim();
 
     if (!trimmedMessage) {
       return;
@@ -115,27 +116,37 @@ export const ChatForm = ({ onFormSubmitSideEffect }: Props) => {
   }, [messageToEdit]);
 
   return (
-    <form
-      ref={formRef}
-      onKeyDown={handleKeyDown}
-      onSubmit={handleSubmit}
-      className="relative mt-auto flex w-full gap-4 border-t border-slate-300 pt-2 before:absolute before:bottom-[calc(100%+6px)] before:left-0 before:z-3 before:h-10 before:w-[calc(100%-8px)] before:-translate-y-[2px] before:bg-gradient-to-t before:from-background-light before:to-transparent dark:before:from-background-dark">
-      <Textarea
-        name={TEXTAREA_NAME}
-        className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
-        value={message}
-        onFocus={handleFocus}
-        placeholder="Type your message..."
-        maxRows={8}
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <Button
-        type="submit"
-        size="icon-lg"
-        disabled={!message || messageToEdit?.text === message}
-        className="shrink-0 rounded-full">
-        {messageToEdit ? <Check /> : <SendHorizonal />}
-      </Button>
-    </form>
+    <TooltipProvider>
+      <Tooltip open={Boolean(message)}>
+        <TooltipContent align="start" className="bg-slate-300 dark:bg-slate-950">
+          <b>{MESSAGE_TEXT_MAX_LENGTH - message.length}</b>/{MESSAGE_TEXT_MAX_LENGTH}
+        </TooltipContent>
+        <TooltipTrigger asChild>
+          <form
+            ref={formRef}
+            onKeyDown={handleKeyDown}
+            onSubmit={handleSubmit}
+            className="relative mt-auto flex w-full gap-4 border-t border-slate-300 pt-2 before:absolute before:bottom-[calc(100%+6px)] before:left-0 before:z-3 before:h-10 before:w-[calc(100%-8px)] before:-translate-y-[2px] before:bg-gradient-to-t before:from-background-light before:to-transparent dark:before:from-background-dark">
+            <Textarea
+              name={TEXTAREA_NAME}
+              className="w-full resize-none bg-slate-100 p-2 scrollbar scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg scrollbar-w-[4px] dark:bg-slate-700"
+              value={message}
+              onFocus={handleFocus}
+              placeholder="Type your message..."
+              maxRows={8}
+              maxLength={MESSAGE_TEXT_MAX_LENGTH}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <Button
+              type="submit"
+              size="icon-lg"
+              disabled={!message || messageToEdit?.text === message}
+              className="shrink-0 rounded-full">
+              {messageToEdit ? <Check /> : <SendHorizonal />}
+            </Button>
+          </form>
+        </TooltipTrigger>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { boolean, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { MESSAGE_TEXT_MAX_LENGTH } from '~/constants/global';
 import { createTable } from '../table-creator';
 import { chats } from './chats';
 import { users } from './users';
@@ -16,7 +17,7 @@ export const messages = createTable('messages', {
   receiverId: varchar('receiver_id', { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  text: varchar('text', { length: 255 }).notNull(),
+  text: varchar('text', { length: MESSAGE_TEXT_MAX_LENGTH }).notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
   isRead: boolean('is_read').notNull().default(false),
