@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { Button } from '~/components/ui/button';
 import { ROUTES } from '~/constants/routes';
+import { env } from '~/env';
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/trpc/server';
 
@@ -27,8 +28,8 @@ export default async function SignInWelcomePage() {
         <p className="px-4">
           If you have any questions or issues with the app, you can reply to our email:
         </p>
-        <Link href="mailto:chitchat.app.2024@gmail.com" className="link mt-2">
-          chitchat.app.2024@gmail.com
+        <Link href={`mailto:${env.NEXT_PUBLIC_SUPPORT_EMAIL}`} className="link mt-2">
+          {env.NEXT_PUBLIC_SUPPORT_EMAIL}
         </Link>
       </div>
       <div className="mt-8 flex w-full justify-center gap-3 max-xs:flex-col xs:mt-4">

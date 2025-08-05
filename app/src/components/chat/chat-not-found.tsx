@@ -6,7 +6,7 @@ export const ChatNotFound = () => {
     <ChatContainer>
       <div className="flex max-w-60 flex-col items-center gap-2 text-center">
         <PackageOpen className="h-24 w-24" strokeWidth={0.5} />
-        <p>To communicate with somebody, choose a user from the chat list</p>
+        <p>To communicate with somebody, choose a user from the chats list</p>
       </div>
     </ChatContainer>
   );

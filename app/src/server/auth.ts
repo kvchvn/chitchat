@@ -2,10 +2,12 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { and, eq, lt } from 'drizzle-orm';
 import { getServerSession, type DefaultSession, type NextAuthOptions } from 'next-auth';
 import { type Adapter } from 'next-auth/adapters';
-import FacebookProvider from 'next-auth/providers/facebook';
+import EmailProvider from 'next-auth/providers/email';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import YandexProvider from 'next-auth/providers/yandex';
+import { Resend } from 'resend';
+import { MagicLinkEmailTemplate } from '~/components/auth/magic-link-email-template';
 import { ROUTES } from '~/constants/routes';
 
 import { env } from '~/env';
@@ -72,10 +74,11 @@ export const authOptions: NextAuthOptions = {
     signIn: ROUTES.signIn,
     error: ROUTES.signInError,
     newUser: ROUTES.signInWelcome,
+    verifyRequest: ROUTES.verifyRequest,
   },
   session: {
-    // 12 hours
-    maxAge: 12 * 60 * 60,
+    // 48 hours
+    maxAge: 48 * 60 * 60,
     // 1 hour
     updateAge: 60 * 60,
   },
@@ -98,9 +101,29 @@ export const authOptions: NextAuthOptions = {
       clientId: env.YANDEX_ID,
       clientSecret: env.YANDEX_SECRET,
     }),
-    FacebookProvider({
-      clientId: env.FACEBOOK_ID,
-      clientSecret: env.FACEBOOK_SECRET,
+    EmailProvider({
+      server: env.EMAIL_SERVER,
+      from: env.EMAIL_FROM,
+      // 24h
+      maxAge: 24 * 60 * 60,
+      sendVerificationRequest: async ({ identifier, url }) => {
+        try {
+          const resend = new Resend(env.RESEND_API_KEY);
+
+          const { error } = await resend.emails.send({
+            from: 'Chit-Chat <onboarding@resend.dev>',
+            to: [identifier],
+            subject: 'Sign-in confirmation link',
+            react: MagicLinkEmailTemplate({ magicLink: url, expiryTimeText: '24 hours' }),
+          });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+        } catch (err) {
+          log.error(err);
+        }
+      },
     }),
     /**
      * ...add more providers here.
