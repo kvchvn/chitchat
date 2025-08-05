@@ -20,12 +20,16 @@ export const env = createEnv({
     YANDEX_ID: z.string(),
     YANDEX_SECRET: z.string(),
 
-    FACEBOOK_ID: z.string(),
-    FACEBOOK_SECRET: z.string(),
+    EMAIL_SERVER: z.string(),
+    EMAIL_FROM: z.string().email(),
+
+    RESEND_API_KEY: z.string(),
 
     UPLOADTHING_TOKEN: z.string(),
 
     SENTRY_AUTH_TOKEN: z.string(),
+
+    APP_URL: z.string().url(),
   },
 
   /**
@@ -35,6 +39,9 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_SENTRY_DSN: z.string().url(),
+    NEXT_PUBLIC_EMAIL_FROM: z.string().email(),
+    NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_SUPPORT_EMAIL: z.string().email(),
   },
 
   /**
@@ -52,11 +59,17 @@ export const env = createEnv({
     GOOGLE_SECRET: process.env.GOOGLE_SECRET,
     YANDEX_ID: process.env.YANDEX_ID,
     YANDEX_SECRET: process.env.YANDEX_SECRET,
-    FACEBOOK_ID: process.env.FACEBOOK_ID,
-    FACEBOOK_SECRET: process.env.FACEBOOK_SECRET,
+    EMAIL_SERVER: process.env.EMAIL_SERVER,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    APP_URL: process.env.APP_URL,
+
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_EMAIL_FROM: process.env.NEXT_PUBLIC_EMAIL_FROM,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SUPPORT_EMAIL: process.env.NEXT_PUBLIC_SUPPORT_EMAIL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

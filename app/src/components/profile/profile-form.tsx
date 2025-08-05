@@ -5,6 +5,7 @@ import { Ban, PencilLine, Save } from 'lucide-react';
 import { useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { env } from '~/env';
 import { useUpdateUserOptimisticMutation } from '~/hooks/mutations/use-update-user-optimistic-mutation';
 import { useCheckNameUniqueness } from '~/hooks/use-check-name-uniqueness';
 import { type User } from '~/server/db/schema/users';
@@ -55,7 +56,7 @@ export const PROFILE_FORM_FIELDS: FormField[] = [
   {
     name: 'id',
     labelText: 'Your ID',
-    descriptionText: `You can use this ID to share link to your chat with somebody, i.e. https://<current-url>/<ID>`,
+    descriptionText: `You can use this ID to share link to your chat with somebody, i.e. ${env.NEXT_PUBLIC_APP_URL}/<ID>`,
     readOnly: true,
   },
   {
