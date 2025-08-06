@@ -1,4 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import * as Sentry from '@sentry/nextjs';
 import { and, eq, lt } from 'drizzle-orm';
 import { getServerSession, type DefaultSession, type NextAuthOptions } from 'next-auth';
 import { type Adapter } from 'next-auth/adapters';
@@ -64,7 +65,14 @@ export const authOptions: NextAuthOptions = {
           .returning();
         log.info({ expiredSessions }, `${expiredSessions.length} sessions were cleared`);
       } catch (err) {
-        log.error(err);
+        Sentry.captureException(err, {
+          level: 'error',
+          user: { id: user.id, username: user.name ?? undefined },
+          extra: {
+            method: 'signIn',
+            description: 'clearing expired sessions failed',
+          },
+        });
       }
 
       return true;
@@ -118,10 +126,24 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (error) {
-            throw new Error(error.message);
+            Sentry.captureException(error, {
+              level: 'error',
+              user: { email: identifier },
+              extra: {
+                method: 'sendVerificationRequest',
+                description: 'sending verification request (via Resend) failed',
+              },
+            });
           }
         } catch (err) {
-          log.error(err);
+          Sentry.captureException(err, {
+            level: 'error',
+            user: { email: identifier },
+            extra: {
+              method: 'sendVerificationRequest',
+              description: 'sending verification request failed',
+            },
+          });
         }
       },
     }),
