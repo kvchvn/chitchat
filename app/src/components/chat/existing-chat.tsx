@@ -128,7 +128,7 @@ export const ExistingChat = ({ messagesMap, blockedBy }: Props) => {
                 <span className="messages-list-date mx-auto block w-fit rounded-3xl bg-accent-light px-3 py-1 font-mono text-xs dark:bg-accent-dark">
                   {date}
                 </span>
-                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto overflow-x-hidden px-1 py-8">
+                <ul className="flex shrink-0 flex-col justify-end gap-2 overflow-y-auto overflow-x-hidden px-1 py-12">
                   {messages.map((message) => (
                     <MessageContainerMemo
                       key={`${message.id}-${message.text}`}

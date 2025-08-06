@@ -20,7 +20,7 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
     { children, unreadMessages, message, isEditing, isBlockedChat, isActiveSearchMessage },
     firstUnreadMessageRef
   ) => {
-    const { ref: inViewRef, inView } = useInView({ threshold: 1, delay: 100 });
+    const { ref: inViewRef, inView, entry } = useInView({ threshold: 1, delay: 100 });
     const containerRef = useRef<HTMLDivElement | null>(null);
     const userId = useUserId();
 
@@ -45,6 +45,13 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
       }
     }, [message.isRead, message.id, unreadMessages]);
 
+    useEffect(() => {
+      // scroll to active message in search
+      if (isActiveSearchMessage) {
+        entry?.target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, [isActiveSearchMessage, entry?.target]);
+
     return (
       <li
         ref={(el) => {
@@ -60,7 +67,7 @@ const MessageContainer = forwardRef<HTMLLIElement | null, Props>(
             firstUnreadMessageRef.current = el;
           }
         }}
-        className={cn('message group flex w-full items-end justify-end gap-1', {
+        className={cn('message group flex w-full scroll-mt-12 items-end justify-end gap-1', {
           'self-message self-end': message.senderId === userId,
           'companion-message flex-row-reverse': message.senderId !== userId,
         })}>
