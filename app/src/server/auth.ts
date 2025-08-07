@@ -7,14 +7,17 @@ import EmailProvider from 'next-auth/providers/email';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import YandexProvider from 'next-auth/providers/yandex';
-import { Resend } from 'resend';
-import { MagicLinkEmailTemplate } from '~/components/auth/magic-link-email-template';
+import nodemailer from 'nodemailer';
 import { ROUTES } from '~/constants/routes';
 
 import { env } from '~/env';
 import { logger } from '~/lib/logger';
 import { db } from '~/server/db';
 import { accounts, sessions, verificationTokens } from '~/server/db/schema/auth';
+import {
+  ConfirmationLinkHTMLTemplate,
+  ConfirmationLinkTextTemplate,
+} from './confirmation-link-templates';
 import { users } from './db/schema/users';
 
 const log = logger.child({ module: 'auth.ts' });
@@ -110,40 +113,59 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.YANDEX_SECRET,
     }),
     EmailProvider({
-      server: env.EMAIL_SERVER,
+      server: {
+        host: env.EMAIL_HOST,
+        port: Number(env.EMAIL_PORT),
+        auth: {
+          user: env.EMAIL_FROM,
+          pass: env.GMAIL_APP_PASSWORD,
+        },
+      },
       from: env.EMAIL_FROM,
       // 24h
       maxAge: 24 * 60 * 60,
       sendVerificationRequest: async ({ identifier, url }) => {
-        try {
-          const resend = new Resend(env.RESEND_API_KEY);
+        const transporter = nodemailer.createTransport({
+          host: env.EMAIL_HOST,
+          port: Number(env.EMAIL_PORT),
+          auth: {
+            user: env.EMAIL_FROM,
+            pass: env.GMAIL_APP_PASSWORD,
+          },
+        });
 
-          const { error } = await resend.emails.send({
-            from: 'Chit-Chat <onboarding@resend.dev>',
-            to: [identifier],
+        try {
+          const expiredIn = '24 hours';
+
+          const res = await transporter.sendMail({
+            from: env.EMAIL_FROM,
+            to: identifier,
             subject: 'Sign-in confirmation link',
-            react: MagicLinkEmailTemplate({ magicLink: url, expiryTimeText: '24 hours' }),
+            attachments: [
+              {
+                filename: 'logo.png',
+                path: './public/favicon.png',
+                cid: 'favicon',
+              },
+            ],
+            html: ConfirmationLinkHTMLTemplate({ url, expiredIn }),
+            text: ConfirmationLinkTextTemplate({ url, expiredIn }),
           });
 
-          if (error) {
-            Sentry.captureException(error, {
-              level: 'error',
-              user: { email: identifier },
-              extra: {
-                method: 'sendVerificationRequest',
-                description: 'sending verification request (via Resend) failed',
-              },
-            });
+          if (res.rejected.length) {
+            throw new Error(`Email(s) (${res.rejected.join(', ')}) could not be sent`);
           }
-        } catch (err) {
-          Sentry.captureException(err, {
+        } catch (error) {
+          console.error({ error });
+          Sentry.captureException(error, {
             level: 'error',
             user: { email: identifier },
             extra: {
               method: 'sendVerificationRequest',
-              description: 'sending verification request failed',
+              description: 'sending verification request (via Gmail) failed',
             },
           });
+          throw error;
         }
       },
     }),
