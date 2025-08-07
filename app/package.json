@@ -48,6 +48,7 @@
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
     "next-themes": "^0.3.0",
+    "nodemailer": "^7.0.5",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "postcss-nested": "^6.2.0",
@@ -59,7 +60,6 @@
     "react-intersection-observer": "^9.15.1",
     "react-resizable-panels": "^2.1.7",
     "react-textarea-autosize": "^8.5.7",
-    "resend": "^4.7.0",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.5.3",
@@ -72,6 +72,7 @@
   "devDependencies": {
     "@types/eslint": "^8.56.10",
     "@types/node": "^20.14.10",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
