@@ -1,7 +1,9 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
 import { Button } from '~/components/ui/button';
 import { ROUTES } from '~/constants/routes';
 import { getAuthErrorDescription } from '~/lib/auth-errors';
@@ -11,6 +13,12 @@ export default function SignInErrorPage({
 }: {
   searchParams: Record<string, string>;
 }) {
+  useEffect(() => {
+    Sentry.captureException('Sign-in error', {
+      extra: searchParams,
+    });
+  }, [searchParams]);
+
   if (!('error' in searchParams)) {
     redirect(ROUTES.signIn);
   } else {
