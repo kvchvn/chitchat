@@ -10,7 +10,7 @@ export const users = createTable('user', {
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: varchar('name', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull().default(''),
   email: varchar('email', { length: 255 }).notNull().unique(),
   emailVerified: timestamp('email_verified', {
     mode: 'date',

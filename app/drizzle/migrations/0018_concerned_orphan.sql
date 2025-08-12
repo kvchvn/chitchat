@@ -1,0 +1,1 @@
+ALTER TABLE "chitchat-v2_user" ALTER COLUMN "name" SET DEFAULT '';

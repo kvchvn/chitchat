@@ -27,6 +27,10 @@ export const useCheckNameUniqueness = <FormSchema extends Record<string, string>
   );
 
   const runChecking = useCallback(async () => {
+    if (!form.getValues(inputName)) {
+      return;
+    }
+
     form.clearErrors(inputName);
     const isValid = await form.trigger();
 
@@ -34,17 +38,15 @@ export const useCheckNameUniqueness = <FormSchema extends Record<string, string>
       clearTimeout(timerRef.current);
     }
 
-    if (form.getValues(inputName)) {
-      timerRef.current = setTimeout(async () => {
-        if (isValid) {
-          const res = await checkNameUniqueness();
+    timerRef.current = setTimeout(async () => {
+      if (isValid) {
+        const res = await checkNameUniqueness();
 
-          if (res.data && !res.data.isUniqueName) {
-            form.setError(inputName, { message: ERROR_MESSAGE });
-          }
+        if (res.data && !res.data.isUniqueName) {
+          form.setError(inputName, { message: ERROR_MESSAGE });
         }
-      }, TIMEOUT_MS);
-    }
+      }
+    }, TIMEOUT_MS);
   }, [checkNameUniqueness, form, inputName]);
 
   return {
