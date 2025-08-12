@@ -62,11 +62,24 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user }) {
       try {
         // because next-auth doesn't do it for you
-        const expiredSessions = await db
+        const clearExpiredSessionsPromise = db
           .delete(sessions)
-          .where(and(eq(sessions.userId, user.id), lt(sessions.expires, new Date())))
-          .returning();
-        log.info({ expiredSessions }, `${expiredSessions.length} sessions were cleared`);
+          .where(and(eq(sessions.userId, user.id), lt(sessions.expires, new Date())));
+
+        const clearExpiredVerificationTokensPromise = db.delete(verificationTokens).where(
+          user.email
+            ? and(
+                eq(verificationTokens.identifier, user.email),
+                lt(verificationTokens.expires, new Date())
+              )
+            : // remove all expired tokens
+              lt(verificationTokens.expires, new Date())
+        );
+
+        await Promise.allSettled([
+          clearExpiredSessionsPromise,
+          clearExpiredVerificationTokensPromise,
+        ]);
       } catch (err) {
         Sentry.captureException(err, {
           level: 'error',
@@ -84,7 +97,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: ROUTES.signIn,
     error: ROUTES.signInError,
-    newUser: ROUTES.signInWelcome,
+    newUser: ROUTES.signInUsername,
     verifyRequest: ROUTES.verifyRequest,
   },
   session: {
